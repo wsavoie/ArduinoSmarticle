@@ -1,10 +1,10 @@
 #include <Servo.h>
 #define myabs(n) ((n) < 0 ? -(n) : (n))
 //pin definitions
-#define servo1 9 	//D9
-#define servo2 10 	//D10
+#define servo1 5 	//D9
+#define servo2 6 	//D10
 #define mic     A0       //D3
-#define stressPin A2	//A2
+#define stressPin A1	//A2
 #define led 13   	//13 SCK
 
 #define stressMoveThresh 2
