@@ -82,14 +82,15 @@ void loop()
 	{
 	  getRange(midPtCross);                
 	}
-	light(ledVal);
+	//light(ledVal);
         
 	delay(del);
 }
 
 void currentRead(uint16_t meanCurrVal)
 {
-	if(meanCurrVal<5)//make magic number into meaningful value!!
+  static bool v = true;
+	if(meanCurrVal<50)//make magic number into meaningful value!!
 	{
 		stressCount = 0;
 	}
@@ -98,9 +99,11 @@ void currentRead(uint16_t meanCurrVal)
 		stressCount++;
 		if(stressCount>=stressMoveThresh && rangeType!=6 && rangeType!=7)
 		{
-                        ledVal=true;
-			(stress > 1 ? stress=0 : (stress++));
+                        v=!v;
+                        light(v);
+			(stress > 2 ? stress=0 : (stress++));
 			moveMotor(stress);
+                        _delay_ms(del);
 		}	
 		delay(del);
 	}
@@ -167,12 +170,12 @@ switch (pos)
           S2.writeMicroseconds(1500 - 300);
           break;
     case 3:
-          S1.writeMicroseconds(1500 + 900);
-          S2.writeMicroseconds(1500 - 900);
-          break;
-    case 4:
           S1.writeMicroseconds(1500 - 900);
           S2.writeMicroseconds(1500 + 900);
+          break;
+    case 4:
+          S1.writeMicroseconds(1500 + 900);
+          S2.writeMicroseconds(1500 - 900);
           break;
     case 5:
           S1.writeMicroseconds(1500 + 900);
@@ -181,19 +184,19 @@ switch (pos)
     case 6:
           S1.writeMicroseconds(maxx * 10 + 600);
           S2.writeMicroseconds((minn) * 10 + 600);
-          _delay_ms(del);
+          _delay_ms(del*2);
     
           S1.writeMicroseconds(maxx * 10 + 600);
           S2.writeMicroseconds((maxx) * 10 + 600);
-          _delay_ms(del);
+          _delay_ms(del*2);
     
           S1.writeMicroseconds(minn * 10 + 600);
           S2.writeMicroseconds((maxx) * 10 + 600);
-          _delay_ms(del);
+          _delay_ms(del*2);
     
           S1.writeMicroseconds(minn * 10 + 600);
           S2.writeMicroseconds((minn) * 10 + 600);
-          
+           _delay_ms(del);
           break;
     case 7:
           //S1.writeMicroseconds(maxx * 10 + 600);
@@ -223,14 +226,15 @@ switch (pos)
           _delay_ms(del);
           S1.writeMicroseconds(maxx * 10 + 600);
           S2.writeMicroseconds((minn) * 10 + 600);
+          //_delay_ms(del/2);
           //S1.writeMicroseconds(maxx * 10 + 600);
           //S2.writeMicroseconds((midd) * 10 + 600);
     	  
           //_delay_ms(del/2);
           break;
     case 8:
-          S1.writeMicroseconds(1500 + 900);
-          S2.writeMicroseconds(1500 - 900);
+          S1.writeMicroseconds(1500);
+          S2.writeMicroseconds(1500);
           break;
   }
 }
