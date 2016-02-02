@@ -7,8 +7,8 @@
 //pin definitions
 #define servo1 5 	//
 #define servo2 6 	//
-#define mic     A6      //
-#define stressPin A7	//
+#define mic     A6      // CHANGE BACK TO a6
+#define stressPin A7	// CHANGE BACK TO a7
 #define led 13   	//13 SCK
 
 #define stressMoveThresh 2
