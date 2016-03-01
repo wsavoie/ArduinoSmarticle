@@ -10,42 +10,118 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[      2016,         73]
-NotebookOptionsPosition[      1740,         59]
-NotebookOutlinePosition[      2082,         74]
-CellTagsIndexPosition[      2039,         71]
+NotebookDataLength[      7992,        263]
+NotebookOptionsPosition[      6980,        222]
+NotebookOutlinePosition[      7324,        237]
+CellTagsIndexPosition[      7281,        234]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
 Notebook[{
-Cell[BoxData[{
- RowBox[{
-  RowBox[{
-   RowBox[{"Vdd", "=", 
-    RowBox[{"{", 
-     RowBox[{"4.2", ",", "4.7"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
-  RowBox[{"(*", 
-   RowBox[{"Vreg", "=", "4.2"}], "*)"}]}], "\n", 
- RowBox[{
-  RowBox[{"Vreg", "=", 
-   RowBox[{"Vdd", "-", "1"}]}], ";"}], "\n", 
- RowBox[{
-  RowBox[{"Vbatt", "=", 
-   RowBox[{"{", 
-    RowBox[{"2.7", ",", "4.2"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{"Rprogmine", "=", "2000"}], ";"}], "\[IndentingNewLine]", 
- RowBox[{
-  RowBox[{
-   RowBox[{"Ireg", "=", 
-    FractionBox["1000", "Rprog"]}], ";"}], 
-  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+
+Cell[CellGroupData[{
+Cell[BoxData[
  RowBox[{
   RowBox[{"(*", 
+   RowBox[{"Package", " ", "Values"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", "\[IndentingNewLine]", 
    RowBox[{
-    RowBox[{"Vrth", "/", "Vreg"}], "="}], "*)"}]}]}], "Input",
+    RowBox[{
+     FractionBox["Ipreg", "Ireg"], "=", "10"}], ";", "\[IndentingNewLine]", 
+    RowBox[{
+     FractionBox["Vpth", "Vreg"], "=", "66.5"}], ";", "\[IndentingNewLine]", 
+    RowBox[{
+     FractionBox["Iterm", "Ireg"], "=", "7.5"}], ";", "\[IndentingNewLine]", 
+    RowBox[{
+     FractionBox["Vrth", "Vreg"], "=", "96.5"}]}], "\[IndentingNewLine]", 
+   "*)"}], "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"Vdd", "=", 
+     RowBox[{"{", 
+      RowBox[{"4.2", ",", "4.7"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"Vreglims", " ", "=", " ", 
+    RowBox[{
+     RowBox[{"(", GridBox[{
+        {
+         RowBox[{"Vdd", "-", "1"}]},
+        {
+         RowBox[{"Vdd", "-", ".3"}]}
+       }], ")"}], "//", "MatrixForm"}]}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Vbatt", "=", 
+     RowBox[{"{", 
+      RowBox[{"2.7", ",", "4.2"}], "}"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Rprogmine", "=", "2000"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"Rprog", "=", "10000"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{"Ireg", "=", 
+    FractionBox["1000", "Rprog"]}], "\[IndentingNewLine]", 
+   "\[IndentingNewLine]", 
+   RowBox[{"(*", 
+    RowBox[{
+     RowBox[{"Vrth", "/", "Vreg"}], "="}], "*)"}]}]}]], "Input",
  CellChangeTimes->{{3.6651384218618283`*^9, 3.665138529618992*^9}, {
-  3.6651386688749566`*^9, 3.6651387100513115`*^9}}],
+  3.6651386688749566`*^9, 3.6651387100513115`*^9}, {3.6651387812913866`*^9, 
+  3.6651388416838408`*^9}, {3.665139050827803*^9, 3.665139066899722*^9}, {
+  3.6651391467722907`*^9, 3.665139356844306*^9}, {3.6651394299804897`*^9, 
+  3.6651394833405414`*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {
+      RowBox[{"(", "\[NoBreak]", 
+       TagBox[GridBox[{
+          {"3.2`"},
+          {"3.7`"}
+         },
+         GridBoxAlignment->{
+          "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, 
+           "Rows" -> {{Baseline}}, "RowsIndexed" -> {}},
+         GridBoxSpacings->{"Columns" -> {
+             Offset[0.27999999999999997`], {
+              Offset[0.5599999999999999]}, 
+             Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+             Offset[0.2], {
+              Offset[0.4]}, 
+             Offset[0.2]}, "RowsIndexed" -> {}}],
+        Column], "\[NoBreak]", ")"}]},
+     {
+      RowBox[{"(", "\[NoBreak]", 
+       TagBox[GridBox[{
+          {"3.9000000000000004`"},
+          {"4.4`"}
+         },
+         GridBoxAlignment->{
+          "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, 
+           "Rows" -> {{Baseline}}, "RowsIndexed" -> {}},
+         GridBoxSpacings->{"Columns" -> {
+             Offset[0.27999999999999997`], {
+              Offset[0.5599999999999999]}, 
+             Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+             Offset[0.2], {
+              Offset[0.4]}, 
+             Offset[0.2]}, "RowsIndexed" -> {}}],
+        Column], "\[NoBreak]", ")"}]}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{
+  3.665139067159737*^9, 3.6651391835653954`*^9, {3.6651394366978736`*^9, 
+   3.6651394968673153`*^9}, 3.6651395402117944`*^9}]
+}, Open  ]],
 
 Cell[BoxData[
  RowBox[{"\[IndentingNewLine]", "\[IndentingNewLine]", 
@@ -55,10 +131,97 @@ Cell[BoxData[
      RowBox[{"(", 
       RowBox[{"Vddmax", "-", "Vpthmin"}], ")"}], " ", "Iregmax"}]}], 
    ";"}]}]], "Input",
- CellChangeTimes->{{3.665138618725088*^9, 3.6651386529550457`*^9}}]
+ CellChangeTimes->{{3.665138618725088*^9, 3.6651386529550457`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.6651393760304036`*^9, 3.665139427965374*^9}}],
+
+Cell[BoxData[
+ TagBox[
+  RowBox[{"(", "\[NoBreak]", GridBox[{
+     {"3.2`", "3.7`"},
+     {"3.9000000000000004`", "4.4`"}
+    },
+    GridBoxAlignment->{
+     "Columns" -> {{Center}}, "ColumnsIndexed" -> {}, "Rows" -> {{Baseline}}, 
+      "RowsIndexed" -> {}},
+    GridBoxSpacings->{"Columns" -> {
+        Offset[0.27999999999999997`], {
+         Offset[0.7]}, 
+        Offset[0.27999999999999997`]}, "ColumnsIndexed" -> {}, "Rows" -> {
+        Offset[0.2], {
+         Offset[0.4]}, 
+        Offset[0.2]}, "RowsIndexed" -> {}}], "\[NoBreak]", ")"}],
+  Function[BoxForm`e$, 
+   MatrixForm[BoxForm`e$]]]], "Output",
+ CellChangeTimes->{{3.6651393966325817`*^9, 3.6651394068481665`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.665139641321577*^9, 3.6651396714823027`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"308.8`", ",", "357.05`"}], "}"}]], "Output",
+ CellChangeTimes->{3.6651396552733755`*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Vrth", "/", "Vreg"}]], "Input",
+ CellChangeTimes->{{3.6651397780733995`*^9, 3.665139782684663*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"96.5`", ",", "96.49999999999999`"}], "}"}]], "Output",
+ CellChangeTimes->{3.665139783560713*^9}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["Vrth"], "Input",
+ CellChangeTimes->{{3.665139784257753*^9, 3.665139797652519*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"308.8`", ",", "357.05`"}], "}"}]], "Output",
+ CellChangeTimes->{{3.6651397876969495`*^9, 3.665139798520569*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Vreg", "=", 
+  RowBox[{"{", 
+   RowBox[{"3.9", ",", "4.4"}], "}"}]}]], "Input",
+ CellChangeTimes->{{3.6651398046239176`*^9, 3.665139837411793*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"3.9`", ",", "4.4`"}], "}"}]], "Output",
+ CellChangeTimes->{{3.665139812025341*^9, 3.6651398378878202`*^9}}]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"Vrth", "=", 
+  RowBox[{"Vreg", "*", ".965"}]}]], "Input",
+ CellChangeTimes->{{3.665139840458967*^9, 3.665139858091976*^9}}],
+
+Cell[BoxData[
+ RowBox[{"{", 
+  RowBox[{"3.7634999999999996`", ",", "4.246`"}], "}"}]], "Output",
+ CellChangeTimes->{3.6651398584729977`*^9}]
+}, Open  ]]
 },
 WindowSize->{778, 886},
-WindowMargins->{{Automatic, 374}, {29, Automatic}},
+WindowMargins->{{Automatic, -1154}, {37, Automatic}},
 FrontEndVersion->"10.0 for Microsoft Windows (64-bit) (July 1, 2014)",
 StyleDefinitions->"Default.nb"
 ]
@@ -73,8 +236,35 @@ CellTagsIndex->{}
 *)
 (*NotebookFileOutline
 Notebook[{
-Cell[558, 20, 866, 27, 190, "Input"],
-Cell[1427, 49, 309, 8, 72, "Input"]
+Cell[CellGroupData[{
+Cell[580, 22, 1768, 46, 375, "Input"],
+Cell[2351, 70, 1951, 52, 143, "Output"]
+}, Open  ]],
+Cell[4317, 125, 309, 8, 72, "Input"],
+Cell[CellGroupData[{
+Cell[4651, 137, 94, 1, 31, "Input"],
+Cell[4748, 140, 682, 18, 56, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5467, 163, 94, 1, 31, "Input"],
+Cell[5564, 166, 128, 3, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[5729, 174, 123, 2, 31, "Input"],
+Cell[5855, 178, 136, 3, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6028, 186, 96, 1, 31, "Input"],
+Cell[6127, 189, 152, 3, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6316, 197, 171, 4, 31, "Input"],
+Cell[6490, 203, 147, 3, 31, "Output"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[6674, 211, 147, 3, 31, "Input"],
+Cell[6824, 216, 140, 3, 31, "Output"]
+}, Open  ]]
 }
 ]
 *)

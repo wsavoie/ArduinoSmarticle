@@ -2432,6 +2432,10 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <part name="C4" library="SparkFun-Capacitors" deviceset="4.7UF-6.3V-10%(0603)" device="0603" value=".1uF"/>
 <part name="GND11" library="SparkFun-Aesthetics" deviceset="GND" device=""/>
 <part name="I2C" library="SparkFun-Connectors" deviceset="M02" device="PTH"/>
+<part name="R5" library="SparkFun-Resistors" deviceset="4.7KOHM-1/10W-1%(0603)" device="" value="10k"/>
+<part name="3.3V5" library="supply2" deviceset="VCC" device="" value="3.3V"/>
+<part name="3.3V6" library="supply2" deviceset="VCC" device="" value="3.3V"/>
+<part name="3.3V7" library="supply2" deviceset="VCC" device="" value="3.3V"/>
 </parts>
 <sheets>
 <sheet>
@@ -2440,13 +2444,13 @@ You are welcome to use this library for commercial purposes. For attribution, we
 </plain>
 <instances>
 <instance part="FRAME1" gate="G$1" x="0" y="0"/>
-<instance part="SOLARCHIP" gate="G$1" x="25.4" y="27.94"/>
-<instance part="C1" gate="G$1" x="10.16" y="30.48"/>
-<instance part="C2" gate="G$1" x="45.72" y="30.48"/>
-<instance part="GND1" gate="1" x="10.16" y="17.78"/>
-<instance part="GND2" gate="1" x="45.72" y="22.86"/>
-<instance part="GND4" gate="1" x="38.1" y="10.16"/>
-<instance part="R2" gate="G$1" x="38.1" y="20.32" rot="R270"/>
+<instance part="SOLARCHIP" gate="G$1" x="27.94" y="27.94"/>
+<instance part="C1" gate="G$1" x="12.7" y="30.48"/>
+<instance part="C2" gate="G$1" x="48.26" y="30.48"/>
+<instance part="GND1" gate="1" x="12.7" y="17.78"/>
+<instance part="GND2" gate="1" x="48.26" y="22.86"/>
+<instance part="GND4" gate="1" x="40.64" y="10.16"/>
+<instance part="R2" gate="G$1" x="40.64" y="20.32" rot="R270"/>
 <instance part="S2" gate="G$1" x="35.56" y="104.14" smashed="yes" rot="R180">
 <attribute name="VALUE" x="38.1" y="111.76" size="1.778" layer="96" rot="R180"/>
 <attribute name="NAME" x="38.1" y="98.298" size="1.778" layer="95" rot="R180"/>
@@ -2469,13 +2473,13 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <instance part="3.3V1" gate="G$1" x="88.9" y="104.14"/>
 <instance part="GND5" gate="1" x="81.28" y="96.52" rot="R270"/>
 <instance part="SUPPLY4" gate="G$1" x="86.36" y="91.44" rot="R180"/>
-<instance part="BATT" gate="G$1" x="60.96" y="38.1" rot="R180"/>
-<instance part="GND6" gate="1" x="53.34" y="22.86"/>
-<instance part="SOLAR1+" gate="G$1" x="5.08" y="53.34" rot="R270"/>
-<instance part="SOLAR2+" gate="G$1" x="15.24" y="53.34" rot="R270"/>
-<instance part="GND3" gate="1" x="35.56" y="55.88" rot="R180"/>
-<instance part="SOLAR1-" gate="1" x="25.4" y="50.8"/>
-<instance part="SOLAR2-" gate="1" x="43.18" y="50.8" rot="R180"/>
+<instance part="BATT" gate="G$1" x="63.5" y="38.1" rot="R180"/>
+<instance part="GND6" gate="1" x="55.88" y="22.86"/>
+<instance part="SOLAR1+" gate="G$1" x="7.62" y="53.34" rot="R270"/>
+<instance part="SOLAR2+" gate="G$1" x="17.78" y="53.34" rot="R270"/>
+<instance part="GND3" gate="1" x="38.1" y="55.88" rot="R180"/>
+<instance part="SOLAR1-" gate="1" x="27.94" y="50.8"/>
+<instance part="SOLAR2-" gate="1" x="45.72" y="50.8" rot="R180"/>
 <instance part="U$1" gate="G$1" x="132.08" y="30.48"/>
 <instance part="SUPPLY1" gate="G$1" x="149.86" y="43.18" smashed="yes" rot="R270">
 <attribute name="VALUE" x="153.416" y="44.196" size="1.778" layer="96"/>
@@ -2492,6 +2496,10 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <instance part="C4" gate="G$1" x="71.12" y="58.42" rot="R180"/>
 <instance part="GND11" gate="1" x="106.68" y="43.18"/>
 <instance part="I2C" gate="G$1" x="160.02" y="93.98" rot="R180"/>
+<instance part="R5" gate="G$1" x="114.3" y="68.58" rot="R180"/>
+<instance part="3.3V5" gate="G$1" x="124.46" y="68.58" rot="R270"/>
+<instance part="3.3V6" gate="G$1" x="66.04" y="68.58" rot="R90"/>
+<instance part="3.3V7" gate="G$1" x="63.5" y="73.66" rot="R90"/>
 </instances>
 <busses>
 </busses>
@@ -2500,20 +2508,20 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <segment>
 <pinref part="C1" gate="G$1" pin="2"/>
 <pinref part="GND1" gate="1" pin="GND"/>
-<wire x1="10.16" y1="27.94" x2="10.16" y2="20.32" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="27.94" x2="12.7" y2="20.32" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="SOLARCHIP" gate="G$1" pin="VSS"/>
 <pinref part="R2" gate="G$1" pin="2"/>
-<wire x1="35.56" y1="15.24" x2="38.1" y2="15.24" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="15.24" x2="40.64" y2="15.24" width="0.1524" layer="91"/>
 <pinref part="GND4" gate="1" pin="GND"/>
-<wire x1="38.1" y1="15.24" x2="38.1" y2="12.7" width="0.1524" layer="91"/>
-<junction x="38.1" y="15.24"/>
+<wire x1="40.64" y1="15.24" x2="40.64" y2="12.7" width="0.1524" layer="91"/>
+<junction x="40.64" y="15.24"/>
 </segment>
 <segment>
 <pinref part="C2" gate="G$1" pin="2"/>
 <pinref part="GND2" gate="1" pin="GND"/>
-<wire x1="45.72" y1="25.4" x2="45.72" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="25.4" x2="48.26" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="MIC" gate="G$1" pin="2"/>
@@ -2534,7 +2542,7 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <segment>
 <pinref part="BATT" gate="G$1" pin="2"/>
 <pinref part="GND6" gate="1" pin="GND"/>
-<wire x1="53.34" y1="25.4" x2="53.34" y2="35.56" width="0.1524" layer="91"/>
+<wire x1="55.88" y1="25.4" x2="55.88" y2="35.56" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U1" gate="G$1" pin="GND@6"/>
@@ -2558,20 +2566,20 @@ You are welcome to use this library for commercial purposes. For attribution, we
 </segment>
 <segment>
 <pinref part="SOLAR1-" gate="1" pin="P"/>
-<wire x1="35.56" y1="50.8" x2="27.94" y2="50.8" width="0.1524" layer="91"/>
-<junction x="35.56" y="50.8"/>
+<wire x1="38.1" y1="50.8" x2="30.48" y2="50.8" width="0.1524" layer="91"/>
+<junction x="38.1" y="50.8"/>
 <pinref part="SOLAR2-" gate="1" pin="P"/>
-<wire x1="40.64" y1="50.8" x2="35.56" y2="50.8" width="0.1524" layer="91"/>
+<wire x1="43.18" y1="50.8" x2="38.1" y2="50.8" width="0.1524" layer="91"/>
 <pinref part="GND3" gate="1" pin="GND"/>
-<wire x1="35.56" y1="50.8" x2="35.56" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="50.8" x2="38.1" y2="53.34" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$5" class="0">
 <segment>
 <pinref part="SOLARCHIP" gate="G$1" pin="PROG"/>
-<wire x1="35.56" y1="27.94" x2="38.1" y2="27.94" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="27.94" x2="40.64" y2="27.94" width="0.1524" layer="91"/>
 <pinref part="R2" gate="G$1" pin="1"/>
-<wire x1="38.1" y1="27.94" x2="38.1" y2="25.4" width="0.1524" layer="91"/>
+<wire x1="40.64" y1="27.94" x2="40.64" y2="25.4" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="V_BATT" class="0">
@@ -2639,6 +2647,26 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <junction x="106.68" y="58.42"/>
 <wire x1="106.68" y1="58.42" x2="109.22" y2="58.42" width="0.1524" layer="91"/>
 </segment>
+<segment>
+<pinref part="R5" gate="G$1" pin="1"/>
+<pinref part="3.3V5" gate="G$1" pin="VCC"/>
+<wire x1="121.92" y1="68.58" x2="119.38" y2="68.58" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="SCX"/>
+<wire x1="78.74" y1="68.58" x2="73.66" y2="68.58" width="0.1524" layer="91"/>
+<pinref part="U1" gate="G$1" pin="SDX"/>
+<wire x1="78.74" y1="71.12" x2="73.66" y2="71.12" width="0.1524" layer="91"/>
+<wire x1="73.66" y1="68.58" x2="73.66" y2="71.12" width="0.1524" layer="91"/>
+<junction x="73.66" y="68.58"/>
+<pinref part="3.3V6" gate="G$1" pin="VCC"/>
+<wire x1="68.58" y1="68.58" x2="73.66" y2="68.58" width="0.1524" layer="91"/>
+</segment>
+<segment>
+<pinref part="U1" gate="G$1" pin="SDO/SA0"/>
+<wire x1="78.74" y1="73.66" x2="66.04" y2="73.66" width="0.1524" layer="91"/>
+<pinref part="3.3V7" gate="G$1" pin="VCC"/>
+</segment>
 </net>
 <net name="SERVOGND" class="0">
 <segment>
@@ -2663,12 +2691,12 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <segment>
 <pinref part="BATT" gate="G$1" pin="1"/>
 <pinref part="SOLARCHIP" gate="G$1" pin="VBAT"/>
-<wire x1="35.56" y1="38.1" x2="45.72" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="38.1" y1="38.1" x2="48.26" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="C2" gate="G$1" pin="1"/>
-<wire x1="45.72" y1="38.1" x2="45.72" y2="35.56" width="0.1524" layer="91"/>
-<junction x="45.72" y="38.1"/>
-<label x="54.102" y="40.64" size="1.778" layer="95" rot="R180"/>
-<wire x1="53.34" y1="38.1" x2="45.72" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="48.26" y1="38.1" x2="48.26" y2="35.56" width="0.1524" layer="91"/>
+<junction x="48.26" y="38.1"/>
+<label x="56.642" y="40.64" size="1.778" layer="95" rot="R180"/>
+<wire x1="55.88" y1="38.1" x2="48.26" y2="38.1" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <pinref part="U$1" gate="G$1" pin="V+"/>
@@ -2711,36 +2739,45 @@ You are welcome to use this library for commercial purposes. For attribution, we
 <net name="SOLAR+" class="0">
 <segment>
 <pinref part="SOLAR1+" gate="G$1" pin="1"/>
-<wire x1="5.08" y1="45.72" x2="7.62" y2="45.72" width="0.1524" layer="91"/>
-<wire x1="7.62" y1="45.72" x2="7.62" y2="38.1" width="0.1524" layer="91"/>
-<junction x="7.62" y="45.72"/>
+<wire x1="7.62" y1="45.72" x2="10.16" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="10.16" y1="45.72" x2="10.16" y2="38.1" width="0.1524" layer="91"/>
+<junction x="10.16" y="45.72"/>
 <pinref part="SOLARCHIP" gate="G$1" pin="VDD"/>
 <pinref part="C1" gate="G$1" pin="1"/>
-<wire x1="10.16" y1="38.1" x2="15.24" y2="38.1" width="0.1524" layer="91"/>
-<wire x1="10.16" y1="38.1" x2="10.16" y2="35.56" width="0.1524" layer="91"/>
-<junction x="10.16" y="38.1"/>
-<label x="5.08" y="38.1" size="1.778" layer="95"/>
-<wire x1="7.62" y1="38.1" x2="10.16" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="38.1" x2="17.78" y2="38.1" width="0.1524" layer="91"/>
+<wire x1="12.7" y1="38.1" x2="12.7" y2="35.56" width="0.1524" layer="91"/>
+<junction x="12.7" y="38.1"/>
+<label x="7.62" y="38.1" size="1.778" layer="95"/>
+<wire x1="10.16" y1="38.1" x2="12.7" y2="38.1" width="0.1524" layer="91"/>
 <pinref part="SOLAR2+" gate="G$1" pin="1"/>
-<wire x1="15.24" y1="45.72" x2="7.62" y2="45.72" width="0.1524" layer="91"/>
+<wire x1="17.78" y1="45.72" x2="10.16" y2="45.72" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$2" class="0">
+<segment>
+<pinref part="U1" gate="G$1" pin="CS"/>
+<pinref part="R5" gate="G$1" pin="2"/>
+<wire x1="104.14" y1="68.58" x2="109.22" y2="68.58" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
 </sheet>
 </sheets>
 <errors>
-<approved hash="104,1,15.24,38.1,SOLARCHIP,VDD,SOLAR+,,,"/>
-<approved hash="104,1,35.56,38.1,SOLARCHIP,VBAT,SWITCH+,,,"/>
-<approved hash="104,1,35.56,15.24,SOLARCHIP,VSS,GND,,,"/>
+<approved hash="104,1,17.78,38.1,SOLARCHIP,VDD,SOLAR+,,,"/>
+<approved hash="104,1,38.1,38.1,SOLARCHIP,VBAT,SWITCH+,,,"/>
+<approved hash="104,1,38.1,15.24,SOLARCHIP,VSS,GND,,,"/>
 <approved hash="113,1,91.971,66.571,FRAME1,,,,,"/>
+<approved hash="113,1,31.1573,101.405,S2,,,,,"/>
+<approved hash="113,1,59.0973,96.3253,S1,,,,,"/>
 <approved hash="113,1,170.375,66.7173,MIC,,,,,"/>
 <approved hash="113,1,81.9573,117.915,STRESS,,,,,"/>
 <approved hash="113,1,92.1173,95.0553,BOARD,,,,,"/>
-<approved hash="113,1,56.5573,35.3653,BATT,,,,,"/>
-<approved hash="113,1,6.54473,48.9373,SOLAR1+,,,,,"/>
-<approved hash="113,1,16.7047,48.9373,SOLAR2+,,,,,"/>
-<approved hash="113,1,29.4057,51.9726,SOLAR1-,,,,,"/>
-<approved hash="113,1,39.1743,49.6274,SOLAR2-,,,,,"/>
+<approved hash="113,1,59.0973,35.3653,BATT,,,,,"/>
+<approved hash="113,1,9.08473,48.9373,SOLAR1+,,,,,"/>
+<approved hash="113,1,19.2447,48.9373,SOLAR2+,,,,,"/>
+<approved hash="113,1,31.9457,51.9726,SOLAR1-,,,,,"/>
+<approved hash="113,1,41.7143,49.6274,SOLAR2-,,,,,"/>
 <approved hash="113,1,155.617,91.2453,I2C,,,,,"/>
 </errors>
 </schematic>
