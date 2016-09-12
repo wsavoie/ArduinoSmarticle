@@ -43,7 +43,7 @@ void setup() {
  
 	pinMode(led,OUTPUT);
 	
-	pinMode(stress,INPUT);
+	pinMode(stressPin,INPUT);
 	pinMode(mic,INPUT);
 }
 
