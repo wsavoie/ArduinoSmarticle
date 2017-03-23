@@ -49,6 +49,10 @@ static int oldVal  = 0;
 static int newVal  = 0;
 static int diff  = 0;
 static int curr  = 0;
+
+static int lightLevel1 = 0;
+static int lightLevel2 = 0;
+
 int MATCHLIM=5;
 int matchCount=MATCHLIM;
 int ARRAYLEN=9;
