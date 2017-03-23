@@ -1,4 +1,12 @@
+/**
+Written by Will Savoie
+Modified by Ross Warkentin on 03/23/2017
+
+Code for Smarticles running on an Arduino Pro Mini
+**/
+
 //#include <MegaServo.h>
+
 
 #include <Servo.h>
 #include <avr/io.h>
@@ -6,9 +14,17 @@
 
 //#define F_CPU 8000000UL
 #define myabs(n) ((n) < 0 ? -(n) : (n))
+
 //pin definitions 
 #define servo1 5   //
 #define servo2 6  //
+
+// Photoresistor reading definitions
+// Based on implementation seen at:
+// https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
+#define pr1 A1
+#define pr2 A2
+
 #define mic     A6      // CHANGE BACK TO a6
 #define stressPin A7    // CHANGE BACK TO a7
 
@@ -61,8 +77,11 @@ void loop()
   ledVal=false;
   int midPtCross = 0;
   int meanCurr = 0;
-        oldVal = 0;
+  oldVal = 0;
   
+	lightLevel1 = analogRead(pr1);
+	lightLevel2 = analogRead(pr2);
+	
   for (int i = 0; i < 1<<samps; i++)
   {
     oldVal    = newVal;
