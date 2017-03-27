@@ -259,5 +259,86 @@ void light(bool a)
     digitalWrite(led, LOW);
 }
 
+//switch (pos)
+//{ ///1500 = straight out, my 0 degrees servo's 90 degrees
+//    case 0:
+//          S1.writeMicroseconds(1500);
+//          S2.writeMicroseconds(1500);
+//          break;
+//    case 1:
+//          S1.writeMicroseconds(1500 - 300);
+//          S2.writeMicroseconds(1500 + 300);
+//          break;
+//    case 2:
+//          S1.writeMicroseconds(1500 + 300);
+//          S2.writeMicroseconds(1500 - 300);
+//          break;
+//    case 3:
+//          S1.writeMicroseconds(1500 - 900);
+//          S2.writeMicroseconds(1500 + 900);
+//          break;
+//    case 4:
+//          S1.writeMicroseconds(1500 + 900);
+//          S2.writeMicroseconds(1500 - 900);
+//          break;
+//    case 5:
+//          S1.writeMicroseconds(1500 + 900);
+//          S2.writeMicroseconds(1500 + 900);
+//          break;
+//    case 6:
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//          _delay_ms(del*2);
+//    
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((maxx) * 10 + 600);
+//          _delay_ms(del*2);
+//    
+//          S1.writeMicroseconds(minn * 10 + 600);
+//          S2.writeMicroseconds((maxx) * 10 + 600);
+//          _delay_ms(del*2);
+//    
+//          S1.writeMicroseconds(minn * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//           _delay_ms(del);
+//          break;
+//    case 7:
+//          //S1.writeMicroseconds(maxx * 10 + 600);
+//          //S2.writeMicroseconds((midd) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(midd * 10 + 600);
+//          //S2.writeMicroseconds((maxx) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(minn * 10 + 600);
+//          //S2.writeMicroseconds((midd) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(midd * 10 + 600);
+//          //S2.writeMicroseconds((minn) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(maxx * 10 + 600);
+//          //S2.writeMicroseconds((midd) * 10 + 600);
+//          
+//          
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((midd) * 10 + 600);
+//          _delay_ms(del);
+//          S1.writeMicroseconds(midd * 10 + 600);
+//          S2.writeMicroseconds((midd) * 10 + 600);
+//          _delay_ms(del);
+//          S1.writeMicroseconds(midd * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//          _delay_ms(del);
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//          _delay_ms(del/2);
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((midd) * 10 + 600);
+//          
+//          //_delay_ms(del/2);
+//          break;
+//    case 8:
+//          S1.writeMicroseconds(1500);
+//          S2.writeMicroseconds(1500);
+//          break;
 
 
