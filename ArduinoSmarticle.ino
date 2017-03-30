@@ -49,7 +49,7 @@ static int oldVal  = 0;
 static int newVal  = 0;
 static int diff  = 0;
 static int curr  = 0;
-
+static bool lightVal=false;
 static int lightLevel1 = 0;
 static int lightLevel2 = 0;
 
@@ -85,7 +85,16 @@ void loop()
   
 	lightLevel1 = analogRead(pr1);
 	lightLevel2 = analogRead(pr2);
-	
+	if (lightLevel1>512)
+  {
+    ledVal=true;
+    light(ledVal);
+  }
+  else
+  {
+    light(ledVal);
+  }
+  
   for (int i = 0; i < 1<<samps; i++)
   {
     oldVal    = newVal;
@@ -212,8 +221,8 @@ void moveMotor(uint8_t pos) //break method into chunks to allow "multithreading"
     oldP1=p1; oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-    v=!v;
-    light(v);
+   // v=!v;
+    //light(v);
     return;
   }
     else if(pos==8)
