@@ -1,6 +1,6 @@
 /**
 Written by Will Savoie
-Modified by Ross Warkentin on 03/23/2017
+Modified by Ross Warkentin on 03/30/2017
 
 Code for Smarticles running on an Arduino Pro Mini
 **/
@@ -50,8 +50,11 @@ static int newVal  = 0;
 static int diff  = 0;
 static int curr  = 0;
 static bool lightVal=false;
+
+// Parameters for the photoresistors
 static int lightLevel1 = 0;
 static int lightLevel2 = 0;
+static int lightThresh = 512;
 
 int MATCHLIM=5;
 int matchCount=MATCHLIM;
@@ -75,43 +78,47 @@ void setup() {
   pinMode(stressPin,INPUT);
   pinMode(mic,INPUT);
   randomSeed(analogRead(0));
+	
+	int midPtCross;
+	int meanCurr;
 }
 
-void loop() 
-{          
-  ledVal=false;
+void loop() {          
+  
+	ledVal = false;
   int midPtCross = 0;
   int meanCurr = 0;
   oldVal = 0;
   
+	// Get the light levels from the voltage dividers
 	lightLevel1 = analogRead(pr1);
 	lightLevel2 = analogRead(pr2);
-	if (lightLevel1>512)
-  {
+	
+	// High readings are associated with light exposure
+	if (lightLevel1>512 || lightLevel2>512){ // If the light exposure one either sensor is high
     ledVal=true;
     light(ledVal);
   }
-  else
-  {
+  else { // if neither sensor has a light level above the necessary threshold
     light(ledVal);
   }
   
-  for (int i = 0; i < 1<<samps; i++)
-  {
-    oldVal    = newVal;
-    curr    = analogRead(stressPin);
-    newVal    = analogRead(mic);
+	// Poll the current sensor and mic
+  for (int i = 0; i < 1<<samps; i++){
+    oldVal = newVal;
+    curr = analogRead(stressPin);
+    newVal = analogRead(mic);
 
-    meanCurr  = meanCurr+curr;
+    meanCurr = meanCurr+curr;
     int aa= newVal > micMean;
     int bb= oldVal > micMean;
     diff = (newVal > micMean) - (oldVal > micMean);
     diff = aa - bb;
     diff = myabs(diff);        
   
-    midPtCross = midPtCross + diff;
-                
+    midPtCross = midPtCross + diff;       
   }
+	
   //Serial.print(midPtCross);    // prints a tab
   //bitshift divide by sample, meancurr=meancurr/(2^samps)
   meanCurr >>= samps;
@@ -126,31 +133,26 @@ void loop()
   //delay(del);
 }
 
-void currentRead(uint16_t meanCurrVal)
-{
+void currentRead(uint16_t meanCurrVal){
   static bool v = true;
-  if(meanCurrVal<40)//make magic number into meaningful value!!
-  {
+  if(meanCurrVal<40){//make magic number into meaningful value!!
     stressCount = 0;
   }
-  else
-  {
+  else {
     stressCount++;
-    if(stressCount>=stressMoveThresh && rangeType!=6 && rangeType!=7)
-    {
-                        v=!v;
-                        light(v);
+    if(stressCount>=stressMoveThresh && rangeType!=6 && rangeType!=7){
+			v=!v;
+      light(v);
       (stress > 2 ? stress=0 : (stress++));
       moveMotor(stress);
                         //_delay_ms(del);
     } 
     //delay(del);
   }
-  
 }
 
-void getRange(uint16_t ftVal)// at thresh = 50, thresh = 216-433-650
-{  
+void getRange(uint16_t ftVal){// at thresh = 50, thresh = 216-433-650
+
   bool a = false;
   static bool v = false;
   rangeType=0;
@@ -176,19 +178,17 @@ void getRange(uint16_t ftVal)// at thresh = 50, thresh = 216-433-650
 //currMoveType=findMaxVal();
 //moveMotor(currMoveType);
 
-  if (rangeType != currMoveType)
-  { 
-    prevVal = rangeType;
+  if (rangeType != currMoveType) { 
+		prevVal = rangeType;
     matchCount--;
-    if(matchCount<0)
-     {
+    if(matchCount<0) {
       matchCount=0;
       currMoveType=rangeType;
-     }
-     return;
-     moveMotor(currMoveType);
+    }
+    return;
+    moveMotor(currMoveType);
 //    return;
-  }
+	}
   matchCount++;
   matchCount=matchCount%MATCHLIM;
   
@@ -204,38 +204,24 @@ void getRange(uint16_t ftVal)// at thresh = 50, thresh = 216-433-650
   //currMoveType=rangeType;
   moveMotor(currMoveType);
 }
-void moveMotor(uint8_t pos) //break method into chunks to allow "multithreading"
-{
+
+void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading"
+
   static int oldP1 = 1500;
   static int oldP2 = 1500;
   static int p1 = 1500;
   static int p2 = 1500;
   static bool v = false;
-  if(pos==0)
-  {
+	
+	// If certain conditions are met such that we do not want the servos to perform the normal gait 
+  if(pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh || lightLevel2>lightThresh){
     oldP1=p1; oldP2=p2;
-    S1.writeMicroseconds(p1=1500);
+    S1.writeMicroseconds(p1=1500); // "On standard servos a parameter value of 1000 is fully counter-clockwise, 2000 is fully clockwise, and 1500 is in the middle."
     S2.writeMicroseconds(p2=1500);
   }
-  else if(pos==SERVONUM)
-  {
-    oldP1=p1; oldP2=p2;
-    S1.writeMicroseconds(p1=1500);
-    S2.writeMicroseconds(p2=1500);
-   // v=!v;
-    //light(v);
-    return;
-  }
-    else if(pos==8)
-  {
-    oldP1=p1; oldP2=p2;
-    S1.writeMicroseconds(p1=1500);
-    S2.writeMicroseconds(p2=1500);
-
-    return;
-  }
-  else
-  {
+	
+	// If nothing else, perform normal gait (I think?)
+  else{
     
     oldP1=p1;
     oldP2=p2;
@@ -260,10 +246,9 @@ void moveMotor(uint8_t pos) //break method into chunks to allow "multithreading"
     delay(random(100));
     return;
   }         
-
 }
-int findMaxVal()
-{
+
+int findMaxVal() {
   int maxVal=0;
   int maxInd=0;
   int rv = rangeType;
