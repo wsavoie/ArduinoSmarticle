@@ -1,4 +1,4 @@
-%% Voltage checking for the Smarticle-Photoresistor/potentiometer setup
+    %% Voltage checking for the Smarticle-Photoresistor/potentiometer setup
 close all; clear all; clc;
 
 % Circuit parameters
@@ -6,12 +6,12 @@ vIn = 3.3; % volts
 rOut = 10000; % voltage divider resistor which goes to ground
 
 % Potentiometer parameters
-rl = 0.8;
-rh = 10000;
+% rl = 0.8;
+% rh = 10000;
 
 % Photoresistor parameters
-% rl = 1000;
-% rh = 100000;
+rl = 100;
+rh = 700000;
 
 rRange = linspace(rl, rh, 1000); % not sure I am discretizing this the right way
 
