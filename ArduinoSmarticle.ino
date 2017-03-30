@@ -65,6 +65,7 @@ void currentRead(uint16_t meanCurrVal);
 void getRange(uint16_t ftVal);
 int findMaxVal();
 void light(bool a);
+
 void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
