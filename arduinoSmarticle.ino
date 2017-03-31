@@ -22,8 +22,8 @@ Code for Smarticles running on an Arduino Pro Mini
 // Photoresistor reading definitions
 // Based on implementation seen at:
 // https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
-#define pr1 A1
-#define pr2 A2
+#define pr1 A4
+#define pr2 A5
 
 #define mic     A6      // CHANGE BACK TO a6
 #define stressPin A7    // CHANGE BACK TO a7
