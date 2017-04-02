@@ -122,7 +122,7 @@ void loop() {
   //Serial.print(midPtCross);    // prints a tab
   //bitshift divide by sample, meancurr=meancurr/(2^samps)
   meanCurr >>= samps;
-  currentRead(meanCurr);
+ // currentRead(meanCurr);
   
   if(stressCount<stressMoveThresh || rangeType==6 || rangeType==7) //if previous moves were 6 or 7, continue without stress
   {
