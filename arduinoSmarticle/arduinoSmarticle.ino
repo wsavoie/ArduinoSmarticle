@@ -16,19 +16,19 @@ Code for Smarticles running on an Arduino Pro Mini
 #define myabs(n) ((n) < 0 ? -(n) : (n))
 
 //pin definitions 
-#define servo1 5   //
-#define servo2 6  //
+#define servo1 10   //
+#define servo2 11  //
 
 // Photoresistor reading definitions
 // Based on implementation seen at:
 // https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
-#define pr1 A1
-#define pr2 A2
+#define pr1 A5
+#define pr2 A1
 
-#define mic     A6      // CHANGE BACK TO a6
-#define stressPin A7    // CHANGE BACK TO a7
+#define mic     A2      // CHANGE BACK TO a6
+#define stressPin A3    // CHANGE BACK TO a7
 
-#define randPin A5    // CHANGE BACK TO a7
+#define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
 #define stressMoveThresh 2
 
