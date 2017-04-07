@@ -16,19 +16,19 @@ Code for Smarticles running on an Arduino Pro Mini
 #define myabs(n) ((n) < 0 ? -(n) : (n))
 
 //pin definitions 
-#define servo1 5   //
-#define servo2 6  //
+#define servo1 10   //
+#define servo2 11  //
 
 // Photoresistor reading definitions
 // Based on implementation seen at:
 // https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
-#define pr1 A4
-#define pr2 A5
+#define pr1 A5
+#define pr2 A1
 
-#define mic     A6      // CHANGE BACK TO a6
-#define stressPin A7    // CHANGE BACK TO a7
+#define mic     A2      // CHANGE BACK TO a6
+#define stressPin A3    // CHANGE BACK TO a7
 
-#define randPin A5    // CHANGE BACK TO a7
+#define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
 #define stressMoveThresh 2
 
@@ -60,7 +60,7 @@ int MATCHLIM=5;
 int matchCount=MATCHLIM;
 int ARRAYLEN=9;
 int moveMatches[] = {0,0,0,0,0,0,0,0,MATCHLIM};
-int SERVONUM=3;
+int SERVONUM=0;
 int nextMoveType=8;
 bool ledVal = false;
 void moveMotor(uint8_t pos);
@@ -122,11 +122,14 @@ void loop() {
   //Serial.print(midPtCross);    // prints a tab
   //bitshift divide by sample, meancurr=meancurr/(2^samps)
   meanCurr >>= samps;
- // currentRead(meanCurr);
+  currentRead(meanCurr);
   
   if(stressCount<stressMoveThresh || rangeType==6 || rangeType==7) //if previous moves were 6 or 7, continue without stress
   {
-    getRange(midPtCross);                
+		//if using microphone use below line
+    //getRange(midPtCross);         
+		//for non-mic system:
+		moveMotor(3); //3 is a rangetype which will perform gait motion
   }
   //light(ledVal);
         
@@ -277,5 +280,86 @@ void light(bool a)
     digitalWrite(led, LOW);
 }
 
+//switch (pos)
+//{ ///1500 = straight out, my 0 degrees servo's 90 degrees
+//    case 0:
+//          S1.writeMicroseconds(1500);
+//          S2.writeMicroseconds(1500);
+//          break;
+//    case 1:
+//          S1.writeMicroseconds(1500 - 300);
+//          S2.writeMicroseconds(1500 + 300);
+//          break;
+//    case 2:
+//          S1.writeMicroseconds(1500 + 300);
+//          S2.writeMicroseconds(1500 - 300);
+//          break;
+//    case 3:
+//          S1.writeMicroseconds(1500 - 900);
+//          S2.writeMicroseconds(1500 + 900);
+//          break;
+//    case 4:
+//          S1.writeMicroseconds(1500 + 900);
+//          S2.writeMicroseconds(1500 - 900);
+//          break;
+//    case 5:
+//          S1.writeMicroseconds(1500 + 900);
+//          S2.writeMicroseconds(1500 + 900);
+//          break;
+//    case 6:
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//          _delay_ms(del*2);
+//    
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((maxx) * 10 + 600);
+//          _delay_ms(del*2);
+//    
+//          S1.writeMicroseconds(minn * 10 + 600);
+//          S2.writeMicroseconds((maxx) * 10 + 600);
+//          _delay_ms(del*2);
+//    
+//          S1.writeMicroseconds(minn * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//           _delay_ms(del);
+//          break;
+//    case 7:
+//          //S1.writeMicroseconds(maxx * 10 + 600);
+//          //S2.writeMicroseconds((midd) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(midd * 10 + 600);
+//          //S2.writeMicroseconds((maxx) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(minn * 10 + 600);
+//          //S2.writeMicroseconds((midd) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(midd * 10 + 600);
+//          //S2.writeMicroseconds((minn) * 10 + 600);
+//          //_delay_ms(del);
+//          //S1.writeMicroseconds(maxx * 10 + 600);
+//          //S2.writeMicroseconds((midd) * 10 + 600);
+//          
+//          
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((midd) * 10 + 600);
+//          _delay_ms(del);
+//          S1.writeMicroseconds(midd * 10 + 600);
+//          S2.writeMicroseconds((midd) * 10 + 600);
+//          _delay_ms(del);
+//          S1.writeMicroseconds(midd * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//          _delay_ms(del);
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((minn) * 10 + 600);
+//          _delay_ms(del/2);
+//          S1.writeMicroseconds(maxx * 10 + 600);
+//          S2.writeMicroseconds((midd) * 10 + 600);
+//          
+//          //_delay_ms(del/2);
+//          break;
+//    case 8:
+//          S1.writeMicroseconds(1500);
+//          S2.writeMicroseconds(1500);
+//          break;
 
 
