@@ -60,7 +60,7 @@ int MATCHLIM=5;
 int matchCount=MATCHLIM;
 int ARRAYLEN=9;
 int moveMatches[] = {0,0,0,0,0,0,0,0,MATCHLIM};
-int SERVONUM=3;
+int SERVONUM=0;
 int nextMoveType=8;
 bool ledVal = false;
 void moveMotor(uint8_t pos);
@@ -126,7 +126,10 @@ void loop() {
   
   if(stressCount<stressMoveThresh || rangeType==6 || rangeType==7) //if previous moves were 6 or 7, continue without stress
   {
-    getRange(midPtCross);                
+		//if using microphone use below line
+    //getRange(midPtCross);         
+		//for non-mic system:
+		moveMotor(3); //3 is a rangetype which will perform gait motion
   }
   //light(ledVal);
         
