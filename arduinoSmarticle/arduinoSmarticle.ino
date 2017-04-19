@@ -95,7 +95,7 @@ void loop() {
 	lightLevel2 = analogRead(pr2);
 	
 	// High readings are associated with light exposure
-	if (lightLevel1>512 || lightLevel2>512){ // If the light exposure one either sensor is high
+	if (lightLevel1>lightThresh || lightLevel2>lightThresh){ // If the light exposure one either sensor is high
     ledVal=true;
     light(ledVal);
   }

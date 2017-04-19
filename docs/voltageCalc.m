@@ -1,4 +1,8 @@
-    %% Voltage checking for the Smarticle-Photoresistor/potentiometer setup
+%% Voltage checking for the Smarticle-Photoresistor/potentiometer setup
+% As the light exposure on the pr increases, the resistance will decrease
+% Low resistances are associated with larger light exposure
+% High voltage readings on the arduino are associated with high light
+% exposure
 close all; clear all; clc;
 
 % Circuit parameters
@@ -10,8 +14,8 @@ rOut = 10000; % voltage divider resistor which goes to ground
 % rh = 10000;
 
 % Photoresistor parameters
-rl = 100;
-rh = 700000;
+rl = 1000;
+rh = 100000;
 
 rRange = linspace(rl, rh, 1000); % not sure I am discretizing this the right way
 
