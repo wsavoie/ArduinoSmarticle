@@ -42,7 +42,9 @@ uint16_t const del = 400;
 uint8_t stressCount = 0;
 uint16_t rangeType=0;
 double thresh = 12.5;
-uint8_t minn = 30; uint8_t maxx = 150; uint8_t midd = 90;
+uint8_t minn = 0; // low end of servo actuating range
+uint8_t maxx = 180; // high end of servo actuating range
+uint8_t midd = 90; // middle of servo actuating range
 static uint16_t prevVal = 8;
 static uint16_t currMoveType = 8;
 static int oldVal  = 0;
