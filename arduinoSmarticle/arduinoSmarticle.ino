@@ -1,6 +1,6 @@
 /**
 Written by Will Savoie
-Modified by Ross Warkentin on 03/30/2017
+Modified by Ross Warkentin on 05/01/2017
 
 Code for Smarticles running on an Arduino Pro Mini
 **/
@@ -22,8 +22,8 @@ Code for Smarticles running on an Arduino Pro Mini
 // Photoresistor reading definitions
 // Based on implementation seen at:
 // https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
-#define pr1 A5
-#define pr2 A1
+#define pr1 A5 // front PR sensor
+#define pr2 A1 // back PR sensor
 
 #define mic     A2      // CHANGE BACK TO a6
 #define stressPin A3    // CHANGE BACK TO a7
@@ -52,6 +52,8 @@ static int newVal  = 0;
 static int diff  = 0;
 static int curr  = 0;
 static bool lightVal=false;
+
+static bool lightSmarticleActive=false;
 
 // Parameters for the photoresistors
 static int lightLevel1 = 0;
@@ -210,24 +212,83 @@ void getRange(uint16_t ftVal){// at thresh = 50, thresh = 216-433-650
   moveMotor(currMoveType);
 }
 
+// "On standard servos a parameter value of 1000 is fully counter-clockwise, 2000 is fully clockwise, and 1500 is in the middle."
 void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading"
-
+	
   static int oldP1 = 1500;
   static int oldP2 = 1500;
   static int p1 = 1500;
   static int p2 = 1500;
   static bool v = false;
 	
-	// If certain conditions are met such that we do not want the servos to perform the normal gait 
-  if(pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh || lightLevel2>lightThresh){
-    oldP1=p1; oldP2=p2;
-    S1.writeMicroseconds(p1=1500); // "On standard servos a parameter value of 1000 is fully counter-clockwise, 2000 is fully clockwise, and 1500 is in the middle."
+	// If certain conditions are met such that we do not want the servos to perform the normal gait
+	
+	// If we want the lit smarticle to perform a gait that is specific to the PR1 sensor, put it in this if-statement
+	// remember to set lightSmarticleActive to true
+  if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh)){ // front sensor
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=maxx * 10 + 600);
+    S2.writeMicroseconds(p2=minn * 10 + 600);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=maxx * 10 + 600);
+    S2.writeMicroseconds(p2=minn * 10 + 600);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=1500);
+    S2.writeMicroseconds(p2=1500);
+    delay(300);
+    delay(random(100));
+    return;
+	}
+	
+	// If we want the lit smarticle to perform a gait that is specific to the PR2 sensor, put it in this if-statement
+	// remember to set lightSmarticleActive to true
+	else if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel2>lightThresh)){ // back sensor
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=minn * 10 + 600);
+    S2.writeMicroseconds(p2=maxx * 10 + 600);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=1500);
+    S2.writeMicroseconds(p2=1500);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=minn * 10 + 600);
+    S2.writeMicroseconds(p2=maxx * 10 + 600);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=1500);
+    S2.writeMicroseconds(p2=1500);
+    delay(300);
+    delay(random(100));
+    return;
   }
 	
-	// If nothing else, perform normal gait (I think?)
+	// If we want the lit smarticle to simply become inactive,set lightSmarticleActive to false and this if-statement will execute when
+	// either of the PR sensors are above the lightThresh value
+	else if (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh || lightLevel1>lightThresh){
+		oldP1=p1;
+		oldP2=p2;
+    S1.writeMicroseconds(p1=1500);
+    S2.writeMicroseconds(p2=1500);
+		return;
+	}
+	
+	// If nothing else, perform normal gait
   else{
-    
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
@@ -250,7 +311,8 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
     delay(300);
     delay(random(100));
     return;
-  }         
+  }
+	return;	
 }
 
 int findMaxVal() {
@@ -274,8 +336,8 @@ int findMaxVal() {
   }
   return maxInd;
 }
-void light(bool a)
-{ 
+
+void light(bool a){ 
   if (a)
     digitalWrite(led, HIGH);
   else
