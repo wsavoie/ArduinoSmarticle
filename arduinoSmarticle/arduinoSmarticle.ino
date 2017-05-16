@@ -1,6 +1,7 @@
 /**
 Written by Will Savoie
 Modified by Ross Warkentin on 05/01/2017
+Modified by Shea Wells on 05/16/2017
 
 Code for Smarticles running on an Arduino Pro Mini
 **/
@@ -56,7 +57,7 @@ static bool lightVal=false;
 static bool lightSmarticleActive=false;
 
 // Parameters for the photoresistors
-// Staandards are:
+// Standards are:
 // static int lightThresh1 = 520;
 // static int lightThresh2 = 800;
 
