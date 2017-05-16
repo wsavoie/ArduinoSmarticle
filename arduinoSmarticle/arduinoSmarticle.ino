@@ -53,12 +53,18 @@ static int diff  = 0;
 static int curr  = 0;
 static bool lightVal=false;
 
-static bool lightSmarticleActive=true;
+static bool lightSmarticleActive=false;
 
 // Parameters for the photoresistors
+// Staandards are:
+// static int lightThresh1 = 520;
+// static int lightThresh2 = 800;
+
 static int lightLevel1 = 0;
 static int lightLevel2 = 0;
-static int lightThresh = 512;
+static int lightThresh1 = 255;
+static int lightThresh2 = 255;
+
 
 int MATCHLIM=5;
 int matchCount=MATCHLIM;
@@ -99,7 +105,7 @@ void loop() {
 	lightLevel2 = analogRead(pr2);
 	
 	// High readings are associated with light exposure
-	if (lightLevel1>lightThresh || lightLevel2>lightThresh){ // If the light exposure one either sensor is high
+	if (lightLevel1>lightThresh1 || lightLevel2>lightThresh2){ // If the light exposure one either sensor is high
     ledVal=true;
     light(ledVal);
   }
@@ -205,7 +211,7 @@ void getRange(uint16_t ftVal){// at thresh = 50, thresh = 216-433-650
 //    moveMotor(currMoveType);
 //    prevVal = rangeType;
 //    return;
-//  }
+//  }l
 //  
   prevVal = rangeType;
   //currMoveType=rangeType;
@@ -225,7 +231,7 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
 	
 	// If we want the lit smarticle to perform a gait that is specific to the PR1 sensor, put it in this if-statement
 	// remember to set lightSmarticleActive to true
-  if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh)){ // front sensor
+  if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh1)){ // front sensor
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
@@ -252,7 +258,7 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
 	
 	// If we want the lit smarticle to perform a gait that is specific to the PR2 sensor, put it in this if-statement
 	// remember to set lightSmarticleActive to true
-	else if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel2>lightThresh)){ // back sensor
+	else if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel2>lightThresh2)){ // back sensor
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
@@ -279,7 +285,7 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
 	
 	// If we want the lit smarticle to simply become inactive,set lightSmarticleActive to false and this if-statement will execute when
 	// either of the PR sensors are above the lightThresh value
-	else if (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh || lightLevel1>lightThresh){
+	else if (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh1 || lightLevel2>lightThresh2){
 		oldP1=p1;
 		oldP2=p2;
     S1.writeMicroseconds(p1=1500);
