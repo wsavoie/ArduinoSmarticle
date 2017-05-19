@@ -61,11 +61,17 @@ static bool lightSmarticleActive=false;
 // static int lightThresh1 = 520;
 // static int lightThresh2 = 800;
 
+// Values used to store the maximum value seen by the photoresistors over the gait period
 static int lightLevel1 = 0;
 static int lightLevel2 = 0;
+
+// Global values to store the updated check to avoid reallocation latency
+static int lightLevel1New = 0;
+static int lightLevel2New = 0;
+
+// Thresholds which can be modified to adjust the sensitivity of the smarticles to light
 static int lightThresh1 = 255;
 static int lightThresh2 = 255;
-
 
 int MATCHLIM=5;
 int matchCount=MATCHLIM;
@@ -102,8 +108,8 @@ void loop() {
   oldVal = 0;
   
 	// Get the light levels from the voltage dividers
-	lightLevel1 = analogRead(pr1);
-	lightLevel2 = analogRead(pr2);
+	// lightLevel1 = analogRead(pr1);
+	// lightLevel2 = analogRead(pr2);
 	
 	// High readings are associated with light exposure
 	if (lightLevel1>lightThresh1 || lightLevel2>lightThresh2){ // If the light exposure one either sensor is high
@@ -237,23 +243,23 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-    delay(300);
-    delay(random(100));
+    lightLevelDelay(300);
+    lightLevelDelay(random(100));
     return;
 	}
 	
@@ -264,23 +270,23 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
     S2.writeMicroseconds(p2=minn * 10 + 600);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
     S2.writeMicroseconds(p2=minn * 10 + 600);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-    delay(300);
-    delay(random(100));
+    lightLevelDelay(300);
+    lightLevelDelay(random(100));
     return;
   }
 	
@@ -300,25 +306,29 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
     S2.writeMicroseconds(p2=minn * 10 + 600);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    delay(del);   
+    lightLevelDelay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=minn * 10 + 600);
-    delay(300);
-    delay(random(100));
+    lightLevelDelay(300);
+    lightLevelDelay(random(100));
     return;
   }
+	lightLevel1 = lightLevel1New;
+	lightLevel2 = lightLevel2New;
+	lightLevel1New = 0;
+	lightLevel2New = 0;
 	return;	
 }
 
@@ -349,6 +359,18 @@ void light(bool a){
     digitalWrite(led, HIGH);
   else
     digitalWrite(led, LOW);
+}
+
+// capture the control flow for sec milliseconds
+// update lightLevel1 and lightLevel2 to the maximum value read over the period of the delay
+void lightLevelDelay(int sec){
+	int startTime = millis();
+	
+	while((millis() - startTime) < sec){
+		lightLevel1New = max(analogRead(pr1), lightLevel1New);
+		lightLevel2New = max(analogRead(pr2), lightLevel2New);
+	}
+	return;
 }
 
 //switch (pos)
