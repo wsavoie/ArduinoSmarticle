@@ -297,6 +297,8 @@ void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading
 		oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
+		lightLevelDelay(1500);
+    lightLevelDelay(random(100));
 		return;
 	}
 	
