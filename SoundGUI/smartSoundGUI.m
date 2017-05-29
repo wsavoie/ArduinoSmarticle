@@ -22,7 +22,7 @@ function varargout = smartSoundGUI(varargin)
 
 % Edit the above text to modify the response to help smartSoundGUI
 
-% Last Modified by GUIDE v2.5 16-Feb-2017 11:56:44
+% Last Modified by GUIDE v2.5 29-May-2017 16:51:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -64,7 +64,7 @@ guidata(hObject, handles);
 
 % UIWAIT makes smartSoundGUI wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-set(gcf, 'WindowKeyPressFcn', @KeyPress)
+set(gcf, 'WindowKeyPressFcn', @figure1_WindowKeyPressFcn)
 
 % --- Outputs from this function are returned to the command line.
 function varargout = smartSoundGUI_OutputFcn(hObject, eventdata, handles)
@@ -182,31 +182,31 @@ global sampRate tt player
 pause(player);
 
 
-function KeyPress(hObject, eventdata, handles)
-% determine the key that was pressed
-global sampRate tt player
-key = get(gcf,'CurrentKey');
-switch eventdata.Key
-    
-    case 'f1'
-        playfreq(85);
-    case 'f2'
-        playfreq(125);
-    case 'f3'
-        playfreq(175);
-    case 'f4'
-        playfreq(225);
-    case 'f5'
-        playfreq(275);
-    case 'f6'
-        playfreq(325);
-    case 'f7'
-        playfreq(375);
-    case 'f8'
-        playfreq(425);
-    case 'escape'
-        pause(player);
-end
+% function KeyPress(hObject, eventdata, handles)
+% % determine the key that was pressed
+% global sampRate tt player
+% key = get(gcf,'CurrentKey');
+% f0=50;
+% switch eventdata.Key
+%     case 'f1'
+%         pushbutton7_Callback(handles.pushbutton7, [], handles); 
+%     case 'f2'
+%         playfreq(str2num(pushbutton2.String));
+%     case 'f3'
+%         playfreq(str2num(pushbutton3.String));
+%     case 'f4'
+%         playfreq(str2num(pushbutton4.String));
+%     case 'f5'
+%         playfreq(str2num(pushbutton5.String));
+%     case 'f6'
+%         playfreq(str2num(pushbutton6.String));
+%     case 'f7'
+%         playfreq(str2num(pushbutton7.String));
+%     case 'f8'
+%         pushbutton8_Callback;
+%     case 'escape'
+%         pause(player);
+% end
 
 function playfreq(freq)
 global sampRate tt player
@@ -214,3 +214,41 @@ pause(player);
 player=audioplayer(sin(tt*freq*2*pi), sampRate);
 play(player);
 %pts(freq);
+
+
+% --- Executes on key press with focus on figure1 or any of its controls.
+function figure1_WindowKeyPressFcn(hObject, eventdata, handles)
+% hObject    handle to figure1 (see GCBO)
+% eventdata  structure with the following fields (see MATLAB.UI.FIGURE)
+%	Key: name of the key that was pressed, in lower case
+%	Character: character interpretation of the key(s) that was pressed
+%	Modifier: name(s) of the modifier key(s) (i.e., control, shift) pressed
+% handles    structure with handles and user data (see GUIDATA)
+
+% determine the key that was pressed
+global sampRate tt player
+key = get(gcf,'CurrentKey');
+f0=50;
+handles = guidata(hObject);
+switch eventdata.Key
+    case 'f1'
+        playfreq(str2double(handles.pushbutton1.String));
+    case 'f2'
+        playfreq(str2double(handles.pushbutton2.String));
+    case 'f3'
+        playfreq(str2double(handles.pushbutton3.String));
+    case 'f4'
+        playfreq(str2double(handles.pushbutton4.String));
+    case 'f5'
+        playfreq(str2double(handles.pushbutton5.String));
+    case 'f6'
+        playfreq(str2double(handles.pushbutton6.String));
+    case 'f7'
+        playfreq(str2double(handles.pushbutton7.String));
+    case 'f8'
+        playfreq(str2double(handles.pushbutton8.String));;
+    case 'escape'
+        pause(player);
+end
+
+
