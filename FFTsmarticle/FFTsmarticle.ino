@@ -1,3 +1,7 @@
+#include <arduinoFFT.h>
+#include <types.h>
+#include <defs.h>
+
 //#include <MegaServo.h>
 
 #include <Servo.h>
@@ -8,11 +12,20 @@
 #define myabs(n) ((n) < 0 ? -(n) : (n))
 
 /* Pin Definitions */
-#define servo1 5
-#define servo2 6
-#define mic     A6      // CHANGE BACK TO a6
-#define stressPin A7    // CHANGE BACK TO a7
-#define randPin A5    // CHANGE BACK TO a7
+//pin definitions 
+#define servo1 10   //
+#define servo2 11  //
+
+// Photoresistor reading definitions
+// Based on implementation seen at:
+// https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
+#define pr1 A5 // front PR sensor
+#define pr2 A1 // back PR sensor
+
+#define mic     A2      // CHANGE BACK TO a6
+#define stressPin A3    // CHANGE BACK TO a7
+
+#define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
 #define stressMoveThresh 2
 
@@ -25,7 +38,7 @@ uint16_t const del = 400;
 uint8_t stressCount = 0;
 uint16_t rangeType=0;
 static int p1 = 1500; static int p2 = 1500;
-uint8_t minn = 30; uint8_t maxx = 150; uint8_t midd = 90;
+uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 static uint16_t currMoveType = 8;
 static int curr  = 0;
 int SERVONUM = 3;
@@ -37,7 +50,6 @@ void activateSmarticle();
 void deactivateSmarticle();
 
 /* FFT Stuff */
-#include "arduinoFFT.h"
 arduinoFFT FFT = arduinoFFT(); //creates new FFT object
 const uint16_t samples = 64;
 double samplingFrequency = 8300; //elapsed time ~ 7700us
@@ -59,6 +71,7 @@ void setup() {
   pinMode(stressPin,INPUT);
   pinMode(mic,INPUT);
   randomSeed(analogRead(0));
+  deactivateSmarticle();
 }
 
 void loop() 

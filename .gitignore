@@ -1,0 +1,19 @@
+# csv files#
+###################
+*.csv
+
+# matlab autosave files#
+########################
+*.asv
+
+# matlab matrix files#
+########################
+*.mat
+
+# movie files#
+########################
+*.avi
+
+#mac folder files#
+########################
+.DS_Store

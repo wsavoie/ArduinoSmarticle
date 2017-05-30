@@ -61,17 +61,11 @@ static bool lightSmarticleActive=false;
 // static int lightThresh1 = 520;
 // static int lightThresh2 = 800;
 
-// Values used to store the maximum value seen by the photoresistors over the gait period
 static int lightLevel1 = 0;
 static int lightLevel2 = 0;
-
-// Global values to store the updated check to avoid reallocation latency
-static int lightLevel1New = 0;
-static int lightLevel2New = 0;
-
-// Thresholds which can be modified to adjust the sensitivity of the smarticles to light
 static int lightThresh1 = 255;
 static int lightThresh2 = 255;
+
 
 int MATCHLIM=5;
 int matchCount=MATCHLIM;
@@ -95,24 +89,24 @@ void setup() {
   pinMode(stressPin,INPUT);
   pinMode(mic,INPUT);
   randomSeed(analogRead(0));
-	
-	int midPtCross;
-	int meanCurr;
+  
+  int midPtCross;
+  int meanCurr;
 }
 
 void loop() {          
   
-	ledVal = false;
+  ledVal = false;
   int midPtCross = 0;
   int meanCurr = 0;
   oldVal = 0;
   
-	// Get the light levels from the voltage dividers
-	// lightLevel1 = analogRead(pr1);
-	// lightLevel2 = analogRead(pr2);
-	
-	// High readings are associated with light exposure
-	if (lightLevel1>lightThresh1 || lightLevel2>lightThresh2){ // If the light exposure one either sensor is high
+  // Get the light levels from the voltage dividers
+  lightLevel1 = analogRead(pr1);
+  lightLevel2 = analogRead(pr2);
+  
+  // High readings are associated with light exposure
+  if (lightLevel1>lightThresh1 || lightLevel2>lightThresh2){ // If the light exposure one either sensor is high
     ledVal=true;
     light(ledVal);
   }
@@ -120,7 +114,7 @@ void loop() {
     light(ledVal);
   }
   
-	// Poll the current sensor and mic
+  // Poll the current sensor and mic
   for (int i = 0; i < 1<<samps; i++){
     oldVal = newVal;
     curr = analogRead(stressPin);
@@ -135,7 +129,7 @@ void loop() {
   
     midPtCross = midPtCross + diff;       
   }
-	
+  
   //Serial.print(midPtCross);    // prints a tab
   //bitshift divide by sample, meancurr=meancurr/(2^samps)
   meanCurr >>= samps;
@@ -143,10 +137,10 @@ void loop() {
   
   if(stressCount<stressMoveThresh || rangeType==6 || rangeType==7) //if previous moves were 6 or 7, continue without stress
   {
-		//if using microphone use below line
+    //if using microphone use below line
     //getRange(midPtCross);         
-		//for non-mic system:
-		moveMotor(3); //3 is a rangetype which will perform gait motion
+    //for non-mic system:
+    moveMotor(3); //3 is a rangetype which will perform gait motion
   }
   //light(ledVal);
         
@@ -161,7 +155,7 @@ void currentRead(uint16_t meanCurrVal){
   else {
     stressCount++;
     if(stressCount>=stressMoveThresh && rangeType!=6 && rangeType!=7){
-			v=!v;
+      v=!v;
       light(v);
       (stress > 2 ? stress=0 : (stress++));
       moveMotor(stress);
@@ -199,7 +193,7 @@ void getRange(uint16_t ftVal){// at thresh = 50, thresh = 216-433-650
 //moveMotor(currMoveType);
 
   if (rangeType != currMoveType) { 
-		prevVal = rangeType;
+    prevVal = rangeType;
     matchCount--;
     if(matchCount<0) {
       matchCount=0;
@@ -208,7 +202,7 @@ void getRange(uint16_t ftVal){// at thresh = 50, thresh = 216-433-650
     return;
     moveMotor(currMoveType);
 //    return;
-	}
+  }
   matchCount++;
   matchCount=matchCount%MATCHLIM;
   
@@ -227,111 +221,105 @@ void getRange(uint16_t ftVal){// at thresh = 50, thresh = 216-433-650
 
 // "On standard servos a parameter value of 1000 is fully counter-clockwise, 2000 is fully clockwise, and 1500 is in the middle."
 void moveMotor(uint8_t pos){ //break method into chunks to allow "multithreading"
-	
+  
   static int oldP1 = 1500;
   static int oldP2 = 1500;
   static int p1 = 1500;
   static int p2 = 1500;
   static bool v = false;
-	
-	// If certain conditions are met such that we do not want the servos to perform the normal gait
-	
-	// If we want the lit smarticle to perform a gait that is specific to the PR1 sensor, put it in this if-statement
-	// remember to set lightSmarticleActive to true
+  
+  // If certain conditions are met such that we do not want the servos to perform the normal gait
+  
+  // If we want the lit smarticle to perform a gait that is specific to the PR1 sensor, put it in this if-statement
+  // remember to set lightSmarticleActive to true
   if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh1)){ // front sensor
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    lightLevelDelay(del);   
+    delay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-    lightLevelDelay(del);   
+    delay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    lightLevelDelay(del);   
+    delay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-    lightLevelDelay(300);
-    lightLevelDelay(random(100));
-    return;
-	}
-	
-	// If we want the lit smarticle to perform a gait that is specific to the PR2 sensor, put it in this if-statement
-	// remember to set lightSmarticleActive to true
-	else if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel2>lightThresh2)){ // back sensor
-    oldP1=p1;
-    oldP2=p2;
-    S1.writeMicroseconds(p1=maxx * 10 + 600);
-    S2.writeMicroseconds(p2=minn * 10 + 600);
-    lightLevelDelay(del);   
-    oldP1=p1;
-    oldP2=p2;
-    S1.writeMicroseconds(p1=1500);
-    S2.writeMicroseconds(p2=1500);
-    lightLevelDelay(del);   
-    oldP1=p1;
-    oldP2=p2;
-    S1.writeMicroseconds(p1=maxx * 10 + 600);
-    S2.writeMicroseconds(p2=minn * 10 + 600);
-    lightLevelDelay(del);   
-    oldP1=p1;
-    oldP2=p2;
-    S1.writeMicroseconds(p1=1500);
-    S2.writeMicroseconds(p2=1500);
-    lightLevelDelay(300);
-    lightLevelDelay(random(100));
+    delay(300);
+    delay(random(100));
     return;
   }
-	
-	// If we want the lit smarticle to simply become inactive,set lightSmarticleActive to false and this if-statement will execute when
-	// either of the PR sensors are above the lightThresh value
-	else if (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh1 || lightLevel2>lightThresh2){
-		oldP1=p1;
-		oldP2=p2;
+  
+  // If we want the lit smarticle to perform a gait that is specific to the PR2 sensor, put it in this if-statement
+  // remember to set lightSmarticleActive to true
+  else if(lightSmarticleActive && (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel2>lightThresh2)){ // back sensor
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=maxx * 10 + 600);
+    S2.writeMicroseconds(p2=minn * 10 + 600);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
     S1.writeMicroseconds(p1=1500);
     S2.writeMicroseconds(p2=1500);
-		lightLevelDelay(1500);
-    lightLevelDelay(random(100));
-		return;
-	}
-	
-	// If nothing else, perform normal gait
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=maxx * 10 + 600);
+    S2.writeMicroseconds(p2=minn * 10 + 600);
+    delay(del);   
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=1500);
+    S2.writeMicroseconds(p2=1500);
+    delay(300);
+    delay(random(100));
+    return;
+  }
+  
+  // If we want the lit smarticle to simply become inactive,set lightSmarticleActive to false and this if-statement will execute when
+  // either of the PR sensors are above the lightThresh value
+  else if (pos==0 || pos==SERVONUM ||  pos==8 || lightLevel1>lightThresh1 || lightLevel2>lightThresh2){
+    oldP1=p1;
+    oldP2=p2;
+    S1.writeMicroseconds(p1=1500);
+    S2.writeMicroseconds(p2=1500);
+    return;
+  }
+  
+  // If nothing else, perform normal gait
   else{
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
     S2.writeMicroseconds(p2=minn * 10 + 600);
-    lightLevelDelay(del);   
+    delay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=maxx * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    lightLevelDelay(del);   
+    delay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=maxx * 10 + 600);
-    lightLevelDelay(del);   
+    delay(del);   
     oldP1=p1;
     oldP2=p2;
     S1.writeMicroseconds(p1=minn * 10 + 600);
     S2.writeMicroseconds(p2=minn * 10 + 600);
-    lightLevelDelay(300);
-    lightLevelDelay(random(100));
+    delay(300);
+    delay(random(100));
     return;
   }
-	lightLevel1 = lightLevel1New;
-	lightLevel2 = lightLevel2New;
-	lightLevel1New = 0;
-	lightLevel2New = 0;
-	return;	
+  return; 
 }
 
 int findMaxVal() {
@@ -361,18 +349,6 @@ void light(bool a){
     digitalWrite(led, HIGH);
   else
     digitalWrite(led, LOW);
-}
-
-// capture the control flow for sec milliseconds
-// update lightLevel1 and lightLevel2 to the maximum value read over the period of the delay
-void lightLevelDelay(int sec){
-	int startTime = millis();
-	
-	while((millis() - startTime) < sec){
-		lightLevel1New = max(analogRead(pr1), lightLevel1New);
-		lightLevel2New = max(analogRead(pr2), lightLevel2New);
-	}
-	return;
 }
 
 //switch (pos)
@@ -456,5 +432,6 @@ void lightLevelDelay(int sec){
 //          S1.writeMicroseconds(1500);
 //          S2.writeMicroseconds(1500);
 //          break;
+
 
 
