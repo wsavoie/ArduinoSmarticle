@@ -12,19 +12,15 @@
 #define myabs(n) ((n) < 0 ? -(n) : (n))
 
 /* Pin Definitions */
-//pin definitions 
-#define servo1 10   //
-#define servo2 11  //
-
+#define servo1 10
+#define servo2 11
 // Photoresistor reading definitions
 // Based on implementation seen at:
 // https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
 #define pr1 A5 // front PR sensor
 #define pr2 A1 // back PR sensor
-
 #define mic     A2      // CHANGE BACK TO a6
 #define stressPin A3    // CHANGE BACK TO a7
-
 #define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
 #define stressMoveThresh 2
@@ -53,8 +49,13 @@ void deactivateSmarticle();
 arduinoFFT FFT = arduinoFFT(); //creates new FFT object
 const uint16_t samples = 64;
 double samplingFrequency = 8300; //elapsed time ~ 7700us
-double freqBounds[8] = {600, 650, 700, 750, 800, 850, 900, 950};
-//SERVONUM:                 1    2    3    4    5    6    7
+//SERVONUM:            1    2    3    4    5    6    7    8
+int freqCenters[8] = {600, 650, 700, 750, 800, 850, 900, 950};
+int freqAcceptThresh = 20;  //+-30Hz from freqCenter is accepted
+int freqUpperBounds[8];
+int freqLowerBounds[8];
+//TODO: ADJUST ALGORITHM TO USE THESE BOUNDS
+//MAKE IT AN AVERAGE OR MEDIAN  OR MOST TO IGNORE SOME NOISE
 double vReal[samples];
 double vImag[samples];
 #define SCL_INDEX 0x00
@@ -72,6 +73,9 @@ void setup() {
   pinMode(mic,INPUT);
   randomSeed(analogRead(0));
   deactivateSmarticle();
+
+  freqUpperBounds[8] = freqCenters + freqAcceptThresh;
+  freqLowerBounds[8] = freqCenters - freqAcceptThresh;
 }
 
 void loop() 
@@ -94,15 +98,15 @@ void loop()
 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
 double findFrequency() {
-  //unsigned long startTime = micros();
+  unsigned long startTime = micros();
   for(uint16_t i =0; i<samples; i++)
   {
     vReal[i] = int(analogRead(mic));
     vImag[i] = 0;
   }
-  //unsigned long endTime = micros();
-  //unsigned long elapsedTime = endTime - startTime; //~ 7700 microseconds
-  //samplingFrequency = 1 / (elapsedTime/64000000); /*approximates previous sampling frequency*/
+  unsigned long endTime = micros();
+  unsigned long elapsedTime = endTime - startTime; //~ 7700 microseconds
+  samplingFrequency = 1 / (elapsedTime/64000000); /*approximates using previous sampling frequency*/
   
   FFT.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  /* Weigh data */
   FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
@@ -114,13 +118,13 @@ double findFrequency() {
 
 /* Determines whether or not to activate the smarticle based on frequency */
 void analyzeFrequency(double freq) {
-  if (freq > 1000) {
+  /*if (freq > 1000) {
     deactivateSmarticle();
     return;
-  }
+  }*/
   
-  for (int k = 0; k < 7; k++) {
-    if (freqBounds[k]<freq && freq>freqBounds[k+1] && SERVONUM == k+1) {
+  for (int k = 0; k < 8; k++) {
+    if (freqLowerBounds[k]<freq && freq>freqUpperBounds[k] && SERVONUM == k+1) {
       deactivateSmarticle();
       return;
     }
