@@ -6,47 +6,34 @@
 
 //#define F_CPU 8000000UL
 #define myabs(n) ((n) < 0 ? -(n) : (n))
-//pin definitions 
-#define servo1 5   //
-#define servo2 6  //
+
+/* Pin Definitions */
+#define servo1 5
+#define servo2 6
 #define mic     A6      // CHANGE BACK TO a6
 #define stressPin A7    // CHANGE BACK TO a7
-
 #define randPin A5    // CHANGE BACK TO a7
 #define led 13    //13 SCK
 #define stressMoveThresh 2
 
+/* Instance Data & Declarations */
 Servo S1;
 Servo S2;
-int silenceCount = 0;
 uint8_t stress = 0;
 uint16_t samps = 9; 
-uint16_t micMean = 512;
 uint16_t const del = 400;
 uint8_t stressCount = 0;
 uint16_t rangeType=0;
-double thresh = 50; //was 12.5
 uint8_t minn = 30; uint8_t maxx = 150; uint8_t midd = 90;
-static uint16_t prevVal = 8;
 static uint16_t currMoveType = 8;
-static int oldVal  = 0;
-static int newVal  = 0;
-static int diff  = 0;
 static int curr  = 0;
-int MATCHLIM=5;
-int matchCount=MATCHLIM;
-int ARRAYLEN=9;
-int moveMatches[] = {0,0,0,0,0,0,0,0,MATCHLIM};
-int SERVONUM=3;
-int nextMoveType=8;
+int SERVONUM = 3;
 bool ledVal = false;
-void moveMotor(uint8_t pos);
+void stressMove(uint8_t stress);
 void currentRead(uint16_t meanCurrVal);
-void getRange(uint16_t ftVal);
-int findMaxVal();
 void light(bool a);
 
-//FFT stuff
+/* FFT Stuff */
 #include "arduinoFFT.h"
 arduinoFFT FFT = arduinoFFT(); //creates new FFT object
 const uint16_t samples = 64;
@@ -74,71 +61,19 @@ void setup() {
 void loop() 
 {
   ledVal=false;
-  /*int meanCurr = 0;
+  double freq = findFrequency();
+  analyzeFrequency();
   
+  /*int meanCurr = 0;
   for (int i = 0; i < 1<<samps; i++)
   {
     curr    = analogRead(stressPin);
     meanCurr  = meanCurr+curr;
   }
-
   //bitshift divide by sample, meancurr=meancurr/(2^samps)
   meanCurr >>= samps;
   currentRead(meanCurr);*/
-  
-  double freq = findFrequency();
-  analyzeFrequency();
-  
 }
-
-void currentRead(uint16_t meanCurrVal)
-{
-  static bool v = true;
-  if(meanCurrVal<40)//make magic number into meaningful value!!
-  {
-    stressCount = 0;
-  }
-  else
-  {
-    stressCount++;
-    if(stressCount>=stressMoveThresh && rangeType!=6 && rangeType!=7)
-    {
-                        v=!v;
-                        light(v);
-      (stress > 2 ? stress=0 : (stress++));
-      moveMotor(stress);
-                        //_delay_ms(del);
-    } 
-    //delay(del);
-  }
-  
-}
-
-void moveMotor(uint8_t pos) //break method into chunks to allow "multithreading"
-{
-  if(pos==0)
-  {
-    deactivateSmarticle;
-  }
-  else if(pos==SERVONUM) //deactivate
-  {
-    deactiveSmarticle();
-    return;
-  }
-    else if(pos==8)
-  {
-    deactiveSmarticle();
-    return;
-  }
-  else
-  {
-    activateSmarticle();
-    return;
-  }         
-
-}
-
-
 
 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
@@ -161,7 +96,7 @@ double findFrequency() {
   return x;
 }
 
-
+/* Determines whether or not to activate the smarticle based on frequency */
 void analyzeFrequency(double freq) {
   if (freq > 1000) {
     deactivateSmarticle();
@@ -176,8 +111,6 @@ void analyzeFrequency(double freq) {
   }
   activateSmarticle();
 }
-
-
 
 void deactivateSmarticle() {
   S1.writeMicroseconds(p1=1500);
@@ -207,3 +140,33 @@ void light(bool a)
   else
     digitalWrite(led, LOW);
 }
+
+
+/*void currentRead(uint16_t meanCurrVal)
+{
+  static bool v = true;
+  if(meanCurrVal<40)//make magic number into meaningful value!!
+  {
+    stressCount = 0;
+  }
+  else
+  {
+    stressCount++;
+    if(stressCount>=stressMoveThresh && rangeType!=6 && rangeType!=7)
+    {
+                        v=!v;
+                        light(v);
+      (stress > 2 ? stress=0 : (stress++));
+      moveMotor(stress);
+                        //_delay_ms(del);
+    } 
+    //delay(del);
+  }
+  
+}
+
+void stressMove(uint8_t stress) //break method into chunks to allow "multithreading"
+{
+  activateSmarticle();
+  return;
+}*/
