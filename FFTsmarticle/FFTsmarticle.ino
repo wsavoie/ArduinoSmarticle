@@ -54,8 +54,6 @@ int freqCenters[8] = {600, 650, 700, 750, 800, 850, 900, 950};
 int freqAcceptThresh = 20;  //+-30Hz from freqCenter is accepted
 int freqUpperBounds[8];
 int freqLowerBounds[8];
-//TODO: ADJUST ALGORITHM TO USE THESE BOUNDS
-//MAKE IT AN AVERAGE OR MEDIAN  OR MOST TO IGNORE SOME NOISE
 double vReal[samples];
 double vImag[samples];
 #define SCL_INDEX 0x00
