@@ -13,3 +13,7 @@
 # movie files#
 ########################
 *.avi
+
+#mac folder files#
+########################
+.DS_Store
