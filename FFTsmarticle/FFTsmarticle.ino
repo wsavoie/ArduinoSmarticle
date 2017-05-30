@@ -24,6 +24,7 @@ uint16_t samps = 9;
 uint16_t const del = 400;
 uint8_t stressCount = 0;
 uint16_t rangeType=0;
+static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 30; uint8_t maxx = 150; uint8_t midd = 90;
 static uint16_t currMoveType = 8;
 static int curr  = 0;
@@ -32,6 +33,8 @@ bool ledVal = false;
 void stressMove(uint8_t stress);
 void currentRead(uint16_t meanCurrVal);
 void light(bool a);
+void activateSmarticle();
+void deactivateSmarticle();
 
 /* FFT Stuff */
 #include "arduinoFFT.h"
@@ -62,7 +65,7 @@ void loop()
 {
   ledVal=false;
   double freq = findFrequency();
-  analyzeFrequency();
+  analyzeFrequency(freq);
   
   /*int meanCurr = 0;
   for (int i = 0; i < 1<<samps; i++)
@@ -104,8 +107,8 @@ void analyzeFrequency(double freq) {
   }
   
   for (int k = 0; k < 7; k++) {
-    if (bounds[k]<freq && freq>bounds[k+1] && SERVONUM == k+1) {
-      deactiveSmarticle();
+    if (freqBounds[k]<freq && freq>freqBounds[k+1] && SERVONUM == k+1) {
+      deactivateSmarticle();
       return;
     }
   }
