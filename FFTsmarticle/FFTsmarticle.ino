@@ -125,7 +125,7 @@ void analyzeFrequency(double freq) {
   }*/
   
   for (int k = 0; k < 8; k++) {
-    if (freqLowerBounds[k]<freq && freq>freqUpperBounds[k] && SERVONUM == k+1) {
+    if (freqLowerBounds[k]<freq && freq<freqUpperBounds[k] && SERVONUM == k+1) {
       deactivateSmarticle();
       return;
     }
