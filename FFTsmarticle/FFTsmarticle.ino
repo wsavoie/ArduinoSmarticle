@@ -99,15 +99,15 @@ void loop()
 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
 double findFrequency() {
-  unsigned long startTime = micros();
+  //unsigned long startTime = micros();
   for(uint16_t i =0; i<samples; i++)
   {
     vReal[i] = int(analogRead(mic));
     vImag[i] = 0;
   }
-  unsigned long endTime = micros();
-  unsigned long elapsedTime = endTime - startTime; //~ 7700 microseconds
-  samplingFrequency = 1 / (elapsedTime/64000000); /*approximates using previous sampling frequency*/
+  //unsigned long endTime = micros();
+  //unsigned long elapsedTime = endTime - startTime; //~ 7700 microseconds
+  //samplingFrequency = 1 / (elapsedTime/64000000); /*approximates using previous sampling frequency*/
   
   FFT.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  /* Weigh data */
   FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
