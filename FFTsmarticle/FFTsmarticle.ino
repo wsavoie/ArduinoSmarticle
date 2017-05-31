@@ -72,8 +72,11 @@ void setup() {
   randomSeed(analogRead(0));
   deactivateSmarticle();
 
-  freqUpperBounds[8] = freqCenters + freqAcceptThresh;
-  freqLowerBounds[8] = freqCenters - freqAcceptThresh;
+  //Compute Frequency Bounds
+  for (int k = 0; k < 8; k++) {
+    freqUpperBounds[k] = freqCenters[k] + freqAcceptThresh;
+    freqLowerBounds[k] = freqCenters[k] - freqAcceptThresh;
+  }
 }
 
 void loop() 
