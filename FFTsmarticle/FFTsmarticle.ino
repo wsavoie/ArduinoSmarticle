@@ -37,7 +37,7 @@ static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 static uint16_t currMoveType = 8;
 static int curr  = 0;
-int SERVONUM = 5;
+int SERVONUM = 1;
 bool ledVal = false;
 void stressMove(uint8_t stress);
 void currentRead(uint16_t meanCurrVal);
@@ -142,7 +142,7 @@ void analyzeFrequency(double freq) {
   
   for (int k = 0; k < 8; k++) {
     if (freqLowerBounds[k]<freq && freq<freqUpperBounds[k] && SERVONUM == k+1) {
-      inertia = 5;
+      inertia = 8;
       deactivateSmarticle();
       return;
     }
