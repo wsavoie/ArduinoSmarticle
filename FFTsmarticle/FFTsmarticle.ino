@@ -5,8 +5,8 @@
 //#include <MegaServo.h>
 
 #include <Servo.h>
-#include <avr/io.h>
-#include <avr035.h>
+//#include <avr/io.h>
+//#include <avr035.h>
 
 //#define F_CPU 8000000UL
 #define myabs(n) ((n) < 0 ? -(n) : (n))
@@ -29,7 +29,7 @@
 Servo S1;
 Servo S2;
 uint8_t stress = 0;
-uint16_t samps = 9; 
+uint16_t samps = 9;
 uint16_t const del = 400;
 uint8_t stressCount = 0;
 uint16_t rangeType=0;
@@ -37,7 +37,7 @@ static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 static uint16_t currMoveType = 8;
 static int curr  = 0;
-int SERVONUM = 3;
+int SERVONUM = 5;
 bool ledVal = false;
 void stressMove(uint8_t stress);
 void currentRead(uint16_t meanCurrVal);
@@ -48,17 +48,23 @@ void deactivateSmarticle();
 /* FFT Stuff */
 arduinoFFT FFT = arduinoFFT(); //creates new FFT object
 const uint16_t samples = 64;
-double samplingFrequency = 8300; //elapsed time ~ 7700us
+//double samplingFrequency = 8300; //breadboard: elapsed time ~ 7700us
+double samplingFrequency = 7950; //smarticle: elapsed time ~ 8050us
 //SERVONUM:            1    2    3    4    5    6    7    8
-int freqCenters[8] = {600, 650, 700, 750, 800, 850, 900, 950};
-int freqAcceptThresh = 20;  //+-30Hz from freqCenter is accepted
+int freqCenters[8] = {600, 700, 800, 900, 1000, 1100, 1200, 1300};
+int freqAcceptThresh = 40;  //+-30Hz from freqCenter is accepted
+//int freqCenters[8] = {600, 650, 700, 750, 800, 850, 900, 950};
+//int freqAcceptThresh = 20;  //+-30Hz from freqCenter is accepted
 int freqUpperBounds[8];
 int freqLowerBounds[8];
+double computedFreqs[5];
 double vReal[samples];
 double vImag[samples];
 #define SCL_INDEX 0x00
 #define SCL_TIME 0x01
 #define SCL_FREQUENCY 0x02
+int inertia = 0;
+int curRange = 0;
 
 
 void setup() {
@@ -77,6 +83,7 @@ void setup() {
     freqUpperBounds[k] = freqCenters[k] + freqAcceptThresh;
     freqLowerBounds[k] = freqCenters[k] - freqAcceptThresh;
   }
+  //Serial.begin(9600);
 }
 
 void loop() 
@@ -84,6 +91,14 @@ void loop()
   ledVal=false;
   double freq = findFrequency();
   analyzeFrequency(freq);
+  
+  /*int freqSum = 0;
+  for (int k = 0; k < 5; k++) {
+    computedFreqs[k] = findFrequency();
+    freqSum += computedFreqs[k];
+  }
+  double avgFreq = freqSum/5;
+  analyzeFrequency(avgFreq);*/
   
   /*int meanCurr = 0;
   for (int i = 0; i < 1<<samps; i++)
@@ -99,15 +114,16 @@ void loop()
 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
 double findFrequency() {
-  //unsigned long startTime = micros();
+  double startTime = micros();
   for(uint16_t i =0; i<samples; i++)
   {
-    vReal[i] = int(analogRead(mic));
+    vReal[i] = double(analogRead(mic));
     vImag[i] = 0;
   }
-  //unsigned long endTime = micros();
-  //unsigned long elapsedTime = endTime - startTime; //~ 7700 microseconds
-  //samplingFrequency = 1 / (elapsedTime/64000000); /*approximates using previous sampling frequency*/
+  double endTime = micros();
+  double elapsedTime = endTime - startTime; //~ 7700 microseconds
+  //Serial.println(elapsedTime);
+  samplingFrequency = 1 / (elapsedTime/64000000); /*approximates using previous sampling frequency*/
   
   FFT.Windowing(vReal, samples, FFT_WIN_TYP_HAMMING, FFT_FORWARD);  /* Weigh data */
   FFT.Compute(vReal, vImag, samples, FFT_FORWARD); /* Compute FFT */
@@ -126,16 +142,20 @@ void analyzeFrequency(double freq) {
   
   for (int k = 0; k < 8; k++) {
     if (freqLowerBounds[k]<freq && freq<freqUpperBounds[k] && SERVONUM == k+1) {
+      inertia = 5;
       deactivateSmarticle();
       return;
     }
   }
-  activateSmarticle();
+  inertia--;
+  if (inertia <= 0)
+    activateSmarticle();
 }
 
 void deactivateSmarticle() {
   S1.writeMicroseconds(p1=1500);
   S2.writeMicroseconds(p2=1500);
+  delay(del);
 }
 
 void activateSmarticle() {
