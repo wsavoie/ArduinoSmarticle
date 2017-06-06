@@ -28,6 +28,7 @@
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
+const int SERVONUM = 5;
 uint8_t stress = 0;
 uint16_t samps = 9;
 uint16_t const del = 400;
@@ -37,7 +38,6 @@ static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 static uint16_t currMoveType = 8;
 static int curr  = 0;
-int SERVONUM = 1;
 bool ledVal = false;
 void stressMove(uint8_t stress);
 void currentRead(uint16_t meanCurrVal);
