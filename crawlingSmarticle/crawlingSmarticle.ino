@@ -12,7 +12,7 @@ const int SERVONUM = 3;
 uint16_t const del = 400;
 static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
-uint8_t radiusChange = 0;
+uint8_t radiusChange = 60;
 void activateSmarticle();
 void deactivateSmarticle();
 
@@ -41,15 +41,19 @@ void deactivateSmarticle() {
 void activateSmarticle() {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
+  //S2.writeMicroseconds(p2=(180-minn) * 10 + 600);
   delay(del);   
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
+  //S2.writeMicroseconds(p2=(180-maxx) * 10 + 600);
   delay(del);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
+  //S2.writeMicroseconds(p2=(180-maxx) * 10 + 600);
   delay(del);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
+  //S2.writeMicroseconds(p2=(180-minn) * 10 + 600);
   delay(300);
   //delay(random(100));
 }
