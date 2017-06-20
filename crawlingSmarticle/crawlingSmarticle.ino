@@ -1,8 +1,8 @@
 #include <Servo.h>
 
 /* Pin Definitions */
-#define servo1 10
-#define servo2 11
+#define servo1 5 //new: 10
+#define servo2 6 //new: 11
 #define led 13
 
 /* Instance Data & Declarations */
@@ -23,6 +23,7 @@ void setup() {
   minn = minn + radiusChange;
   maxx = maxx - radiusChange;
   deactivateSmarticle();
+  delay(5000);
 }
 
 void loop() 
