@@ -24,8 +24,8 @@ void setup() {
 
 void loop() 
 {
-  activateSmarticle();
-  //deactivateSmarticle();
+  //activateSmarticle();
+  deactivateSmarticle();
 }
 
 
