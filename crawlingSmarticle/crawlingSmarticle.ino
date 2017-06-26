@@ -12,7 +12,8 @@ const int SERVONUM = 3;
 uint16_t const del = 400;
 static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
-uint8_t radiusChange = 60;
+uint8_t gaitRadius = 90; //between 0 and 90 degrees
+uint8_t radiusChange;
 void activateSmarticle();
 void deactivateSmarticle();
 
@@ -20,6 +21,7 @@ void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
   pinMode(led,OUTPUT);
+  radiusChange = 90 - gaitRadius;
   minn = minn + radiusChange;
   maxx = maxx - radiusChange;
   deactivateSmarticle();
