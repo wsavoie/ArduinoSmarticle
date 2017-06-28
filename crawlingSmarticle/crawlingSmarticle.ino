@@ -14,8 +14,9 @@ static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 uint8_t gaitRadius = 90; //between 0 and 90 degrees
 uint8_t radiusChange;
-void activateSmarticle();
 void deactivateSmarticle();
+void activateForward();
+void activateBackward();
 
 void setup() {
   S1.attach(servo1,600,2400);
@@ -24,38 +25,51 @@ void setup() {
   radiusChange = 90 - gaitRadius;
   minn = minn + radiusChange;
   maxx = maxx - radiusChange;
-  deactivateSmarticle();
+  deactivate();
   delay(5000);
 }
 
-void loop() 
+void loop()
 {
-  activateSmarticle();
+  activateForward();
 }
 
-
-void deactivateSmarticle() {
+/* Moves the arms parallel to the Smarticle's body */
+void deactivate() {
   S1.writeMicroseconds(p1=1500);
   S2.writeMicroseconds(p2=1500);
   delay(del);
 }
 
-void activateSmarticle() {
+/* Moves the Smarticle forward (convention: switch on left side) */
+void activateForward() {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
-  //S2.writeMicroseconds(p2=(180-minn) * 10 + 600);
   delay(del);   
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
-  //S2.writeMicroseconds(p2=(180-maxx) * 10 + 600);
   delay(del);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
-  //S2.writeMicroseconds(p2=(180-maxx) * 10 + 600);
   delay(del);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
-  //S2.writeMicroseconds(p2=(180-minn) * 10 + 600);
   delay(300);
-  //delay(random(100));
 }
+
+/* Moves the Smarticle backward (convention: switch on left side) */
+void activateBackward() {
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=(180-minn) * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=(180-maxx) * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=(180-maxx) * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=(180-minn) * 10 + 600);
+  delay(300);
+}
+
