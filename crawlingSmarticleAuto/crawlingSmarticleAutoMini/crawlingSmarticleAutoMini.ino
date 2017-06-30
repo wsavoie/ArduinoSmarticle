@@ -1,10 +1,11 @@
-#include <Servo.h>
+#include <AltSoftSerial.h> 
+#include "Servo.h"
 
 /* Pin Definitions */
 #define servo1 5 //new: 10
 #define servo2 6 //new: 11
 #define led 13
-
+AltSoftSerial AS;
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
@@ -17,14 +18,17 @@ uint8_t radiusChange;
 void deactivateSmarticle();
 void activateForward();
 void activateBackward();
-
+void stopLoop();
+int dir = 1;
+int v=0;//run nums
+int maxV=10;
 void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
   pinMode(led,OUTPUT);
-  radiusChange = 90 - gaitRadius;
-  minn = minn + radiusChange;
-  maxx = maxx - radiusChange;
+//  radiusChange = 90 - gaitRadius;
+//  minn = minn + radiusChange;
+//  maxx = maxx - radiusChange;
   deactivate();
   delay(5000);
 }
@@ -32,9 +36,31 @@ void setup() {
 void loop()
 {
   activateForward();
+  AS.begin(9600);
+  if(AS.available()>0)
+  {
+    dir=AS.read();
+    v=v+1;
+    if(v>maxV)
+    {
+      v=0;
+      gaitRadius=gaitRadius+5;
+      if(gaitRadius>90)
+      {
+        AS.println("end");
+        stopLoop();
+      }
+    }
+    String message = "_"+String(gaitRadius)+"_"+String(v);
+    AS.println(message); 
+  }
 }
 
 /* Moves the arms parallel to the Smarticle's body */
+void stopLoop()
+{
+  while(1);
+}
 void deactivate() {
   S1.writeMicroseconds(p1=1500);
   S2.writeMicroseconds(p2=1500);
@@ -43,6 +69,8 @@ void deactivate() {
 
 /* Moves the Smarticle forward (convention: switch on left side) */
 void activateForward() {
+  if(dir==1)
+  {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
   delay(del);   
@@ -55,6 +83,22 @@ void activateForward() {
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
   delay(300);
+  }
+  else
+  {
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del); 
+   S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(300);   
+  }
 }
 
 /* Moves the Smarticle backward (convention: switch on left side) */
