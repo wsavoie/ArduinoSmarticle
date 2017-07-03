@@ -1,4 +1,4 @@
-#include <AltSoftSerial.h> 
+#include <SoftwareSerial.h> 
 //on uno and promini
 //TX=9 RX=8
 int front = A1; //photoresistor top of plate
@@ -9,7 +9,7 @@ int valF = 0;
 int valB = 0;
 int dir =0;
 int thresh = 700;
-AltSoftSerial AS;
+SoftwareSerial AS(8,9);
 void setup() 
 {
 //read sensor data
@@ -21,7 +21,6 @@ pinMode(back, INPUT);
 
 AS.begin(9600);
 Serial.begin(9600); //serial to matlab
-Serial.write("yoyoyo");
 }
 
 void loop()
@@ -34,41 +33,44 @@ void loop()
       valB=readSensor(analogRead(back));
 //      Serial.println();        
       if(valF){
-        dir=-1;//set new dir to front
+        dir=2;//set new dir to front
         AS.write(dir);
-        Serial.println("Go Back"); 
+//        Serial.println("Go Back"); 
     
       }
       else if(valB){
         dir=1;//set new dir to front
         AS.write(dir);
-        Serial.println("Go Front");     
+//        Serial.println("Go Front");     
       }
 
       break;
     case 1: //polling front side, read front
       valF=readSensor(analogRead(front));
       if(valF){
-        dir=-1;
+        dir=2;
         AS.write(dir);
-         Serial.println("Go Back"); 
+//         Serial.println("Go Back"); 
       }
       break;
-    case -1: //towards back
+    case 2: //towards back
       valF=readSensor(analogRead(back));
       if(valF){
           dir=1;
           AS.write(dir);
-          Serial.println("Go Front");
+//          Serial.println("Go Front");
       }
       break; 
   }
 ///////since serialEvent I dont think will work////////
   inBuffer="";
-  while(AS.available()> 0)
+  while(AS.available())
   {
-    inBuffer =  inBuffer+AS.read();
-
+    char c = AS.read();
+    inBuffer = inBuffer+c;
+    
+//    Serial.print(AS.read());
+    delay(1);
   }
   if(inBuffer=="end")
   {
@@ -77,9 +79,7 @@ void loop()
   }
   if(inBuffer!="")
   {
-  inBuffer=String(dir)+inBuffer;
   Serial.println(inBuffer);
-  delay(5000);
   }
 
   /////////////////////////////////////////////////////

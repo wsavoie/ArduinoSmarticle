@@ -1,11 +1,11 @@
-#include <AltSoftSerial.h> 
+#include <SoftwareSerial.h> 
 #include "Servo.h"
 
 /* Pin Definitions */
 #define servo1 5 //new: 10
 #define servo2 6 //new: 11
 #define led 13
-AltSoftSerial AS;
+SoftwareSerial AS(9,10);
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
@@ -23,6 +23,7 @@ int dir = 1;
 int v=0;//run nums
 int maxV=10;
 void setup() {
+   AS.begin(9600);
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
   pinMode(led,OUTPUT);
@@ -36,14 +37,13 @@ void setup() {
 void loop()
 {
   activateForward();
-  AS.begin(9600);
   if(AS.available()>0)
   {
     dir=AS.read();
     v=v+1;
     if(v>maxV)
     {
-      v=0;
+      v=1;
       gaitRadius=gaitRadius+5;
       if(gaitRadius>90)
       {
@@ -51,7 +51,7 @@ void loop()
         stopLoop();
       }
     }
-    String message = "_"+String(gaitRadius)+"_"+String(v);
+    String message = String(dir)+"_"+String(gaitRadius)+"_"+String(v);
     AS.println(message); 
   }
 }
