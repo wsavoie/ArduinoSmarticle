@@ -36,6 +36,7 @@
 
 % Connect to instrument object, obj1.
 % fopen(udpc);
+%make sure to have natnetsdk from  http://optitrack.com/downloads/developer-tools.html#natnet-sdk
 function [client]=natnetInit()
 % Creates the natnet client
 client = natnet();
