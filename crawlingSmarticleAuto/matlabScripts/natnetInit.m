@@ -37,6 +37,9 @@
 % Connect to instrument object, obj1.
 % fopen(udpc);
 %make sure to have natnetsdk from  http://optitrack.com/downloads/developer-tools.html#natnet-sdk
+%place folder from ~\NatNetSDK\Samples\MatlabWrapper\natnet 
+%folder inside root path and set natnet as a read folder on path
+%and set assemblypath text file to the lib\x64\NatNetML.dll location
 function [client]=natnetInit()
 % Creates the natnet client
 client = natnet();
