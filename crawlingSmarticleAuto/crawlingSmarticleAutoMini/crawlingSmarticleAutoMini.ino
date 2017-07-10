@@ -86,7 +86,8 @@ void activateForward() {
   }
   else
   {
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  activateBackward();
+  /*S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
   delay(del); 
    S1.writeMicroseconds(p1=minn * 10 + 600);
@@ -97,7 +98,7 @@ void activateForward() {
   delay(del);
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(300);   
+  delay(300);*/
   }
 }
 
