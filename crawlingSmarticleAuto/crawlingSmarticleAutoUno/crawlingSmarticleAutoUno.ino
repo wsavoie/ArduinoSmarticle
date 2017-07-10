@@ -8,7 +8,7 @@ String inBuffer;
 int valF = 0;
 int valB = 0;
 int dir =0;
-int thresh = 700;
+int thresh = 900;
 SoftwareSerial AS(8,9);
 void setup() 
 {
@@ -46,7 +46,9 @@ void loop()
 
       break;
     case 1: //polling front side, read front
+      
       valF=readSensor(analogRead(front));
+//       Serial.println("front:"+String(analogRead(front)));
       if(valF){
         dir=2;
         AS.write(dir);
@@ -55,6 +57,7 @@ void loop()
       break;
     case 2: //towards back
       valF=readSensor(analogRead(back));
+//      Serial.println("back:"+String(analogRead(back)));
       if(valF){
           dir=1;
           AS.write(dir);
@@ -90,11 +93,11 @@ int readSensor(int sensorResult)
   //if using analog read, this function takes read result and
   //does thresholding to determine binary signal output 
   //needs to be ">"because it is high when covered
-  //Serial.println(valB);
+//  Serial.println(sensorResult);
   if (sensorResult>thresh){  
 //    Serial.println(valB);
       return 1;
-      }
+  }
   else
   {
     return 0;

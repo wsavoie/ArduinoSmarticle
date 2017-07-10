@@ -15,7 +15,7 @@ running =1;
 while(running)
     serialOut=fgetl(uno);
     if(~isnan(serialOut))
-        pts(serialOut);
+%         pts(serialOut);
         if(strcmp(serialOut,'end'));
             running=0;
             continue;
