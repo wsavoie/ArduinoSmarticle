@@ -5,15 +5,16 @@
 #define servo1 5 //new: 10
 #define servo2 6 //new: 11
 #define led 13
-SoftwareSerial AS(9,10);
+SoftwareSerial AS(9,8);
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
 const int SERVONUM = 3;
 uint16_t const del = 400;
 static int p1 = 1500; static int p2 = 1500;
-uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
-uint8_t gaitRadius = 20; //between 0 and 90 degrees
+uint8_t ominn = 0; uint8_t omaxx = 180; uint8_t omidd = 90; //originals
+uint8_t minn; uint8_t maxx; uint8_t midd;  //current
+uint8_t gaitRadius = 90; //between 0 and 90 degrees
 uint8_t radiusChange;
 void deactivateSmarticle();
 void activateForward();
@@ -27,9 +28,9 @@ void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
   pinMode(led,OUTPUT);
-//  radiusChange = 90 - gaitRadius;
-//  minn = minn + radiusChange;
-//  maxx = maxx - radiusChange;
+  radiusChange = 90 - gaitRadius;
+  minn = ominn + radiusChange;
+  maxx = omaxx - radiusChange;
   deactivate();
   delay(5000);
 }
@@ -37,19 +38,23 @@ void setup() {
 void loop()
 {
   activateForward();
-  if(AS.available()>0)
-  {
+  
+  if(AS.available()>0) {
     dir=AS.read();
     v=v+1;
-    if(v>maxV)
-    {
+    
+    if(v>maxV) {
       v=1;
-      gaitRadius=gaitRadius+5;
-      if(gaitRadius>90)
-      {
+      gaitRadius=gaitRadius-5;
+      radiusChange = 90 - gaitRadius;
+      minn = ominn + radiusChange;
+      maxx = omaxx - radiusChange;
+      
+      if(gaitRadius<20) {
         AS.println("end");
         stopLoop();
       }
+      
     }
     String message = String(dir)+"_"+String(gaitRadius)+"_"+String(v);
     AS.println(message); 
@@ -69,36 +74,22 @@ void deactivate() {
 
 /* Moves the Smarticle forward (convention: switch on left side) */
 void activateForward() {
-  if(dir==1)
-  {
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(300);
+  if(dir==1) {
+    S1.writeMicroseconds(p1=maxx * 10 + 600);
+    S2.writeMicroseconds(p2=minn * 10 + 600);
+    delay(del);   
+    S1.writeMicroseconds(p1=maxx * 10 + 600);
+    S2.writeMicroseconds(p2=maxx * 10 + 600);
+    delay(del);   
+    S1.writeMicroseconds(p1=minn * 10 + 600);
+    S2.writeMicroseconds(p2=maxx * 10 + 600);
+    delay(del);   
+    S1.writeMicroseconds(p1=minn * 10 + 600);
+    S2.writeMicroseconds(p2=minn * 10 + 600);
+    delay(300);
   }
-  else
-  {
-  activateBackward();
-  /*S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del); 
-   S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(300);*/
+  else {
+    activateBackward();
   }
 }
 
