@@ -7,22 +7,42 @@ int back = A5; //photoresistor at bottom of plate
 String inBuffer;
 int valF = 0;
 int valB = 0;
-int dir =0;
+//beam break threshold
 int thresh = 900;
 SoftwareSerial AS(8,9);
+
+int dir =0;
+bool writeYes=true;
+
+///////////start up variables to write to pro mini//////////
+int maxV = 2;           //number of trials for each radius
+int gaitRadInitial = 30;//initial gait radius
+int gaitIncrease = 1;   //amount to increase gait radius
+int v = 1;              //current trial number
+////////////////////////////////////////////////////////////
+
 void setup() 
 {
-//read sensor data
-pinMode(front, INPUT);
-pinMode(back, INPUT);
-
-//send direction to pro mini
-//pinMode(proDirPin,OUTPUT);
-
-AS.begin(9600);
-Serial.begin(9600); //serial to matlab
+  //read sensor data
+  pinMode(front, INPUT);
+  pinMode(back, INPUT);
+  
+  dir=0;
+//dir=v%2+1; //odd if v is odd dir=2, if even dir=1
+  //pinMode(proDirPin,OUTPUT);
+  
+  AS.begin(9600);
+  Serial.begin(9600); //serial to matlab
+  delay(500);
+  
+//  if(writeYes)
+//  {
+//    inBuffer= String(maxV)+"_"+String(gaitRadInitial)+"_"+
+//    String(gaitIncrease)+"_"+String(v)+"_"+String(dir);
+//  //start from version you want -1
+//    AS.print(inBuffer);
+//  }
 }
-
 void loop()
 {
   
@@ -83,7 +103,7 @@ void loop()
   }
   if(inBuffer!="")
   {
-  Serial.println(inBuffer);
+  Serial.print(inBuffer);
   }
 
   /////////////////////////////////////////////////////

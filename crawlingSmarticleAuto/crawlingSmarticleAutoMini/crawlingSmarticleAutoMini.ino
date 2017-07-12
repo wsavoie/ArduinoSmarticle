@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 #include "Servo.h"
-
+#include <string.h>
 /* Pin Definitions */
 #define servo1 5 //new: 10
 #define servo2 6 //new: 11
@@ -20,23 +20,49 @@ void deactivateSmarticle();
 void activateForward();
 void activateBackward();
 void stopLoop();
-
+String getValue(String data, char separator, int index);
 //counter variables for automation
-int dir = 1;
-int v = 0; //run nums
+
 int maxV = 10;
-int gaitIncrease = 5;
-int gaitRadInitial = 20;
+int gaitRadInitial = 30;
+int gaitIncrease = 2;
+int v = 0; //run nums
+int dir = 1;
+String inBuffer;
 void setup() {
 
   AS.begin(9600);
   S1.attach(servo1, 600, 2400);
   S2.attach(servo2, 600, 2400);
   pinMode(led, OUTPUT);
+
+  //read in maxV_gaitRadInitial_gaitIncrease_v_dir
+  while(AS.available())
+  {
+    int inChar = Serial.read();    
+  }
+
+  deactivate();
+  inBuffer="";
+//  while(AS.available())
+//  {
+//    char c = AS.read();
+//    inBuffer = inBuffer+c;
+//    delay(1);
+//  }
+//  //maxV_gaitRadInitial_gaitIncrease_v_dir
+//  if(inBuffer !="")
+//  {
+//    maxV = getValue(inBuffer, "_", 0).toInt();
+//    gaitRadInitial = getValue(inBuffer, "_", 1).toInt();
+//    gaitIncrease = getValue(inBuffer, "_", 2).toInt();
+//    v = getValue(inBuffer, "_", 3).toInt();
+//    dir = getValue(inBuffer, "_", 4).toInt();
+//  }
   gaitRadius = gaitRadInitial;
   minn = midd - gaitRadius;
   maxx = midd + gaitRadius;
-  deactivate();
+  
   delay(5000);
 }
 
@@ -112,4 +138,18 @@ void activateBackward() {
   S2.writeMicroseconds(p2 = (180 - minn) * 10 + 600);
   delay(endDel);
 }
+String getValue(String data, char separator, int index)
+{
+    int found = 0;
+    int strIndex[] = { 0, -1 };
+    int maxIndex = data.length() - 1;
 
+    for (int i = 0; i <= maxIndex && found <= index; i++) {
+        if (data.charAt(i) == separator || i == maxIndex) {
+            found++;
+            strIndex[0] = strIndex[1] + 1;
+            strIndex[1] = (i == maxIndex) ? i+1 : i;
+        }
+    }
+    return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
