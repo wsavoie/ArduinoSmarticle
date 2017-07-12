@@ -78,12 +78,12 @@ void loop()
   //println appends CR=13=\r,LF=10=\n or \r\n 
   if(inBuffer=="end")
   {
-    Serial.print("end\r\n");
+    Serial.println("end");
     stopProgram();
   }
   if(inBuffer!="")
   {
-  Serial.print(inBuffer+"\r\n");
+  Serial.println(inBuffer);
   }
 
   /////////////////////////////////////////////////////
@@ -108,7 +108,10 @@ int readSensor(int sensorResult)
 void stopProgram()
 {
   while(1)
-  {}
+  {
+    Serial.print("restart uno and mini\r\n");
+    delay(1000);
+  }
 }
 //void serialEvent() {
 //

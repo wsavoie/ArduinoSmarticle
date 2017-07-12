@@ -5,7 +5,7 @@
 #define servo1 5 //new: 10
 #define servo2 6 //new: 11
 #define led 13
-SoftwareSerial AS(9, 10);
+SoftwareSerial AS(8, 9);
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
@@ -35,7 +35,7 @@ void setup() {
   pinMode(led, OUTPUT);
   gaitRadius = gaitRadInitial;
   minn = midd - gaitRadius;
-  maxx = maxx + gaitRadius;
+  maxx = midd + gaitRadius;
   deactivate();
   delay(5000);
 }
@@ -60,12 +60,12 @@ void loop()
       
       if (gaitRadius > 90)
       {
-        AS.print("end");
+        AS.println("end");
         stopLoop();
       }
     }
     String message = String(dir) + "_" + String(gaitRadius) + "_" + String(v);
-    AS.print(message);
+    AS.println(message);
   }
 }
 
