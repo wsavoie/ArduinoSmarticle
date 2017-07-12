@@ -75,14 +75,15 @@ void loop()
 //    Serial.print(AS.read());
     delay(1);
   }
+  //println appends CR=13=\r,LF=10=\n or \r\n 
   if(inBuffer=="end")
   {
-    Serial.println("end");
+    Serial.print("end\r\n");
     stopProgram();
   }
   if(inBuffer!="")
   {
-  Serial.println(inBuffer);
+  Serial.print(inBuffer+"\r\n");
   }
 
   /////////////////////////////////////////////////////

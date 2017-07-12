@@ -6,6 +6,7 @@ if exist('client','var')
 end
 uno = serial('COM16','BaudRate',9600,'DataBits',8);
 set(uno,'terminator','LF/CR')
+set(uno,'terminator','CR/LF')
 % s.terminator = '\r\n'; %termination bit arduino sends \r
 
 fopen(uno);
