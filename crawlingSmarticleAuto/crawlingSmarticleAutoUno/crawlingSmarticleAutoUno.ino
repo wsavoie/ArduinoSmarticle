@@ -1,4 +1,4 @@
-#include <SoftwareSerial.h> 
+#include <SoftwareSerial.h>
 //on uno and promini
 //TX=9 RX=8
 int front = A1; //photoresistor top of plate
@@ -9,10 +9,12 @@ int valF = 0;
 int valB = 0;
 //beam break threshold
 int thresh = 900;
-SoftwareSerial AS(8,9);
-
-int dir =0;
-bool writeYes=true;
+SoftwareSerial AS(8, 9);
+int getValue(String data, char separator, int index);
+void readParamsFromMatlab();
+void sendParamsToMini();
+int dir = 0;
+bool writeYes = true;
 
 ///////////start up variables to write to pro mini//////////
 int maxV = 2;           //number of trials for each radius
@@ -21,113 +23,90 @@ int gaitIncrease = 1;   //amount to increase gait radius
 int v = 1;              //current trial number
 ////////////////////////////////////////////////////////////
 
-void setup() 
+void setup()
 {
   //read sensor data
   pinMode(front, INPUT);
   pinMode(back, INPUT);
-  
-  dir=0;
-//dir=v%2+1; //odd if v is odd dir=2, if even dir=1
+
+  dir = 0;
+  dir = v % 2 + 1; //odd if v is odd dir=2, if even dir=1
   //pinMode(proDirPin,OUTPUT);
-  
+
   AS.begin(9600);
   Serial.begin(9600); //serial to matlab
-  delay(500);
   
-//  if(writeYes)
-//  {
-//    inBuffer= String(maxV)+"_"+String(gaitRadInitial)+"_"+
-//    String(gaitIncrease)+"_"+String(v)+"_"+String(dir);
-//  //start from version you want -1
-//    AS.print(inBuffer);
-//  }
+  delay(1000);
+
+
+  //
+  //  int test = getValue(inBuffer,k, 0);
+  //  Serial.println("value: "+String(test));
 }
 void loop()
 {
-  
-  switch(dir)
+  readParamsFromMatlab();
+  switch (dir)
   {
     case 0: //unknown starting direction
-      valF=readSensor(analogRead(front));
-      valB=readSensor(analogRead(back));
-//      Serial.println();        
-      if(valF){
-        dir=2;//set new dir to front
+      valF = readSensor(analogRead(front));
+      valB = readSensor(analogRead(back));
+      //      Serial.println();
+      if (valF) {
+        dir = 2; //set new dir to front
         AS.write(dir);
-//        Serial.println("Go Back"); 
-    
+        //        Serial.println("Go Back");
+
       }
-      else if(valB){
-        dir=1;//set new dir to front
+      else if (valB) {
+        dir = 1; //set new dir to front
         AS.write(dir);
-//        Serial.println("Go Front");     
+        //        Serial.println("Go Front");
       }
 
       break;
     case 1: //polling front side, read front
-      
-      valF=readSensor(analogRead(front));
-//       Serial.println("front:"+String(analogRead(front)));
-      if(valF){
-        dir=2;
+
+      valF = readSensor(analogRead(front));
+      //       Serial.println("front:"+String(analogRead(front)));
+      if (valF) {
+        dir = 2;
         AS.write(dir);
-//         Serial.println("Go Back"); 
+        //         Serial.println("Go Back");
       }
       break;
     case 2: //towards back
-      valF=readSensor(analogRead(back));
-//      Serial.println("back:"+String(analogRead(back)));
-      if(valF){
-          dir=1;
-          AS.write(dir);
-//          Serial.println("Go Front");
+      valF = readSensor(analogRead(back));
+      //      Serial.println("back:"+String(analogRead(back)));
+      if (valF) {
+        dir = 1;
+        AS.write(dir);
+        //          Serial.println("Go Front");
       }
-      break; 
+      break;
   }
-///////since serialEvent I dont think will work////////
-  inBuffer="";
-  while(AS.available())
-  {
-    char c = AS.read();
-    inBuffer = inBuffer+c;
-    
-//    Serial.print(AS.read());
-    delay(1);
-  }
-  //println appends CR=13=\r,LF=10=\n or \r\n 
-  if(inBuffer=="end")
-  {
-    Serial.println("end");
-    stopProgram();
-  }
-  if(inBuffer!="")
-  {
-  Serial.print(inBuffer);
-  }
-
-  /////////////////////////////////////////////////////
+  readFromMini();
 }
 
 int readSensor(int sensorResult)
 {
   //if using analog read, this function takes read result and
-  //does thresholding to determine binary signal output 
+  //does thresholding to determine binary signal output
   //needs to be ">"because it is high when covered
-//  Serial.println(sensorResult);
-  if (sensorResult>thresh){  
-//    Serial.println(valB);
-      return 1;
+  //  Serial.println(sensorResult);
+  if (sensorResult > thresh) {
+    //    Serial.println(valB);
+    return 1;
   }
   else
   {
     return 0;
   }
-//return(valB);
+  //return(valB);
 }
 void stopProgram()
 {
-  while(1)
+  while (1)
   {
     Serial.print("restart uno and mini\r\n");
     delay(1000);
@@ -136,3 +115,76 @@ void stopProgram()
 //void serialEvent() {
 //
 //}
+
+int getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = { 0, -1 };
+  int maxIndex = data.length() - 1;
+
+  for (int i = 0; i <= maxIndex && found <= index; i++) {
+    if (data.charAt(i) == separator || i == maxIndex) {
+      found++;
+      strIndex[0] = strIndex[1] + 1;
+      strIndex[1] = (i == maxIndex) ? i + 1 : i;
+    }
+  }
+  String a = found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+  return a.toInt();
+}
+void readParamsFromMatlab() //when data comes from matlab
+{
+  char k = '_';
+  String bufferMat;
+  while (Serial.available() > 0)
+  {
+       
+    char inChar = (char)Serial.read();
+    bufferMat = bufferMat + String(inChar);
+    delay(1);
+  }
+
+  if (bufferMat != "") //if received commands from matlab
+  {
+    
+    maxV = getValue(bufferMat, k, 0);
+    gaitRadInitial = getValue(bufferMat, k, 1);
+    gaitIncrease = getValue(bufferMat, k, 2);
+    v = getValue(bufferMat, k, 3);
+    dir = getValue(bufferMat, k, 4);
+        Serial.println("m: "+String(maxV)+" gr: "+String(gaitRadInitial)
+        +" gi: "+String(gaitIncrease)+" v: "+String(v)
+        +" dir: "+String(dir));
+    sendParamsToMini();
+  }
+
+}
+void sendParamsToMini()
+{
+  inBuffer = "_" + String(maxV) + "_" + String(gaitRadInitial) + "_" +
+             String(gaitIncrease) + "_" + String(v) + "_" + String(dir);
+  //start from version you want -1
+  AS.println(inBuffer);
+}
+void readFromMini()
+{
+  inBuffer = "";
+  while (AS.available() > 0)
+  {   
+    char c = AS.read();
+    inBuffer = inBuffer + c;
+    delay(1);
+  }
+  //println appends CR=13=\r,LF=10=\n or \r\n
+  if (inBuffer == "end")
+  {
+    Serial.println("end");
+    stopProgram();
+  }
+  if (inBuffer != "")
+  {
+    Serial.print(inBuffer);
+  }
+}
+
+

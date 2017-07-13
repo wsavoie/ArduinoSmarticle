@@ -4,7 +4,7 @@ end
 if exist('client','var')
     disconnect(client);
 end
-uno = serial('COM16','BaudRate',9600,'DataBits',8);
+uno = serial('COM16','BaudRate',9600,'DataBits',8,'StopBits',1,'Parity','none');
 set(uno,'terminator','CR/LF')
 % s.terminator = '\r\n'; %termination bit arduino sends \r
 
@@ -12,6 +12,25 @@ fopen(uno);
 client=natnetInit;
 %create listener for serial port
 running = 1;
+del='_';%delimiter
+
+startZero=0;
+pause(1);
+%%%%%%%send params to uno%%%%%%%%%%
+if(~startZero)
+maxV=5;
+gaitRadInitial=36;
+gaitIncrease=2;
+v=1;
+direc=mod(v,2)+1;
+% a=pts(maxV,d,gaitRadInitial,d,gaitIncrease,d,v,d,dir);
+% fprintf(uno,'%s',a);
+% fwrite(uno,'1_2_3');
+a=horzcat(num2str(maxV),del,num2str(gaitRadInitial),del,num2str(gaitIncrease),del,num2str(v),del,num2str(direc));
+fwrite(uno,a,'uint16')
+end
+%%%%%%%%%%%%%%
+pts(fgetl(uno));
 while running
     if uno.bytesAvailable
         serialOut=fgetl(uno);
