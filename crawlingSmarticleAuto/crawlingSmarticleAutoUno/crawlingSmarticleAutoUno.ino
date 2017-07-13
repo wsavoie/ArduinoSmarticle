@@ -161,19 +161,21 @@ void readParamsFromMatlab() //when data comes from matlab
 }
 void sendParamsToMini()
 {
-  inBuffer = "_" + String(maxV) + "_" + String(gaitRadInitial) + "_" +
+  delay(5);
+  inBuffer = String(maxV) + "_" + String(gaitRadInitial) + "_" +
              String(gaitIncrease) + "_" + String(v) + "_" + String(dir);
   //start from version you want -1
   AS.println(inBuffer);
+//  Serial.println(inBuffer);
 }
 void readFromMini()
 {
   inBuffer = "";
   while (AS.available() > 0)
   {   
-    char c = AS.read();
+    char c = (char)AS.read();
     inBuffer = inBuffer + c;
-    delay(1);
+    delay(100);
   }
   //println appends CR=13=\r,LF=10=\n or \r\n
   if (inBuffer == "end")

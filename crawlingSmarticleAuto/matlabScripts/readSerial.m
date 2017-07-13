@@ -18,10 +18,10 @@ startZero=0;
 pause(1);
 %%%%%%%send params to uno%%%%%%%%%%
 if(~startZero)
-maxV=5;
+maxV=5;x
 gaitRadInitial=36;
 gaitIncrease=2;
-v=1;
+v=2;
 direc=mod(v,2)+1;
 % a=pts(maxV,d,gaitRadInitial,d,gaitIncrease,d,v,d,dir);
 % fprintf(uno,'%s',a);
