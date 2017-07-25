@@ -77,7 +77,7 @@ void loop()
     
   if (AS.available() > 0)
   {
-    dir = atoi(AS.read());
+    dir = (uint8_t)atoi(AS.read());
     v = v + 1;
     if (v > maxV)
     {
@@ -147,9 +147,9 @@ void readFromUno()
   char aMessage[50];
   int messageSize=0;
   
- while (Serial.available() > 0)
+ while (AS.available() > 0)
   {
-    aMessage[messageSize]= (char) Serial.read();
+    aMessage[messageSize]= (char) AS.read();
     messageSize++;
   }
     aMessage[messageSize]=0;
