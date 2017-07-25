@@ -182,7 +182,7 @@ void sendParamsToMini()
 {
   //  delay(5);
   inBuffer = String(params[0]) + "_" + String(params[1]) + "_" +
-             String(params[2]) + "_" + String(params[3]) + "_" + String(params[4]);
+             String(params[2]) + "_" + String(params[3]) + "_" + String(params[4])+"_";
   //start from version you want -1
   AS.println(inBuffer);
   //  Serial.println(inBuffer);
@@ -203,7 +203,7 @@ void readFromMini()
   }
   if (inBuffer != "")
   {
-    if(inBuffer=="1111")
+    if(inBuffer.startsWith("111",0))
     {
       sendParamsToMini();
     }

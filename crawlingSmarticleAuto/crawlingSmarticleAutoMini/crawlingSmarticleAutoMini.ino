@@ -152,6 +152,7 @@ void readFromUno()
   {
     aMessage[messageSize]= (char) AS.read();
     messageSize++;
+    delay(2);
   }
     aMessage[messageSize]=0;
     
@@ -166,6 +167,7 @@ void readFromUno()
       {
         params[paramNum]=num;
         num = 0;
+        paramNum=paramNum+1;
       }
       else
       {

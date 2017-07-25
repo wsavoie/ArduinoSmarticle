@@ -12,31 +12,39 @@ fopen(uno);
 client=natnetInit;
 %create listener for serial port
 running = 1;
-del='_';%delimiter
+del=',';%delimiter
 
-startZero=0;
+startZero=1;
 pause(1);
 %%%%%%%send params to uno%%%%%%%%%%
 if(~startZero)
-maxV=5;x
-gaitRadInitial=36;
-gaitIncrease=2;
-v=2;
-direc=mod(v,2)+1;
-% a=pts(maxV,d,gaitRadInitial,d,gaitIncrease,d,v,d,dir);
-% fprintf(uno,'%s',a);
-% fwrite(uno,'1_2_3');
-a=horzcat(num2str(maxV),del,num2str(gaitRadInitial),del,num2str(gaitIncrease),del,num2str(v),del,num2str(direc));
-fwrite(uno,a,'uint16')
+    maxV=20;
+    gaitRadInitial=35;
+    gaitIncrease=2;
+    v=1;
+    direc=mod(v,2)+1;
+    % a=pts(maxV,d,gaitRadInitial,d,gaitIncrease,d,v,d,dir);
+    % fprintf(uno,'%s',a);
+    % fwrite(uno,'1_2_3');
+    a=horzcat(num2str(maxV),del,num2str(gaitRadInitial),del,num2str(gaitIncrease),del,num2str(v),del,num2str(direc));
+    fwrite(uno,a,'uint16')
 end
 %%%%%%%%%%%%%%
 pts(fgetl(uno));
+% pts(fgetl(uno));
+% pts(fgetl(uno));
+% pts(fgetl(uno));
+
 while running
     if uno.bytesAvailable
         serialOut=fgetl(uno);
-        %     if all(~isnan(serialOut)) && ~isempty(serialOut) && ~strcmp(serialOut,char(10))
-        %         pts(serialOut);
-        if(strcmp(serialOut,'end'));
+    else
+        serialOut=[];
+    end
+    if all(~isnan(serialOut)) && ~isempty(serialOut) && ~strcmp(serialOut,char(10))
+        pts(serialOut);
+        if(strcmp(serialOut,'end'))
+            pts('read out end')
             running=0;
             client.stopRecord;
             continue;
