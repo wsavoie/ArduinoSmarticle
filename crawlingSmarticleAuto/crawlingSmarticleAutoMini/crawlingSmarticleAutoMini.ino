@@ -60,6 +60,7 @@ void setup() {
 //    dir = getValue(inBuffer, k, 5);
 //  }
   AS.println("1111");
+  delay(4);
   readFromUno();
   gaitRadius = gaitRadInitial;
   minn = midd - gaitRadius;
@@ -77,7 +78,7 @@ void loop()
     
   if (AS.available() > 0)
   {
-    dir = (uint8_t)atoi(AS.read());
+    dir = AS.read()-48; //to properly read it as a 1 digit num
     v = v + 1;
     if (v > maxV)
     {
@@ -153,15 +154,24 @@ void readFromUno()
     messageSize++;
   }
     aMessage[messageSize]=0;
+    
  if (messageSize>0) //if received commands from matlab
   {
-    char* command = strtok(aMessage, &k); 
-    int idx=0;
-    while(command!=NULL)
+    int paramNum=0;//which parameter we are saving
+    int num = 0;//final value for parameter
+    for(int i=0;i<messageSize;i++)
     {
-     params[idx]=atoi(command);
-     command = strtok (NULL, &k);
-     idx++;
+      int value=aMessage[i]-48;
+      if(value==47)//value for '_'-48
+      {
+        params[paramNum]=num;
+        num = 0;
+      }
+      else
+      {
+        num=num*10;
+        num=num+value;
+      }  
     }
     maxV=params[0];
     gaitRadInitial=params[1];
