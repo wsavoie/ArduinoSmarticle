@@ -27,29 +27,47 @@ conv=zeros(nMovs,1);
 closeWaitbar;
 fold
 h = waitbar(0,'Please wait...');
-    steps = nMovs;
+steps = nMovs;
+idx=0;
+badIdx=0;
+failedAttempts=struct;
 for i=1:nMovs
-
-% for i =1:length(f)
+    
+    % for i =1:length(f)
     waitbar(i/steps,h,{['Processing: ',num2str(i),'/',num2str(length(f))],f(i).name})
-%     pts(i,'/',nMovs);
-%     [t,x,y,tracks]
+    %     pts(i,'/',nMovs);
+    %     [t,x,y,tracks]
     
-    [movs(i).t,movs(i).x,movs(i).y,movs(i).data,movs(i).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
-    if RIGIDBODYNAMES
-%         [~,movs(i).Ax,movs(i).Ay,movs(i).Adata,movs(i).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
-        [movs(i).t,movs(i).Ix,movs(i).Iy,movs(i).Idata,movs(i).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
+    try
+        idx=idx+1;
+        [movs(idx).t,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
+        if RIGIDBODYNAMES
+            %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
+            [movs(idx).t,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
+        end
+        movs(idx).fname=f(i).name;
+        movs(idx).fps=120/dec;
+        movs(idx).conv=1;
+        [~,vals]=parseFileNames(f(i).name);
+        vals=[0 0 1 5 i];
+        %     spk=[0]; smart=[-90]; gait=[1]; rob=[5]; v=[nMovs];
+        movs(idx).pars=vals;
+    catch
+        badIdx=badIdx+1;
+        failedAttempts(badIdx).name=f(i).name;
+       
     end
-    movs(i).fname=f(i).name;
-    movs(i).fps=120/dec;
-    movs(i).conv=1;
-    [~,vals]=parseFileNames(f(i).name);
-    %%
-%     spk=[0]; smart=[-90]; gait=[1]; rob=[5]; v=[nMovs];
-    vals=[0 0 1 5 i];
-    %%
-    movs(i).pars=vals;
-    
 end
 closeWaitbar;
+nMovs=idx;
 save(fullfile(fold,'movieInfo.mat'),'movs','fold','nMovs','r')
+if(badIdx)
+    pts(' ');
+    warning([num2str(badIdx),' failed runs']);
+    msg=cell(1,badIdx);
+    for i=1:badIdx
+%         msg{i}=failedAttempts(i).name;
+        pts(failedAttempts(i).name);
+    end
+%     h=msgbox(msg,'errors');
+end
