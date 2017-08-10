@@ -1,11 +1,12 @@
 #include <Servo.h>
 
 /* Pin Definitions */
-#define servo1 10 //5 red//10 ross
-#define servo2 11 //6 red//11 ross
+#define servo1 5 //5 red//10 ross
+#define servo2 6 //6 red//11 ross
 #define led 13
-uint16_t const randAmp = 100;//units of milliseconds
-uint16_t const del = 400;
+int randAmp = 100;//units of milliseconds
+int maxRand = 1000;
+int del = 400;
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
@@ -22,6 +23,7 @@ void setup() {
   S2.attach(servo2,600,2400);
   pinMode(led,OUTPUT);
   deactivateSmarticle();
+  randomSeed(analogRead(0));
 }
 
 void loop() 
@@ -40,17 +42,20 @@ void deactivateSmarticle() {
 }
 
 void activateSmarticle() {
+  //+1 for max argument for random because it goes from min to max-1
+  int periodDel=(maxRand+random(-1*randAmp,randAmp+1))/4.0;//units of milliseconds
+    
+  
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
+  delay(del+periodDel);   
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
+  delay(del+periodDel);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
+  delay(del+periodDel);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(300);
-  delay(random(100));
+  delay(del+periodDel);
 }

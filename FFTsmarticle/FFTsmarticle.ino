@@ -28,7 +28,7 @@
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
-const int SERVONUM = 5;
+const int SERVONUM = 1;
 uint8_t stress = 0;
 uint16_t samps = 9;
 uint16_t const del = 400;
@@ -51,8 +51,8 @@ const uint16_t samples = 64;
 //double samplingFrequency = 8300; //breadboard: elapsed time ~ 7700us
 double samplingFrequency = 7950; //smarticle: elapsed time ~ 8050us
 //SERVONUM:            1    2    3    4    5    6    7    8
-int freqCenters[8] = {600, 700, 800, 900, 1000, 1100, 1200, 1300};
-int freqAcceptThresh = 40;  //+-30Hz from freqCenter is accepted
+int freqCenters[8] = {400, 800, 1200, 1600, 2000, 2400, 10000, 10000};
+int freqAcceptThresh = 200;  //+-30Hz from freqCenter is accepted
 //int freqCenters[8] = {600, 650, 700, 750, 800, 850, 900, 950};
 //int freqAcceptThresh = 20;  //+-30Hz from freqCenter is accepted
 int freqUpperBounds[8];
@@ -113,7 +113,7 @@ void loop()
 
 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
-double findFrequency() {
+double findFrequency(){
   double startTime = micros();
   for(uint16_t i =0; i<samples; i++)
   {
@@ -135,21 +135,28 @@ double findFrequency() {
 
 /* Determines whether or not to activate the smarticle based on frequency */
 void analyzeFrequency(double freq) {
-  /*if (freq > 1000) {
+  if (freq > 1000) {
     deactivateSmarticle();
     return;
-  }*/
-  
-  for (int k = 0; k < 8; k++) {
-    if (freqLowerBounds[k]<freq && freq<freqUpperBounds[k] && SERVONUM == k+1) {
-      inertia = 8;
-      deactivateSmarticle();
-      return;
-    }
   }
-  inertia--;
-  if (inertia <= 0)
-    activateSmarticle();
+  activateSmarticle();
+  
+//  for (int k = 0; k < 8; k++) {
+//    if (freqLowerBounds[k]<freq && freq<freqUpperBounds[k] && SERVONUM == k+1) {
+//      inertia = 8;
+//      deactivateSmarticle();
+//      return;
+//    }
+//  }
+//  if (freqLowerBounds[SERVONUM]<freq && freq<freqUpperBounds[SERVONUM]) {
+//      inertia = 8;
+//      deactivateSmarticle();
+//      return;
+//    }
+//  
+//  inertia--;
+//  if (inertia <= 0)
+//    activateSmarticle();
 }
 
 void deactivateSmarticle() {
