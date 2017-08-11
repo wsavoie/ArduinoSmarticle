@@ -1,6 +1,6 @@
 %clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\pad_singleInactive_nolightpipe_HEAVY');
+fold=uigetdir('A:\2DSmartData\regRing\redSmarts\metal_singleInactive_1-3_inactive_frame');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -28,8 +28,8 @@ closeWaitbar;
 fold
 h = waitbar(0,'Please wait...');
 steps = nMovs;
-idx=0;
-badIdx=0;
+idx=1;
+badIdx=1;
 failedAttempts=struct;
 for i=1:nMovs
     
@@ -39,7 +39,6 @@ for i=1:nMovs
     %     [t,x,y,tracks]
     
     try
-        idx=idx+1;
         [movs(idx).t,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
         if RIGIDBODYNAMES
             %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
@@ -52,22 +51,22 @@ for i=1:nMovs
         vals=[0 0 1 5 i];
         %     spk=[0]; smart=[-90]; gait=[1]; rob=[5]; v=[nMovs];
         movs(idx).pars=vals;
+        idx=idx+1;
     catch
-        badIdx=badIdx+1;
         failedAttempts(badIdx).name=f(i).name;
-       
+        badIdx=badIdx+1;
     end
 end
 closeWaitbar;
-nMovs=idx;
 save(fullfile(fold,'movieInfo.mat'),'movs','fold','nMovs','r')
-if(badIdx)
+if(badIdx>1)
     pts(' ');
-    warning([num2str(badIdx),' failed runs']);
+    warning([num2str(badIdx-1),' failed runs']);
     msg=cell(1,badIdx);
     for i=1:badIdx
-%         msg{i}=failedAttempts(i).name;
+%         msg{yi}=failedAttempts(i).name;
         pts(failedAttempts(i).name);
     end
 %     h=msgbox(msg,'errors');
 end
+beep;

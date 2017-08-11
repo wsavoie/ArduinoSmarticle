@@ -42,8 +42,8 @@ fold
 % 28. plot inactive particle position rotate by its rotation
 
 %************************************************************
-% showFigs=[21 22 23];
-showFigs=[1 22];
+showFigs=[1 23];
+% showFigs=[1 23];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
 %define curve params [] for all
@@ -134,11 +134,13 @@ if(showFigs(showFigs==xx))
     disp(['Trials = ',num2str(length(ma.tracks),'%.d')])
     disp(['Towards X = ',num2str(xpercent,'%.3f')])
     disp(['Towards Y = ',num2str(ypercent,'%.3f')])
-    title('Whole Time-Scale Displacements');
+%     title('Whole Time-Scale Displacements');
     
-    ringRad=.1905/2;
-    h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
-    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%     ringRad=.1905/2;
+%     h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+%     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        figText(gcf,14)
+
 end
 %% 2 plot MSD
 xx=2;
@@ -928,10 +930,10 @@ if(showFigs(showFigs==xx))
     legend off;
     xpercent = xp/length(ma.tracks);
     ypercent = yp/length(ma.tracks);
-    text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
-    text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
+%     text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
+%     text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
     
-    title('Whole Time-Scale Displacements');
+%     title('Whole Time-Scale Displacements');
     figText(gcf,14)
     
 end
