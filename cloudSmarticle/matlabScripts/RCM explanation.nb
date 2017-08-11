@@ -1,0 +1,242 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      7592,        233]
+NotebookOptionsPosition[      7012,        210]
+NotebookOutlinePosition[      7353,        225]
+CellTagsIndexPosition[      7310,        222]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[{
+ RowBox[{"\[Phi]", "=", 
+  RowBox[{"Volume", " ", "fraction"}]}], "\[IndentingNewLine]", 
+ RowBox[{"N", "=", 
+  RowBox[{"Number", " ", "of", " ", "particles"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  SubscriptBox["V", "p"], "=", 
+  RowBox[{
+  "Volume", " ", "of", " ", "single", " ", 
+   "particle"}]}], "\[IndentingNewLine]", 
+ RowBox[{"V", "=", 
+  RowBox[{"Volume", " ", "of", " ", "container"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  SubscriptBox["V", "ex"], "=", 
+  RowBox[{"Excluded", " ", "volume"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  SubscriptBox["N", "i"], "=", 
+  RowBox[{"number", " ", "of", " ", "iterations"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  SubscriptBox["N", "c"], "=", 
+  RowBox[{"number", " ", "of", " ", "collision"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"C", "=", 
+   RowBox[{"contact", " ", "number"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"\[Phi]", "=", 
+   FractionBox[
+    RowBox[{"N", " ", 
+     SubscriptBox["V", "p"]}], "V"]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  SubscriptBox["V", "ex"], "=", "pV"}]}], "Input",
+ CellChangeTimes->{{3.706611352503578*^9, 3.706611538395505*^9}, {
+  3.7066116078166265`*^9, 3.7066116112330327`*^9}},
+ FontSize->14],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.706611453717556*^9, 3.7066114596143665`*^9}, {
+  3.706611505261047*^9, 3.706611506041048*^9}, {3.706611563371149*^9, 
+  3.7066115673345556`*^9}, {3.706611623775455*^9, 3.706611626099859*^9}}],
+
+Cell[BoxData[{
+ RowBox[{"\[Phi]", "=", 
+  RowBox[{"N", " ", "p", " ", 
+   FractionBox[
+    SubscriptBox["V", "p"], 
+    SubscriptBox["V", "ex"]]}]}], "\[IndentingNewLine]", 
+ RowBox[{"C", "=", "Np"}], "\[IndentingNewLine]"}], "Input",
+ CellChangeTimes->{{3.70661156972136*^9, 3.7066116196570473`*^9}}],
+
+Cell[BoxData[
+ RowBox[{"\[Phi]", "=", 
+  RowBox[{"C", " ", 
+   FractionBox[
+    SubscriptBox["V", "p"], 
+    SubscriptBox["V", "ex"]]}]}]], "Input",
+ CellChangeTimes->{{3.7066116279562626`*^9, 3.706611640795085*^9}}],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"p", "==", 
+    FractionBox["C", "N"]}], ",", 
+   RowBox[{"\[Implies]", " ", 
+    RowBox[{
+     SubscriptBox["V", "ex"], "\[Equal]", 
+     RowBox[{
+      FractionBox["C", "N"], "V"}]}]}]}], "\[IndentingNewLine]", 
+  "\[IndentingNewLine]", 
+  RowBox[{"(*", "therefore", "*)"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   FractionBox[
+    SubscriptBox["V", "ex"], 
+    SubscriptBox["V", "p"]], "\[Phi]"}], "=", "C"}]}], "Input",
+ CellChangeTimes->{{3.7066116457090936`*^9, 3.7066117748481207`*^9}}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{
+   RowBox[{
+    RowBox[{"d", "=", "1"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"W", "=", 
+     RowBox[{"14", "d"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"L", "=", 
+     RowBox[{"1.1", "*", "W"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"\[Phi]", "=", ".1"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     SubscriptBox["V", "p"], "=", 
+     RowBox[{
+      RowBox[{"\[Pi]", "*", "W", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         FractionBox["d", "2"], ")"}], "2"]}], "+", 
+      RowBox[{"2", "\[Pi]", " ", "L", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         FractionBox["d", "2"], ")"}], "2"]}], "+", 
+      RowBox[{
+       FractionBox["4", "3"], "\[Pi]", 
+       SuperscriptBox[
+        RowBox[{"(", 
+         FractionBox["d", "2"], ")"}], "3"]}]}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"x", "=", 
+     RowBox[{"NSolve", "[", 
+      RowBox[{
+       SubscriptBox["V", "ex"], "==", 
+       RowBox[{
+        RowBox[{"(", 
+         RowBox[{
+          RowBox[{".460", 
+           SuperscriptBox[
+            RowBox[{"(", 
+             RowBox[{"L", "/", "W"}], ")"}], "2"]}], "+", 
+          RowBox[{".530", 
+           RowBox[{"(", 
+            FractionBox["L", "W"], ")"}]}], "+", "0.148"}], ")"}], 
+        SuperscriptBox[
+         RowBox[{"(", "W", ")"}], "3"]}]}], "]"}]}], ";"}], 
+   "\[IndentingNewLine]", 
+   RowBox[{"c", "=", 
+    RowBox[{
+     RowBox[{
+      FractionBox[
+       SubscriptBox["V", "ex"], 
+       SubscriptBox["V", "p"]], "\[Phi]"}], "/.", "x"}]}]}]}]], "Input",
+ CellChangeTimes->{{3.706611977292676*^9, 3.7066119951703076`*^9}, {
+   3.706612112453314*^9, 3.706612114808918*^9}, 3.706612407562032*^9, {
+   3.706612496968789*^9, 3.70661249734319*^9}, {3.7066125899615526`*^9, 
+   3.706612648244255*^9}, 3.706612716712775*^9, {3.706612771423072*^9, 
+   3.7066128654454365`*^9}, {3.706613183128395*^9, 3.7066131844231973`*^9}, 
+   3.706613277605161*^9, {3.70661333362986*^9, 3.706613387371954*^9}, {
+   3.706613442706251*^9, 3.7066137419821773`*^9}},
+ FontSize->14],
+
+Cell[BoxData[
+ RowBox[{"{", "9.894231740159675`", "}"}]], "Output",
+ CellChangeTimes->{{3.706613466465093*^9, 3.7066137425125785`*^9}}]
+}, Open  ]],
+
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.706614047965115*^9, 3.706614048589116*^9}}],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"(*", 
+   RowBox[{"to", " ", "get", " ", "C"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+    RowBox[{"We", " ", "need", " ", "to", " ", "find", " ", 
+     SubscriptBox["V", "ex"], " ", 
+     RowBox[{"(", 
+      RowBox[{
+       RowBox[{"from", " ", "simulation", " ", 
+        SubscriptBox["V", "ex"]}], "=", 
+       RowBox[{"V", 
+        FractionBox[
+         SubscriptBox["N", "c"], 
+         SubscriptBox["N", "i"]]}]}], ")"}], " ", "for", " ", "all", " ", 
+     "angles"}], ",", "\[IndentingNewLine]", 
+    RowBox[{
+    "then", " ", "we", " ", "need", " ", "\[Phi]", " ", "for", " ", "those", 
+     " ", "shapes"}]}], "*)"}], "\[IndentingNewLine]", "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{
+   "If", " ", "we", " ", "can", " ", "assume", " ", "C", " ", "is", " ", 
+    "some", " ", "value"}], "*)"}], "\[IndentingNewLine]", 
+  RowBox[{"(*", 
+   RowBox[{"\[Phi]", " ", "=", " ", 
+    RowBox[{"C", 
+     FractionBox[
+      SubscriptBox["V", "p"], "V"], 
+     FractionBox[
+      SubscriptBox["N", "i"], 
+      SubscriptBox["N", "c"]]}]}], "*)"}], " "}]], "Input",
+ CellChangeTimes->{{3.7066138448351583`*^9, 3.7066139271565027`*^9}, {
+  3.7066139833332014`*^9, 3.706614169287528*^9}, {3.7066142199418173`*^9, 
+  3.7066142291926336`*^9}, {3.7066143100641756`*^9, 3.7066143103605757`*^9}, {
+  3.706614437753073*^9, 3.70661444940874*^9}},
+ FontSize->14]
+},
+WindowSize->{778, 886},
+WindowMargins->{{47, Automatic}, {Automatic, 44}},
+FrontEndVersion->"10.0 for Microsoft Windows (64-bit) (July 1, 2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 1270, 35, 269, "Input"],
+Cell[1831, 57, 240, 3, 31, "Input"],
+Cell[2074, 62, 301, 7, 90, "Input"],
+Cell[2378, 71, 216, 6, 49, "Input"],
+Cell[2597, 79, 550, 17, 126, "Input"],
+Cell[CellGroupData[{
+Cell[3172, 100, 2173, 62, 252, "Input"],
+Cell[5348, 164, 135, 2, 31, "Output"]
+}, Open  ]],
+Cell[5498, 169, 92, 1, 31, "Input"],
+Cell[5593, 172, 1415, 36, 155, "Input"]
+}
+]
+*)
+
+(* End of internal cache information *)
