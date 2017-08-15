@@ -1,0 +1,1 @@
+ffmpeg -i cam.avi -r 30 -c:v libx264 -filter:v "setpts=0.1*PTS" camnewfaster.avi
