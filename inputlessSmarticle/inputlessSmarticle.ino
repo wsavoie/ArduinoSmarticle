@@ -1,8 +1,16 @@
 #include <Servo.h>
 
 /* Pin Definitions */
-#define servo1 10 //5 red//10 ross
-#define servo2 11 //6 red//11 ross
+#define SERVOTYPE 1 //red=0, ross=1
+
+#if SERVOTYPE==0 //RED
+  #define servo1 5//5 red//10 ross
+  #define servo2 6//6 red//11 ross
+#else            //ROSS
+  #define servo1 10//5 red//10 ross
+  #define servo2 11//6 red//11 ross
+#endif
+
 #define led 13
 uint16_t const randAmp = 100;//units of milliseconds
 uint16_t const del = 400;
