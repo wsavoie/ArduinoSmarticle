@@ -57,9 +57,16 @@ for i=1:nMovs
         movs(idx).rot=movs(idx).rot(idxs);
         
         
-        movs(idx).rotdot=diff(movs(idx).rot)./diff(movs(idx).t);
+        r=diff(movs(idx).rot);
+        qp=find(r>pi);
+        qm=find(r<-pi);
+        r(qp)=r(qp)-2*pi;
+        r(qm)=r(qm)+2*pi;
+        
+        
+        movs(idx).rotdot=r./diff(movs(idx).t);
     else
-        %                 for jj=1:numBods
+        %                 for jj=1:cdnumBods
         [movs(idx).t,movs(idx).x,movs(idx).y,~] = cloudOptitrack(fullfile(fold,f(i).name),dec,'');
         %             end
         
