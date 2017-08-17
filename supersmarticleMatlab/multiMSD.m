@@ -2,8 +2,9 @@ clear all;
 close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
+% fold=uigetdir('A:\2DSmartData\regRing\redSmarts\metal_singleInactive_1-3_SOLIDinactive_frame');
+fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\metal_singleInactive_1-1_frame_inactive');
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\');
 load(fullfile(fold,'movieInfo.mat'));
 figure(1)
 SPACE_UNITS = 'm';
@@ -42,7 +43,7 @@ fold
 % 28. plot inactive particle position rotate by its rotation
 
 %************************************************************
-showFigs=[1 23];
+showFigs=[1 22];
 % showFigs=[1 23];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 

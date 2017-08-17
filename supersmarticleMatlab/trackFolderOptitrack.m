@@ -1,12 +1,14 @@
 %clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\regRing\redSmarts\metal_singleInactive_1-3_inactive_frame');
+% fold=uigetdir('A:\2DSmartData\regRing\redSmarts\');
+fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
-
+clearvars rigidBodyName
 if RIGIDBODYNAMES
-    rigidBodyName = ' ring';
+    rigidBodyName{1} = ' ring';
+    rigidBodyName{2} = ' frame';
     activeName= ' active';
     inactiveName=' inactive';
 else
@@ -29,7 +31,7 @@ fold
 h = waitbar(0,'Please wait...');
 steps = nMovs;
 idx=1;
-badIdx=1;
+badIdx=0;
 failedAttempts=struct;
 for i=1:nMovs
     
@@ -53,15 +55,16 @@ for i=1:nMovs
         movs(idx).pars=vals;
         idx=idx+1;
     catch
-        failedAttempts(badIdx).name=f(i).name;
         badIdx=badIdx+1;
+        failedAttempts(badIdx).name=f(i).name;
+        
     end
 end
 closeWaitbar;
 save(fullfile(fold,'movieInfo.mat'),'movs','fold','nMovs','r')
-if(badIdx>1)
+if(badIdx>0)
     pts(' ');
-    warning([num2str(badIdx-1),' failed runs']);
+    warning([num2str(badIdx),' failed runs']);
     msg=cell(1,badIdx);
     for i=1:badIdx
 %         msg{yi}=failedAttempts(i).name;
