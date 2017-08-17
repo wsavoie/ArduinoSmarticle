@@ -1,12 +1,13 @@
-function [xMat,zMat] = linkOptiTrackTimeStepsCMU(X,Z,numMarkers,distanceThreshold)
+function [xMat,zMat, idx] = linkOptiTrackTimeStepsCMU(X,Z,numMarkers,distanceThreshold)
 
 % these are parameters for tracking (may need to be changed a bit).
-% the code will find the closest match for each marker given that 
-% the distance from the previous time to current time is less than 
+% the code will find the closest match for each marker given that
+% the distance from the previous time to current time is less than
 % distanceThreshold away and that closer in index than timeThreshold.
- 
 
-timeThreshold = 700; %index
+idx=reshape(1:length(X)*numMarkers,[length(X),numMarkers]);
+
+timeThreshold = 100; %index
 
 if nargin < 3 || isempty(numMarkers)
     numMarkers = 18;
@@ -29,8 +30,8 @@ firstFrame = find(len == numMarkers,1,'first'); %%% modify this to back-track ma
 % link information based on proximity of points in previous frame and
 % current frame
 
-xMat = zeros(numMarkers,length(X)-firstFrame);
-zMat = zeros(numMarkers,length(X)-firstFrame);
+xMat = zeros(numMarkers,length(X)-firstFrame+1); %%%%%
+zMat = zeros(numMarkers,length(X)-firstFrame+1); %%%%%
 
 xMat(:,1) = X{firstFrame};
 zMat(:,1) = Z{firstFrame};
@@ -49,7 +50,7 @@ for i = 2:size(xMat,2)
     
     % if marker was dropped, value should be NaN.  If that happens,
     % attempt to link with last non-NaN timestep within the timeThreshold
-
+    
     for j = 1:numMarkers
         if isnan(xtMinus1(j)) || isnan(ztMinus1(j))
             index = find(~isnan(xMat(j,1:i-1)),1,'last');
@@ -60,7 +61,7 @@ for i = 2:size(xMat,2)
         end
     end
     
-
+    
     % D should be numMarkers x numPointsAtT, so find the new points that
     % are closest to the old markers
     D = zeros(length(xtMinus1),length(xt));
@@ -75,8 +76,8 @@ for i = 2:size(xMat,2)
     
     unmatched = 1:numMarkers;
     
-   
     
+    currRow=idx(i,:);
     while ~isempty(find(D<distanceThreshold))
         
         [ii,jj] = find(D == min(min(D)) & D < distanceThreshold);
@@ -84,7 +85,7 @@ for i = 2:size(xMat,2)
             for k = 1:length(ii)
                 xMat(ii(k),i) = xt(jj(k));
                 zMat(ii(k),i) = zt(jj(k));
-                
+                idx(i,ii(k))=currRow(jj(k));
                 % effectively remove assigned marker so that it is not double-counted
                 D(ii(k),:) = inf;
                 D(:,jj(k)) = inf;
@@ -98,5 +99,19 @@ for i = 2:size(xMat,2)
     
     xMat(unmatched,i) = NaN;
     zMat(unmatched,i) = NaN;
-    
+
 end
+
+    
+    [nanxR,nanxC]=find(isnan(xMat));
+    [nanzR,nanzC]=find(isnan(zMat));
+    
+    for qq=1:length(nanxR)
+        xMat(nanxR(qq),nanxC(qq))=xMat(nanxR(qq),nanxC(qq)-1);
+    end
+    
+    for qq=1:length(nanzR)
+        zMat(nanzR(qq),nanzC(qq))=zMat(nanzR(qq),nanzC(qq)-1);
+    end
+    xMat=xMat';
+    zMat=zMat';

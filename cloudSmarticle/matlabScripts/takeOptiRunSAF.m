@@ -12,6 +12,8 @@ client.ClientIP ='127.0.0.1';
 client.HostIP = '127.0.0.1';
 client.connect();
 client.stopRecord;
+%make sure to set OBS's hotkeys for record/stop record to f3/f4
+%respectively
 robot.keyPress(java.awt.event.KeyEvent.VK_F3);
 pause(.05);
 client.startRecord;
