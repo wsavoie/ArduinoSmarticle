@@ -34,7 +34,9 @@ FUn =[0.7960    0.7290    0.7140    0.6430    0.9770];
 FAll=[F95;F10;F105;F11;FUn];
 fm=mean(FAll,2);
 ferr=std(FAll,1,2);
-errorbar(conf,fm,ferr);
+errorbar(conf,fm,ferr,'linewidth',2);
 
-xlabel('confining width (cm)','fontsize',18);
+xlabel('H (cm)','fontsize',18);
 ylabel('force (N)','fontsize',18);
+xlim([9.4,12.1]);
+figText(gcf,16);
