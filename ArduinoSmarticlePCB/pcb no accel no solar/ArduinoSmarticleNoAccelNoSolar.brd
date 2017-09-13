@@ -518,10 +518,10 @@ design rules under a new name.</description>
 <element name="S1" library="SparkFun-Connectors" package="1X02" value="S1" x="16.384221875" y="8.5181625" smashed="yes" rot="R180">
 <attribute name="NAME" x="16.104821875" y="11.2867625" size="1.27" layer="21" ratio="10" rot="R180"/>
 </element>
-<element name="R1" library="SparkFun-Resistors" package="0603-RES" value="1" x="35.0918625" y="11.3284" smashed="yes" rot="R180">
-<attribute name="PROD_ID" value="RES-08296" x="35.0918625" y="11.3284" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VALUE" value="2.0k" x="35.0918625" y="11.3284" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VALUE" x="36.3618625" y="10.3124" size="0.6096" layer="21" font="vector" rot="R180"/>
+<element name="R1" library="SparkFun-Resistors" package="0603-RES" value="1" x="35.4474625" y="11.3284" smashed="yes" rot="R180">
+<attribute name="PROD_ID" value="RES-08296" x="35.4474625" y="11.3284" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" value="2.0k" x="35.4474625" y="11.3284" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" x="36.7174625" y="10.3124" size="0.6096" layer="21" font="vector" rot="R180"/>
 </element>
 <element name="MIC" library="SparkFun-Connectors" package="1X02" value="" x="35.5352" y="15.48288125" smashed="yes" rot="R180">
 <attribute name="NAME" x="32.3856" y="17.61648125" size="0.8128" layer="21" ratio="10" rot="R180"/>
@@ -600,18 +600,14 @@ design rules under a new name.</description>
 <contactref element="STRESS" pad="1"/>
 <contactref element="S2" pad="1"/>
 <contactref element="S1" pad="1"/>
-<wire x1="34.6684625" y1="8.2762375" x2="34.6413625" y2="8.2491375" width="0.4064" layer="1"/>
 <wire x1="25.4948625" y1="12.9594" x2="23.8130625" y2="11.2776" width="0.6096" layer="1"/>
 <wire x1="23.8130625" y1="11.2776" x2="17.8308" y2="11.2776" width="0.6096" layer="1"/>
 <wire x1="17.8308" y1="11.2776" x2="16.384221875" y2="9.831021875" width="0.6096" layer="1"/>
 <wire x1="16.384221875" y1="9.831021875" x2="16.384221875" y2="8.5181625" width="0.6096" layer="1"/>
-<wire x1="34.6413625" y1="10.7511" x2="34.2418625" y2="11.3284" width="0.6096" layer="1"/>
-<wire x1="34.2418625" y1="11.3284" x2="34.4450625" y2="10.9955375" width="0.6096" layer="1"/>
-<wire x1="25.5002625" y1="12.954" x2="25.4948625" y2="12.9594" width="0.6096" layer="1"/>
-<wire x1="34.6413625" y1="10.7511" x2="34.6413625" y2="8.2491375" width="0.6096" layer="1"/>
-<wire x1="25.5002625" y1="12.954" x2="27.0002" y2="12.954" width="0.6096" layer="1"/>
-<wire x1="27.0002" y1="12.954" x2="28.3972" y2="11.4046" width="0.6096" layer="1"/>
-<wire x1="28.3972" y1="11.4046" x2="34.2418625" y2="11.3284" width="0.6096" layer="1"/>
+<wire x1="34.5974625" y1="11.3284" x2="27.1258625" y2="11.3284" width="0.6096" layer="1"/>
+<wire x1="27.1258625" y1="11.3284" x2="25.4948625" y2="12.9594" width="0.6096" layer="1"/>
+<wire x1="34.6413625" y1="8.2491375" x2="34.6413625" y2="11.2845" width="0.6096" layer="1"/>
+<wire x1="34.6413625" y1="11.2845" x2="34.5974625" y2="11.3284" width="0.6096" layer="1"/>
 </signal>
 <signal name="SWITCH+">
 <contactref element="BATT" pad="1"/>
