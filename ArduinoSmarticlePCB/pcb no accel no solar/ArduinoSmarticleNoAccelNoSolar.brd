@@ -6,7 +6,7 @@
 <setting alwaysvectorfont="no"/>
 <setting verticaltext="up"/>
 </settings>
-<grid distance="0.001" unitdist="inch" unit="inch" style="lines" multiple="1" display="yes" altdistance="0.0001" altunitdist="inch" altunit="inch"/>
+<grid distance="50" unitdist="mil" unit="mil" style="lines" multiple="1" display="no" altdistance="5" altunitdist="mil" altunit="mil"/>
 <layers>
 <layer number="1" name="Top" color="4" fill="1" visible="yes" active="yes"/>
 <layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="yes"/>
@@ -155,24 +155,24 @@
 <text x="15.5930625" y="6.223" size="0.8128" layer="21">GND</text>
 <text x="23.7464625" y="8.509" size="1.016" layer="21">+</text>
 <text x="21.5366625" y="2.0066" size="0.8128" layer="21" rot="R180">VB+</text>
-<text x="30.6552625" y="2.1336" size="0.8128" layer="21" rot="R180">GND</text>
-<text x="33.8810625" y="5.715" size="0.8128" layer="21">GND</text>
-<text x="30.8838625" y="5.6642" size="0.8128" layer="21">VS+</text>
+<text x="29.3852625" y="0.8636" size="0.8128" layer="21" rot="R180">GND</text>
+<text x="34.2620625" y="1.524" size="0.8128" layer="21">GND</text>
+<text x="31.0108625" y="1.3462" size="0.8128" layer="21">VS+</text>
 <text x="13.8658625" y="13.208" size="0.8128" layer="21">RAW</text>
 <text x="17.1170625" y="13.3604" size="0.8128" layer="21">GND</text>
 <text x="20.0126625" y="13.335" size="0.8128" layer="21">VCC</text>
 <text x="36.3448625" y="16.129" size="0.8128" layer="21">GND</text>
 <text x="28.8010625" y="16.129" size="0.8128" layer="21">M+</text>
 <wire x1="11.7474625" y1="6.1872" x2="-0.0025375" y2="6.188121875" width="0" layer="20"/>
-<text x="36.9544625" y="29.21" size="1.778" layer="21" rot="R180">RAW,GND,VCC 26 mm</text>
-<text x="37.0052625" y="26.6446" size="1.778" layer="21" rot="R180">battery 45 mm</text>
-<text x="40.8406625" y="24.4094" size="1.778" layer="21" rot="R180">stress 28 mm A7</text>
-<text x="40.9422625" y="22.2504" size="1.778" layer="21" rot="R180">mic 16 mm A6</text>
-<text x="37.5894625" y="-1.4478" size="1.778" layer="21" rot="R180">S1 VCC,GND 37,38 mm</text>
-<text x="41.5518625" y="-6.3754" size="1.778" layer="21" rot="R180">S1 SIG,48 mm D5</text>
-<text x="41.5264625" y="-8.7884" size="1.778" layer="21" rot="R180">S1 SIG,52 mm D6</text>
-<text x="37.6402625" y="-3.9624" size="1.778" layer="21" rot="R180">S2 VCC,GND 37,38 mm</text>
-<text x="37.1322625" y="19.7866" size="1.778" layer="21" rot="R180">mic GND,VCC  21 mm</text>
+<text x="17.78" y="30.48" size="1.778" layer="21">RAW, GND, VCC 26mm</text>
+<text x="17.78" y="27.94" size="1.778" layer="21">Battery 45mm</text>
+<text x="17.78" y="25.4" size="1.778" layer="21">Stress 28 A7</text>
+<text x="17.78" y="22.86" size="1.778" layer="21">Mic 16mm A6</text>
+<text x="17.78" y="-2.54" size="1.778" layer="21">S1 VCC,GND, 37,38mm</text>
+<text x="17.78" y="20.32" size="1.778" layer="21">Mic GND,VCC 26mm, 26 mm</text>
+<text x="17.78" y="-5.08" size="1.778" layer="21">S2 VCC,GND, 37,38mm</text>
+<text x="17.78" y="-7.62" size="1.778" layer="21">S1 SIG, 48 mm D5</text>
+<text x="17.78" y="-10.16" size="1.778" layer="21">S2 SIG, 52mm D6</text>
 </plain>
 <libraries>
 <library name="SparkFun-Capacitors">
@@ -511,17 +511,17 @@ design rules under a new name.</description>
 <attribute name="VALUE" value="4.7uF" x="17.1628" y="2.5653375" size="1.778" layer="27" rot="R180" display="off"/>
 <attribute name="VALUE" x="16.538" y="1.4935375" size="0.6096" layer="21" font="vector" rot="R270"/>
 </element>
-<element name="S2" library="SparkFun-Connectors" package="1X02" value="" x="34.6413625" y="8.2491375" smashed="yes" rot="R180">
-<attribute name="NAME" x="33.4763625" y="11.0040625" size="1.27" layer="21" ratio="10" rot="R180"/>
-<attribute name="VALUE" x="35.9113625" y="11.4241375" size="1.27" layer="27" rot="R180"/>
+<element name="S2" library="SparkFun-Connectors" package="1X02" value="" x="34.6413625" y="3.9311375" smashed="yes" rot="R180">
+<attribute name="NAME" x="33.4763625" y="6.6860625" size="1.27" layer="21" ratio="10" rot="R180"/>
+<attribute name="VALUE" x="35.9113625" y="7.1061375" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="S1" library="SparkFun-Connectors" package="1X02" value="S1" x="16.384221875" y="8.5181625" smashed="yes" rot="R180">
 <attribute name="NAME" x="16.104821875" y="11.2867625" size="1.27" layer="21" ratio="10" rot="R180"/>
 </element>
-<element name="R1" library="SparkFun-Resistors" package="0603-RES" value="1" x="35.4474625" y="11.3284" smashed="yes" rot="R180">
-<attribute name="PROD_ID" value="RES-08296" x="35.4474625" y="11.3284" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VALUE" value="2.0k" x="35.4474625" y="11.3284" size="1.778" layer="27" rot="R180" display="off"/>
-<attribute name="VALUE" x="36.7174625" y="10.3124" size="0.6096" layer="21" font="vector" rot="R180"/>
+<element name="R1" library="SparkFun-Resistors" package="0603-RES" value="1" x="35.5236625" y="9.2202" smashed="yes" rot="R180">
+<attribute name="PROD_ID" value="RES-08296" x="35.5236625" y="9.2202" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" value="2.0k" x="35.5236625" y="9.2202" size="1.778" layer="27" rot="R180" display="off"/>
+<attribute name="VALUE" x="36.7936625" y="8.2042" size="0.6096" layer="21" font="vector" rot="R180"/>
 </element>
 <element name="MIC" library="SparkFun-Connectors" package="1X02" value="" x="35.5352" y="15.48288125" smashed="yes" rot="R180">
 <attribute name="NAME" x="32.3856" y="17.61648125" size="0.8128" layer="21" ratio="10" rot="R180"/>
@@ -536,7 +536,7 @@ design rules under a new name.</description>
 <attribute name="VALUE" x="21.1346625" y="18.5706" size="1.27" layer="27" rot="R180"/>
 </element>
 <element name="BATT" library="SparkFun-Connectors" package="1X02" value="" x="24.206015625" y="2.568659375" smashed="yes">
-<attribute name="NAME" x="20.624615625" y="0.435059375" size="0.8128" layer="21" ratio="10"/>
+<attribute name="NAME" x="21.894615625" y="0.435059375" size="0.8128" layer="21" ratio="10"/>
 <attribute name="VALUE" x="22.936015625" y="-0.606340625" size="1.27" layer="27"/>
 </element>
 <element name="U$1" library="Will-Switch" package="WILL-BLACKSLIDESWITCH" value="WILL-BLACKSLIDESWITCH" x="19.7078625" y="11.2268" rot="R270"/>
@@ -577,22 +577,23 @@ design rules under a new name.</description>
 <wire x1="19.1008" y1="8.255" x2="20.7518" y2="9.652" width="0.6096" layer="1"/>
 <wire x1="20.7518" y1="9.652" x2="26.3144" y2="9.6266" width="0.6096" layer="1"/>
 <wire x1="26.3144" y1="9.6266" x2="26.6954" y2="9.2456" width="0.6096" layer="1"/>
-<wire x1="26.6954" y1="9.2456" x2="26.6954" y2="6.1493375" width="0.6096" layer="1"/>
-<wire x1="26.6954" y1="6.1493375" x2="26.6928625" y2="6.1468" width="0.6096" layer="1"/>
-<wire x1="26.6928625" y1="6.1468" x2="30.0228" y2="6.1468" width="0.6096" layer="1"/>
-<wire x1="30.0228" y1="6.1468" x2="31.9981375" y2="8.2491375" width="0.6096" layer="1"/>
-<wire x1="31.9981375" y1="8.2491375" x2="32.1013625" y2="8.2491375" width="0.6096" layer="1"/>
+<wire x1="26.6954" y1="7.4193375" x2="26.6954" y2="9.2456" width="0.6096" layer="1"/>
+<wire x1="26.6954" y1="7.4193375" x2="26.6928625" y2="6.1468" width="0.6096" layer="1"/>
 <wire x1="13.844221875" y1="8.5181625" x2="13.844221875" y2="14.455159375" width="0.6096" layer="1"/>
 <wire x1="13.844221875" y1="14.455159375" x2="14.7846625" y2="15.3956" width="0.6096" layer="1"/>
+<wire x1="32.1013625" y1="3.9311375" x2="32.1013625" y2="5.9986375" width="0.6096" layer="1"/>
+<wire x1="32.1013625" y1="5.9986375" x2="31.75" y2="6.35" width="0.6096" layer="1"/>
+<wire x1="31.75" y1="6.35" x2="26.8960625" y2="7.62" width="0.6096" layer="1"/>
+<wire x1="26.8960625" y1="7.62" x2="26.6954" y2="7.4193375" width="0.6096" layer="1"/>
 </signal>
 <signal name="VCC">
 <contactref element="MIC" pad="1"/>
 <contactref element="BRD" pad="1"/>
 <wire x1="35.5352" y1="15.48288125" x2="35.5352" y2="13.996" width="0.6096" layer="1"/>
 <wire x1="35.5352" y1="13.996" x2="34.5186" y2="12.9794" width="0.6096" layer="1"/>
-<wire x1="34.5186" y1="12.9794" x2="30.3022" y2="12.9794" width="0.6096" layer="1"/>
-<wire x1="30.3022" y1="12.9794" x2="27.8892" y2="15.3924" width="0.6096" layer="1"/>
-<wire x1="27.8892" y1="15.3924" x2="19.8678625" y2="15.3924" width="0.6096" layer="1"/>
+<wire x1="34.5186" y1="12.9794" x2="31.5722" y2="12.9794" width="0.6096" layer="1"/>
+<wire x1="31.5722" y1="12.9794" x2="29.1592" y2="15.3924" width="0.6096" layer="1"/>
+<wire x1="29.1592" y1="15.3924" x2="19.8678625" y2="15.3924" width="0.6096" layer="1"/>
 <wire x1="19.8678625" y1="15.3924" x2="19.8646625" y2="15.3956" width="0.6096" layer="1"/>
 </signal>
 <signal name="SERVOGND">
@@ -600,14 +601,16 @@ design rules under a new name.</description>
 <contactref element="STRESS" pad="1"/>
 <contactref element="S2" pad="1"/>
 <contactref element="S1" pad="1"/>
-<wire x1="25.4948625" y1="12.9594" x2="23.8130625" y2="11.2776" width="0.6096" layer="1"/>
-<wire x1="23.8130625" y1="11.2776" x2="17.8308" y2="11.2776" width="0.6096" layer="1"/>
-<wire x1="17.8308" y1="11.2776" x2="16.384221875" y2="9.831021875" width="0.6096" layer="1"/>
-<wire x1="16.384221875" y1="9.831021875" x2="16.384221875" y2="8.5181625" width="0.6096" layer="1"/>
-<wire x1="34.5974625" y1="11.3284" x2="27.1258625" y2="11.3284" width="0.6096" layer="1"/>
-<wire x1="27.1258625" y1="11.3284" x2="25.4948625" y2="12.9594" width="0.6096" layer="1"/>
-<wire x1="34.6413625" y1="8.2491375" x2="34.6413625" y2="11.2845" width="0.6096" layer="1"/>
-<wire x1="34.6413625" y1="11.2845" x2="34.5974625" y2="11.3284" width="0.6096" layer="1"/>
+<wire x1="25.57713125" y1="12.87713125" x2="25.4948625" y2="12.9594" width="0.6096" layer="1"/>
+<wire x1="34.6413625" y1="3.9311375" x2="34.6413625" y2="9.1879" width="0.6096" layer="1"/>
+<wire x1="34.6413625" y1="9.1879" x2="34.6736625" y2="9.2202" width="0.6096" layer="1"/>
+<wire x1="16.384221875" y1="8.5181625" x2="16.384221875" y2="12.574221875" width="0.6096" layer="1"/>
+<wire x1="16.384221875" y1="12.574221875" x2="16.51" y2="12.7" width="0.6096" layer="1"/>
+<wire x1="25.4" y1="12.7" x2="16.51" y2="12.7" width="0.6096" layer="1"/>
+<wire x1="25.4" y1="12.7" x2="25.57713125" y2="12.87713125" width="0.6096" layer="1"/>
+<wire x1="34.6736625" y1="9.2202" x2="31.4198" y2="9.2202" width="0.6096" layer="1"/>
+<wire x1="31.4198" y1="9.2202" x2="27.94" y2="12.7" width="0.6096" layer="1"/>
+<wire x1="27.94" y1="12.7" x2="25.4" y2="12.7" width="0.6096" layer="1"/>
 </signal>
 <signal name="SWITCH+">
 <contactref element="BATT" pad="1"/>
