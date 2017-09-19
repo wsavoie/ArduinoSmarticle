@@ -1,7 +1,7 @@
 %clear all
 % fold=uigetdir('A:\2DSmartData');
-% fold=uigetdir('A:\2DSmartData\regRing\redSmarts\');
-fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
+fold=uigetdir('A:\2DSmartData\superlightRing\redSmarts\metal_singleInactive_3-1_inactive_frame');
+% fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
