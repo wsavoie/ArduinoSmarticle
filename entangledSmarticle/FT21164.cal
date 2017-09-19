@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- NOTE: To parse this file for your own software, use the "UserAxis" elements     -->
+<!-- to construct the calibration matrix.  The "Axis" elements contain a scaled and  -->
+<!-- transformed version of the matrix used for ATI's internal purposes only.  When  -->
+<!-- you send your sensor back for recalibration, or replace your sensor with a new  -->
+<!-- one, you will receive a new calibration file with a different matrix.  Make     -->
+<!-- sure any custom software you write stays up to date with the latest version of  -->
+<!-- the calibration matrix.                                                         -->
+<FTSensor  Serial="FT21164" BodyStyle="Nano43" Family="DAQ" NumGages="6" CalFileVersion="1.1">
+	<Calibration  PartNumber="SI-9-0.125" CalDate="7/24/2017" ForceUnits="N" TorqueUnits="N-mm" DistUnits="mm" OutputMode="Ground Referenced Differential" OutputRange="20" HWTempComp="True" GainMultiplier="1" CableLossDetection="False" OutputBipolar="True">
+		<Axis Name="Fx" values=" -0.03606  -0.29755   0.28558  36.14986   0.11731 -36.23864 " max="9" scale="32.6537508054912"/>
+		<Axis Name="Fy" values=" -0.13167 -42.84995  -0.11704  21.06432  -0.17403  20.93029 " max="9" scale="32.6537508054912"/>
+		<Axis Name="Fz" values=" 20.28745   0.13251  21.61649   0.08578  21.09325  -0.02982 " max="9" scale="27.738822864607"/>
+		<Axis Name="Tx" values="  0.30659  -0.07523  37.33246   0.31191 -36.56620   0.00448 " max="125" scale="3.30334556983267"/>
+		<Axis Name="Ty" values="-40.86706  -0.67383  21.72370   0.20115  20.71606   0.14494 " max="125" scale="3.30334556983267"/>
+		<Axis Name="Tz" values=" -0.21910 -21.22920  -0.24460 -20.35247   0.53824 -20.62378 " max="125" scale="2.29902866642831"/>
+		<BasicTransform Dx="0" Dy="0" Dz="4.3434" Rx="0" Ry="0" Rz="0"/>
+		<UserAxis Name="Fx" values=" -0.00110  -0.00911   0.00875   1.10707   0.00359  -1.10978 " max="9"/>
+		<UserAxis Name="Fy" values=" -0.00403  -1.31225  -0.00358   0.64508  -0.00533   0.64098 " max="9"/>
+		<UserAxis Name="Fz" values="  0.73137   0.00478   0.77929   0.00309   0.76042  -0.00108 " max="9"/>
+		<UserAxis Name="Tx" values="  0.07530  -5.72241  11.28584   2.89627 -11.09259   2.78538 " max="125"/>
+		<UserAxis Name="Ty" values="-12.36662  -0.16441   6.53829  -4.74754   6.25563   4.86412 " max="125"/>
+		<UserAxis Name="Tz" values=" -0.09530  -9.23399  -0.10639  -8.85264   0.23412  -8.97065 " max="125"/>
+	</Calibration>
+</FTSensor>
+
