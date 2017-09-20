@@ -1520,7 +1520,6 @@ if(showFigs(showFigs==xx))
     figText(gcf,14)
     axis tight
     
-h
 %     
 %     figText(gcf,16);
 %     xl=xlim;
