@@ -14,21 +14,7 @@ client=natnetInit;
 running = 1;
 del=',';%delimiter
 
-startZero=1;
 pause(1);
-%%%%%%%send params to uno%%%%%%%%%%
-if(~startZero)
-    maxV=20;
-    gaitRadInitial=35;
-    gaitIncrease=2;
-    v=1;
-    direc=mod(v,2)+1;
-    % a=pts(maxV,d,gaitRadInitial,d,gaitIncrease,d,v,d,dir);
-    % fprintf(uno,'%s',a);
-    % fwrite(uno,'1_2_3');
-    a=horzcat(num2str(maxV),del,num2str(gaitRadInitial),del,num2str(gaitIncrease),del,num2str(v),del,num2str(direc));
-    fwrite(uno,a,'uint16')
-end
 %%%%%%%%%%%%%%
 pts(fgetl(uno));
 % pts(fgetl(uno));

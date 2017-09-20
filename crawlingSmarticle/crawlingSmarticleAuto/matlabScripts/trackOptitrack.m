@@ -1,4 +1,4 @@
-function [t,x,y,tracks, varargout]=trackOptitrack(file,dec,rigidBodyName)
+function [t,x,y,z,tracks, varargout]=trackOptitrack(file,dec,rigidBodyName)
 
 % figure(1);clf;
 
@@ -16,7 +16,23 @@ data = importdata(file);
 
 %Get data for the ring specifically (rigid body MUST be named with "ring")
 rigidBodyHeaders = lower(data.textdata{4,1}); %single line of text with csv
-ind = strfind(rigidBodyHeaders,rigidBodyName);
+% ind = strfind(rigidBodyHeaders,rigidBodyName);
+if(iscell(rigidBodyName))
+    i=1;
+    while(1)  
+        ind = strfind(rigidBodyHeaders,rigidBodyName{i});
+        if(ind)
+            break;
+        end
+        i=i+1;
+        if i>length(rigidBodyName)
+            break;
+        end
+    end
+      
+else
+        ind = strfind(rigidBodyHeaders,rigidBodyName);
+end
 
 %TEMPORARY (if inactive particle wasn't labeled 'inactive' in optitrack,  
 %assume first rigid body is inactive)

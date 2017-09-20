@@ -5,11 +5,12 @@ fold=uigetdir('A:\2DSmartData\crawl');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
-
+clearvars walkerName
 if RIGIDBODYNAMES
-    walkerName=' walker';
+    walkerName{1} = ' walker';
+    walkerName{2} = ' crawler';
 else
-    rigidBodyName = 'rigid body 1';
+    walkerName{1} = 'rigid body 1';
 end
 
 % r=.9525;
@@ -39,7 +40,7 @@ for i=1:nMovs
         %         [~,movs(i).Ax,movs(i).Ay,movs(i).Adata,movs(i).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
         try
             idx=idx+1;
-            [movs(idx).t,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,walkerName);
+            [movs(idx).t,movs(idx).x,movs(idx).y,movs(idx).z,movs(idx).data,movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,walkerName);
             movs(idx).fname=f(i).name;
             movs(idx).fps=120/dec;
             [p,v]=parseFileNames(f(i).name);
