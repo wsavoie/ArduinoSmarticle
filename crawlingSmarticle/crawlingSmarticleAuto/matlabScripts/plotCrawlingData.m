@@ -16,7 +16,7 @@ fold
 %* 2. plot gait size  or plot avg speed distance/time vs gait radii with std
 %* 3. distance per gait
 %************************************************************
-showFigs=[3];
+showFigs=[1 2];
 
 %params we wish to plot
 DIR=[]; RAD=[]; V=[];
@@ -119,10 +119,12 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
     
 end
-%% 3 avg speed vs position
+%% 3 get position and time of all gait high&low points for 
 xx=3;
 if(showFigs(showFigs==xx))
     figure(xx);
+    hold on;
+    figure(12312);
     hold on;
     %     first get number of gait radii used
     
@@ -139,6 +141,7 @@ if(showFigs(showFigs==xx))
     
     [pksT,locsT]=findpeaks(usedMovs(1).z,'MinPeakDistance',usedMovs(1).fps*.9*dist,'minpeakHeight',y(2)*.95);
     [pksB,locsB]=findpeaks(-usedMovs(1).z,'MinPeakDistance',usedMovs(1).fps*.9*dist,'minpeakHeight',-y(1)*1.05);
+        
 %     [pksT,locsT]=findpeaks(usedMovs(1).z,usedMovs(1).t,'MinPeakDistance',dist*.9,'minpeakHeight',y(2)*.95);
 %     [pksB,locsB]=findpeaks(-usedMovs(1).z,usedMovs(1).t,'MinPeakDistance',dist*.9,'minpeakHeight',-y(1)*1.1);
     %         plot(usedMovs(1).t,usedMovs(1).z);
@@ -150,6 +153,11 @@ if(showFigs(showFigs==xx))
     plot(usedMovs(1).t(locsB),usedMovs(1).z(locsB),'o');
     gaitzD1=cell(length(uRadD1),1);
     gaitzD2=cell(length(uRadD2),1);
+    figure(xx);
+    %speed
+%     plot(diff(usedMovs(1).x(locsT))*1000./(diff(usedMovs(1).t(locsT))));
+    %displacement
+    plot(diff(usedMovs(1).x(locsB))*1000);
     for i=1:length(uRadD1)
         
         idxs=find(allPars(:,1)==1&allPars(:,2)==uRadD1(i));
@@ -163,8 +171,8 @@ if(showFigs(showFigs==xx))
 %             [pksB,locsB]=findpeaks(-usedMovs(idxs(j)).z,usedMovs(idxs(j)).t,'MinPeakWidth',dist*.9,'minpeakHeight',-y(1)*1.2);
 %             gaitzD1{i}{j,1}=[pksT,locsT];
 %             gaitzD1{i}{j,2}=[-pksB,locsB];
-            gaitzD1{i}{j,1}=[usedMovs(idxs(j)).x(locsT),diff(usedMovs(idxs(j)).x(locsT))];
-            gaitzD1{i}{j,2}=[usedMovs(idxs(j)).x(locsB),diff(usedMovs(idxs(j)).x(locsB))];
+            gaitzD1{i}{j,1}=[usedMovs(idxs(j)).x(locsT(1:end-1)),diff(usedMovs(idxs(j)).x(locsT))];
+            gaitzD1{i}{j,2}=[usedMovs(idxs(j)).x(locsB(1:end-1)),diff(usedMovs(idxs(j)).x(locsB))];
         end
     end
     
@@ -178,13 +186,14 @@ if(showFigs(showFigs==xx))
 %             [pksB,locsB]=findpeaks(-usedMovs(idxs(j)).z,usedMovs(idxs(j)).t,'MinPeakDistance',dist*.9,'minpeakHeight',-y(1)*1.2);
 %             gaitzD2{i}{j,1}=[pksT,locsT];
 %             gaitzD2{i}{j,2}=[-pksB,locsB];
-            gaitzD2{i}{j,1}=[usedMovs(idxs(j)).x(locsT),diff(usedMovs(idxs(j)).x(locsT))];
-            gaitzD2{i}{j,2}=[usedMovs(idxs(j)).x(locsB),diff(usedMovs(idxs(j)).x(locsB))];
+            gaitzD2{i}{j,1}=[usedMovs(idxs(j)).x(locsT(1:end-1)),diff(usedMovs(idxs(j)).x(locsT))];
+            gaitzD2{i}{j,2}=[usedMovs(idxs(j)).x(locsB(1:end-1)),diff(usedMovs(idxs(j)).x(locsB))];
         end
     end
+    figure(xx);
     figText(gcf,16);
     xlabel('gait num');
-    ylabel('displacement (mm)')
+    ylabel('displacement (mm/cycle)')
 end
 
 
