@@ -36,7 +36,7 @@ while running
             continue;
         end
         serialOut=str2double(strsplit(serialOut,'_'));
-        d=datetime(datetime,'Format','yyyyMMDD_hhmmss');
+        d=datetime(datetime,'Format','yyyyMMDD_HHmmss');
         client.stopRecord;
         cc=[char(d),'_D=',num2str(serialOut(1)),...
             '_R=',num2str(serialOut(2)),'_v=',num2str(serialOut(3))];
