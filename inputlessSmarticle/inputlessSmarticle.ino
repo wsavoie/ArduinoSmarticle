@@ -1,7 +1,7 @@
 #include <Servo.h>
 
 /* Pin Definitions */
-#define SERVOTYPE 1 //red=0, ross=1
+#define SERVOTYPE 0 //red=0, ross=1
 
 #if SERVOTYPE==0 //RED
   #define servo1 5//5 red//10 ross
@@ -42,8 +42,8 @@ void loop()
 void deactivateSmarticle() {
   S1.writeMicroseconds(p1=1500);
   S2.writeMicroseconds(p2=1500);
-//  S1.writeMicroseconds(p1=maxx * 10 + 600);
-//  S2.writeMicroseconds(p2=minn * 10 + 600);
+  //S1.writeMicroseconds(p1=minn * 10 + 600);
+  //S2.writeMicroseconds(p2=maxx * 10 + 600);
   delay(del);
 }
 
