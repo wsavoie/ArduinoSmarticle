@@ -2,8 +2,9 @@ clear all;
 close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
+fold=uigetdir('A:\2DSmartData\superlightRing\redSmarts\metal_singleInactive_3-1_inactive_frame');
+% fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\metal_singleInactive_1-1_frame_inactive');
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\');
 load(fullfile(fold,'movieInfo.mat'));
 figure(1)
 SPACE_UNITS = 'm';
@@ -40,9 +41,10 @@ fold
 % 26 rotate each each track by the rotation of inactive smarticle OLDER
 % 27. for each msd traj get linear fit of log
 % 28. plot inactive particle position rotate by its rotation
-
+% 29. Rot each track by the rotation of inactive smart and project
+% 30. partial Rot each track by the rotation of inactive smart and project
 %************************************************************
-showFigs=[1 23];
+showFigs=[1 22 29];
 % showFigs=[1 23];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
@@ -73,7 +75,7 @@ end
 if(isempty(ma.tracks))
     error('no tracks found for params given!');
 end
-
+N=length(usedMovs);
 %% 1 plot Y vs. X
 xx=1;
 if(showFigs(showFigs==xx))
@@ -134,13 +136,13 @@ if(showFigs(showFigs==xx))
     disp(['Trials = ',num2str(length(ma.tracks),'%.d')])
     disp(['Towards X = ',num2str(xpercent,'%.3f')])
     disp(['Towards Y = ',num2str(ypercent,'%.3f')])
-%     title('Whole Time-Scale Displacements');
+    %     title('Whole Time-Scale Displacements');
     
-%     ringRad=.1905/2;
-%     h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
-%     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-        figText(gcf,14)
-
+    %     ringRad=.1905/2;
+    %     h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+    %     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    figText(gcf,14)
+    
 end
 %% 2 plot MSD
 xx=2;
@@ -783,7 +785,7 @@ if(showFigs(showFigs==xx))
     %     ma.plotTracks
     ma.labelPlotTracks
     %     text(0,0+.01,'start')
-%     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
+    %     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
     y=get(gca,'ylim');
     deltax=get(gca,'xlim');
     c=max(abs(deltax)); xlim([-c,c]);
@@ -930,10 +932,10 @@ if(showFigs(showFigs==xx))
     legend off;
     xpercent = xp/length(ma.tracks);
     ypercent = yp/length(ma.tracks);
-%     text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
-%     text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
+    %     text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
+    %     text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
     
-%     title('Whole Time-Scale Displacements');
+    %     title('Whole Time-Scale Displacements');
     figText(gcf,14)
     
 end
@@ -1009,7 +1011,7 @@ if(showFigs(showFigs==xx))
     y=h.Values;
     x=h.BinEdges+h.BinWidth/2;
     x(end)=[];
-%     plot(x,y,'-o');
+    %     plot(x,y,'-o');
     hold on;
     yy=get(gca,'ylim');
     plot([0,0],yy,'r','linewidth',2);
@@ -1174,17 +1176,17 @@ if(showFigs(showFigs==xx))
         [f,gof]=fit(lx,ly,'poly1');
         fs(i)=f.p1;
     end
-%     figure
+    %     figure
     plot(lx, lx*pom.p1+log(D), '-', 'Color',[0,0,0], 'LineWidth', 1)
     xlabel('log(Delay)')
     ylabel('log(MSD)')
-%     hold on
-%     plot(lx, lx-10)
-%     plot(lx, 2*(lx)-10)
+    %     hold on
+    %     plot(lx, lx-10)
+    %     plot(lx, 2*(lx)-10)
     pts('(*)mean of powers=', mean(fs),' stdev=', std(fs),'  power of mean=',pom.p1);
     % std(fs);
 end
-%% 28 plot inactive particle position rotate by its rotation 
+%% 28 plot inactive particle position rotate by its rotation
 xx=28;
 if(showFigs(showFigs==xx))
     figure(xx)
@@ -1193,7 +1195,7 @@ if(showFigs(showFigs==xx))
     %     ma.plotTracks
     ma.labelPlotTracks
     %     text(0,0+.01,'start')
-%     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
+    %     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
     y=get(gca,'ylim');
     deltax=get(gca,'xlim');
     c=max(abs(deltax)); xlim([-c,c]);
@@ -1277,3 +1279,249 @@ if(showFigs(showFigs==xx))
     figText(gcf,14)
 end
 
+%% 29. Rot each track by the rotation of inactive smart and project
+xx=29;
+dir=0;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    hax1=gca;
+    %     ma.plotTracks
+    ma.labelPlotTracks
+    %     text(0,0+.01,'start')
+    %     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
+    y=get(gca,'ylim');
+    deltax=get(gca,'xlim');
+    c=max(abs(deltax)); xlim([-c,c]);
+    c=max(abs(y)); ylim([-c,c]);
+    axis equal
+    
+    axis([-.3 .3 -.3 .3]);
+    deltax=xlim; y=ylim;
+    %set(gca,'xtick',[-.5:.25:.5],'ytick',[-.5:.25:.5]);
+    set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]); %same as 1
+    y=get(gca,'ylim'); deltax=get(gca,'xlim');
+    h=plot(deltax,[0,0],'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    h=plot([0,0],y,'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    %     for i=9
+    %     xp = 0;
+    %     yp = 0;
+    L=length(usedMovs);
+    correctDir=0;
+    minT=1e10;
+    for i=1:length(usedMovs)
+        minT=min(length(usedMovs(i).t),minT);
+        % dpos=diff(pos);
+        pos = [usedMovs(i).x, usedMovs(i).y];
+        rpos = bsxfun(@minus, pos, pos(1,:));
+        
+        % Subtract initial position
+        % Inactive particle position
+        iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+        iapos = bsxfun(@minus, iapos, pos(1,:));
+        
+        %get rid of nans in iapos and rpos
+        [nanr,~]=find(isnan(iapos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+            end
+        end
+        [nanr,~]=find(isnan(rpos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+            end
+        end
+        
+        
+        newpos=zeros(size(rpos));
+        for j=2:size(newpos,1)
+            % Get the change in the ring position in the world frame
+            deltaR = rpos(j, :) - rpos(j-1, :);
+            
+            % Get the vec1, tor from the ring COG to the inactive smarticle
+            rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
+            rs = rs./norm(rs);
+            ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
+            ns=-ns;%this gets direction of perpendicular movement correct
+            %             deltay = ((rs*deltaR')/norm(rs)^2)*rs;
+            %             deltax = deltaR - deltay;
+            newpos(j, :) =[deltaR*ns',deltaR*rs'];
+            %       newpos(j, :) = [sign((rs./norm(rs))*(deltax'./norm(deltax)))*norm(deltax),...
+            %                           sign((rs./norm(rs))*(deltay'./norm(deltay)))*norm(deltay)];
+            
+            
+        end
+        newpos=cumsum(newpos);
+        if newpos(end,2)>0
+            correctDir=correctDir+1;
+        end
+        %         plot(newpos(:,1),newpos(:,2));
+        plot(ones(1,length(newpos(:,2)))*.025*i-length(usedMovs)/2*.025,newpos(:,2));
+        %         h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
+        set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        endPos(i)=newpos(end,2);
+        nn(i)=newpos(end,2)./usedMovs(i).t(end);
+    end
+    pts('mean((final y positions)/time)', mean(nn),' +-',std(nn));
+%     pts('avg projected v=',mean(endPos)/(minT/usedMovs(1).fps));
+    %     xpercent = xp/length(ma.tracks);
+    %     ypercent = yp/length(ma.tracks);
+    %     text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
+    %     text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
+    
+    text(.1,.9,{['towards inactive: ',num2str(correctDir,2),...
+        '/',num2str(L),'=',num2str(correctDir/L,2)]},'units','normalized','Interpreter','latex');
+    
+    ringRad=.1905/2;
+    h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    xlabel('Perpendicular to Inactive Smarticle (m)')
+    ylabel('Along Axis of Inactive Smarticle (m)')
+    title('Projected velocity');
+    figText(gcf,14);
+    axis tight
+    
+    
+    figure(12524);
+    mm=[-0.00013641 -0.00021787 -.00014566, -0.00012244 0.0001927, 0.000697 0.00098668];
+    mmerr=[0.00011918 0.00027257 0.0004223, 0.0006557,  0.0011994, 0.0010046 0.0013029];
+%     mx=[1/6 1/4 1/3 1/2 1 2 3];
+    inactiveMass=34; %grams
+    
+%     mx=[1/6 1/4 1/3 1/2 1 2 3];
+%     mx=[superHeavy,regRing1-4,regRing1-3,mediumRing,shortRing,lightRing,superLight]    
+      mx= inactiveMass./[207,119.9 ,91.1 ,68,29.5,16,9.78];
+    
+%     mm=[-0.00013641 -0.00021787 -.00014566, -0.00012244 0.0001927, 0.000697 0.000548];
+%     mmerr=[0.00011918 0.00027257 0.0004223, 0.0006557,  0.0011994, 0.0010046 0.00073104];
+%     mx=[1/6 1/4 1/3 1/2 1 2 3];
+    errorbar(mx,mm,mmerr);
+    xlabel('M_{inactive}/M_{ring}');
+    ylabel('\langle final drift speed\rangle');
+    hold on;
+    
+    figText(gcf,16);
+    xl=xlim;
+    plot(xl,[0,0],'k');
+end
+%% 30. partial Rot each track by the rotation of inactive smart and project
+xx=30;
+dir=0;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    hax1=gca;
+    %     ma.plotTracks
+    ma.labelPlotTracks
+    %     text(0,0+.01,'start')
+    %     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
+    y=get(gca,'ylim');
+    deltax=get(gca,'xlim');
+    c=max(abs(deltax)); xlim([-c,c]);
+    c=max(abs(y)); ylim([-c,c]);
+    axis equal
+    
+    axis([-.3 .3 -.3 .3]);
+    deltax=xlim; y=ylim;
+    %set(gca,'xtick',[-.5:.25:.5],'ytick',[-.5:.25:.5]);
+    set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]); %same as 1
+    y=get(gca,'ylim'); deltax=get(gca,'xlim');
+    h=plot(deltax,[0,0],'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    h=plot([0,0],y,'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    %     for i=9
+    %     xp = 0;
+    %     yp = 0;
+    L=length(usedMovs);
+    correctDir=0;
+    minT=1e10;
+    for i=1:length(usedMovs)
+        minT=min(length(usedMovs(i).t),minT);
+        % dpos=diff(pos);
+        pos = [usedMovs(i).x, usedMovs(i).y];
+        rpos = bsxfun(@minus, pos, pos(1,:));
+        
+        % Subtract initial position
+        % Inactive particle position
+        iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+        iapos = bsxfun(@minus, iapos, pos(1,:));
+        
+        %get rid of nans in iapos and rpos
+        [nanr,~]=find(isnan(iapos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+            end
+        end
+        [nanr,~]=find(isnan(rpos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+            end
+        end
+        
+        
+        newpos=zeros(size(rpos));
+        for j=2:size(newpos,1)
+            % Get the change in the ring position in the world frame
+            deltaR = rpos(j, :) - rpos(j-1, :);
+            
+            % Get the vec1, tor from the ring COG to the inactive smarticle
+            rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
+            rs = rs./norm(rs);
+            ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
+            ns=-ns;%this gets direction of perpendicular movement correct
+            %             deltay = ((rs*deltaR')/norm(rs)^2)*rs;
+            %             deltax = deltaR - deltay;
+            newpos(j, :) =[deltaR*ns',deltaR*rs'];
+            %       newpos(j, :) = [sign((rs./norm(rs))*(deltax'./norm(deltax)))*norm(deltax),...
+            %                           sign((rs./norm(rs))*(deltay'./norm(deltay)))*norm(deltay)];
+            
+            
+        end
+        newpos=cumsum(newpos);
+        if newpos(end,2)>0
+            correctDir=correctDir+1;
+        end
+        %         plot(newpos(:,1),newpos(:,2));
+        plot(ones(1,length(newpos(:,2)))*.025*i-length(usedMovs)/2*.025,newpos(:,2));
+        %         h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
+        set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        endPos(i)=newpos(end,2);
+        fpt=round(size(newpos,1)*1);%final position
+        
+        nn(i)=newpos(fpt,2)/usedMovs(i).t(fpt);
+    end
+    pts('mean((final y positions)/time)', mean(nn),' +-',std(nn));
+%     pts('avg projected v=',mean(endPos)/(minT/usedMovs(1).fps));
+    %     xpercent = xp/length(ma.tracks);
+    %     ypercent = yp/length(ma.tracks);
+    %     text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
+    %     text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
+    
+    text(.1,.9,{['towards inactive: ',num2str(correctDir,2),...
+        '/',num2str(L),'=',num2str(correctDir/L,2)]},'units','normalized','Interpreter','latex');
+    
+    ringRad=.1905/2;
+    h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    xlabel('Perpendicular to Inactive Smarticle (m)')
+    ylabel('Along Axis of Inactive Smarticle (m)')
+    title('Projected velocity');
+    figText(gcf,14)
+    axis tight
+    
+%     
+%     figText(gcf,16);
+%     xl=xlim;
+%     plot(xl,[0,0],'k');
+end

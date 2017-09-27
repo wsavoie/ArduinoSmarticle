@@ -1,8 +1,7 @@
 SAVEOUTMOVIE=1;
 
 tic
-hh=figure(1000);
-hh.Position=[0 0 1280 720];
+
 [filename,fold]=uigetfile(fullfile('A:\SmarticleAreaFractionData','*.avi;*.mp4'));
 V = VideoReader(fullfile(fold,filename));
 fps=V.framerate;
@@ -40,8 +39,6 @@ for(i=1:N)
 end
 parfor i=1:N
 %     I(i) = readFrame(V);
-
-    
     [hull{i},solidity(i), ~,~]=GetHull(I{i});
     areaNorm(i)=polyarea([hull{i}(:,2)],[hull{i}(:,1)])/(V.Width*V.Height);
     p(i)=patch([hull{i}(:,2)],[hull{i}(:,1)],'r','FaceAlpha',0.2,'visible','off');
@@ -52,8 +49,10 @@ end
 
 
 % parfor i=1:N
-figure(1000);
-hold off
+
+hh=figure(1000);
+hh.Position=[0 0 1280 720];
+% set(imfig,'visible','off');
 if(SAVEOUTMOVIE)
   for i=1:N  
 %     gca;
@@ -62,7 +61,7 @@ if(SAVEOUTMOVIE)
     set(p(i),'Parent',hh.CurrentAxes,'visible','on');
     writeVideo(vid,getframe(gcf));
 %     clf;
-    waitbar(i/N,h,{['Processing frame: ',num2str(i),'/',num2str(N)]});
+%     waitbar(i/N,h,{['Processing frame: ',num2str(i),'/',num2str(N)]});
   end
 end
 %     p(i).Parent=hh.CurrentAxes;
@@ -116,6 +115,7 @@ closeWaitbar;
 
 if(SAVEOUTMOVIE)
     close(vid);
+%     close(V);
 end
 close
 toc

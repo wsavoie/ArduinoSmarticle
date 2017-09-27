@@ -19,14 +19,24 @@ void sendParamsToMini();
 int dir = 0;
 bool writeYes = true;
 //maxV,gaitRadInitial,gaitIncrease,v,dir
-int params[] = {20, 35, 2, 0, 1};
-
-///////////start up variables to write to pro mini//////////
-int maxV = 2;           //number of trials for each radius
-int gaitRadInitial = 30;//initial gait radius
-int gaitIncrease = 1;   //amount to increase gait radius
+int params[] = {20, 43, 2, 0, 1};
+///////////initialize vars//////////
+//int maxV = 2;           //number of trials for each radius
+//int gaitRadInitial = 30;//initial gait radius
+//int gaitIncrease = 1;   //amount to increase gait radius
 int v = 1;              //current trial number
 ////////////////////////////////////////////////////////////
+
+
+
+//start system with power to smarticle unplugged
+//sending program to uno with proper params plugged in above
+//plug in smarticle press reset button and should start moving to right
+//move hand over left side sensor it shouldn't start recording until it
+//the smarticle makes it to the end of right side. Once it passes right sensor
+//system should start a recording on optitrack on optitrack
+//throw away first (2?) recordings
+
 
 void setup()
 {
