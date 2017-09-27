@@ -22,7 +22,7 @@ function varargout = smartSoundGUI(varargin)
 
 % Edit the above text to modify the response to help smartSoundGUI
 
-% Last Modified by GUIDE v2.5 29-May-2017 16:51:31
+% Last Modified by GUIDE v2.5 27-Sep-2017 10:10:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -250,5 +250,3 @@ switch eventdata.Key
     case 'escape'
         pause(player);
 end
-
-
