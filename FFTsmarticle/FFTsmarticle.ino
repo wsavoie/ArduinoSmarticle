@@ -60,6 +60,7 @@ void performFunc(int type);
 void leftSquareGait();
 void rightSquareGait();
 void leftDiamond();
+void rightDiamond();
 void positiveSquare();
 void zShape();
 void uShape();
@@ -72,12 +73,13 @@ const uint16_t samples = 64;
 //double samplingFrequency = 8300; //breadboard: elapsed time ~ 7700us
 double samplingFrequency = 7950; //smarticle: elapsed time ~ 8050us
 //SERVONUM:            1    2    3    4    5    6    7    8
-int freqCenters[8] = {600, 700, 800, 900, 1000, 1100, 1200, 1300};
+int const fN= 9;
+int freqCenters[fN] = {600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400};
 int freqAcceptThresh = 50;  //+-30Hz from freqCenter is accepted
 //int freqCenters[8] = {600, 650, 700, 750, 800, 850, 900, 950};
 //int freqAcceptThresh = 20;  //+-30Hz from freqCenter is accepted
-int freqUpperBounds[8];
-int freqLowerBounds[8];
+int freqUpperBounds[fN];
+int freqLowerBounds[fN];
 double computedFreqs[5];
 double vReal[samples];
 double vImag[samples];
@@ -101,7 +103,7 @@ void setup() {
   deactivateSmarticle();
 
   //Compute Frequency Bounds
-  for (int k = 0; k < 8; k++) {
+  for (int k = 0; k < fN; k++) {
     freqUpperBounds[k] = freqCenters[k] + freqAcceptThresh;
     freqLowerBounds[k] = freqCenters[k] - freqAcceptThresh;
   }
@@ -158,7 +160,7 @@ double findFrequency(){
 
 /* Determines whether or not to activate the smarticle based on frequency */
 void analyzeFrequency(double freq) {
-  for (int k = 0; k < 8; k++) {
+  for (int k = 0; k < fN; k++) {
 //    if (freqLowerBounds[k]<freq && freq<freqUpperBounds[k] && SERVONUM == k+1) {
     if (freqLowerBounds[k]<freq && freq<freqUpperBounds[k]) 
     {
@@ -200,15 +202,18 @@ void performFunc(int type){
       leftDiamond();
       break;
     case 5:
-      leftSquareGait();
+      rightDiamond();
       break;
     case 6:
-      rightSquareGait();
+      leftSquareGait();
       break;
     case 7:
+      rightSquareGait();
+      break;
+    case 8:
       straighten();
       break;     
-                
+                             
     default:
       straighten();
       break;
@@ -272,7 +277,21 @@ void leftDiamond() {
     delay(300);
     delay(random(100));
 }
-
+void rightDiamond() {
+    S1.writeMicroseconds(maxx * 10 + 600);
+    S2.writeMicroseconds((180-midd) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(midd * 10 + 600);
+    S2.writeMicroseconds((180-maxx) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(minn * 10 + 600);
+    S2.writeMicroseconds((180-midd) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(midd * 10 + 600);
+    S2.writeMicroseconds((180-minn) * 10 + 600);
+    delay(300);
+    delay(random(100));
+}
 void positiveSquare() {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=midd * 10 + 600);
