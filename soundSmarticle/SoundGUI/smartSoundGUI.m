@@ -22,7 +22,7 @@ function varargout = smartSoundGUI(varargin)
 
 % Edit the above text to modify the response to help smartSoundGUI
 
-% Last Modified by GUIDE v2.5 29-May-2017 16:51:31
+% Last Modified by GUIDE v2.5 28-Sep-2017 17:22:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -173,9 +173,20 @@ player=audioplayer(sin(tt*freq*2*pi), sampRate);
 play(player);
 %pts(freq);
 
-% --- Executes on button press in pushbutton9.
 function pushbutton9_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton9 (see GCBO)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global sampRate tt player
+freq=str2double(hObject.String);
+pause(player);
+player=audioplayer(sin(tt*freq*2*pi), sampRate);
+play(player);
+%pts(freq);
+
+% --- Executes on button press in pushbutton10.
+function pushbutton10_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton10 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global sampRate tt player
@@ -246,9 +257,9 @@ switch eventdata.Key
     case 'f7'
         playfreq(str2double(handles.pushbutton7.String));
     case 'f8'
-        playfreq(str2double(handles.pushbutton8.String));;
+        playfreq(str2double(handles.pushbutton8.String));
+    case 'f9'
+        playfreq(str2double(handles.pushbutton9.String));
     case 'escape'
         pause(player);
 end
-
-
