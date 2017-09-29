@@ -3,12 +3,11 @@ clear all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\crawl\trials 9-21-17');
+fold=uigetdir('A:\2DSmartData\crawl\diamond gait 9-27-17');
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
 TIME_UNITS = 's';
 fold
-
 %************************************************************
 %* Fig numbers:
 %* 1. calibrate world direction with DIR
@@ -16,8 +15,9 @@ fold
 %* 3. distance per gait
 %* 4. plot only left or right
 %* 5. plot gait radius pic
+%* 6. plotting out x vs t for dan and phase shifting
 %************************************************************
-showFigs=[2 4];
+showFigs=[5];
 
 %params we wish to plot
 DIR=[]; RAD=[]; V=[];
@@ -116,9 +116,9 @@ if(showFigs(showFigs==xx))
     
     errorbar(uRadD1,VD1,stdD1,'r','linewidth',lw);
     errorbar(uRadD2,VD2,stdD2,'k','linewidth',lw);
-%     plot(uRadD1*ones(size(vtot)),vtot,'o');
-%     plot(uRadD2*ones(size(vtot2)),vtot2,'o');
-    xlabel('Gait radius (\circ)');
+    %     plot(uRadD1*ones(size(vtot)),vtot,'o');
+    %     plot(uRadD2*ones(size(vtot2)),vtot2,'o');
+    xlabel('Gait size (\circ)');
     ylabel('Velocity (mm/s)');
     legend({'Toward Right', 'Toward Left'});
     figText(gcf,16);
@@ -144,7 +144,7 @@ if(showFigs(showFigs==xx))
     gBott=y(1); %bottom of gait height
     gTop=y(3);  %top of gait height
     
-    [pksT,locsT]=findpeaks(usedMovs(1).z,'MinPeakDistance',usedMovs(1).fps*.9*dist,'minpeakHeight',y(2)*.95);
+    [pksT,locsT]=findpeaks(usedMovs(100).z,'MinPeakDistance',usedMovs(100).fps*.9*dist,'minpeakHeight',y(2)*.95);
     [pksB,locsB]=findpeaks(-usedMovs(1).z,'MinPeakDistance',usedMovs(1).fps*.9*dist,'minpeakHeight',-y(1)*1.05);
     
     %     [pksT,locsT]=findpeaks(usedMovs(1).z,usedMovs(1).t,'MinPeakDistance',dist*.9,'minpeakHeight',y(2)*.95);
@@ -154,15 +154,18 @@ if(showFigs(showFigs==xx))
     %     plot(locsB,-pksB,'o');
     %     plot(locsT,pksT,'o');
     
-    plot(usedMovs(1).t(locsT),usedMovs(1).z(locsT),'o');
-    plot(usedMovs(1).t(locsB),usedMovs(1).z(locsB),'o');
+    plot(usedMovs(100).t(locsT),usedMovs(100).z(locsT),'o');
+    plot(usedMovs(101).t(locsT),usedMovs(101).z(locsT),'o');
     gaitzD1=cell(length(uRadD1),1);
     gaitzD2=cell(length(uRadD2),1);
-    figure(xx);
+    figure(xx+12312);
     %speed
-    %     plot(diff(usedMovs(1).x(locsT))*1000./(diff(usedMovs(1).t(locsT))));
+    hold on;
+    plot(diff(usedMovs(1).x(locsT))*1000./(diff(usedMovs(1).t(locsT))));
+    plot(diff(-usedMovs(2).x(locsT))*1000./(diff(usedMovs(2).t(locsT))));
     %displacement
-    plot(diff(usedMovs(1).x(locsB))*1000);
+    
+    %     plot(diff(usedMovs(1).x(locsB))*1000);
     for i=1:length(uRadD1)
         
         idxs=find(allPars(:,1)==1&allPars(:,2)==uRadD1(i));
@@ -196,16 +199,33 @@ if(showFigs(showFigs==xx))
         end
     end
     figure(xx);
+    %avg gait cycles per gait radius
+    topGaitAmtD1=zeros(length(gaitzD1),1);
+    d1err=topGaitAmtD1;
+    topGaitAmtD2=zeros(length(gaitzD1),1);
+    d2err=topGaitAmtD2;
+    for i=1:length(gaitzD1)
+        a=cellfun(@(x) size(x,1),gaitzD1{i}(:,1),'uniformoutput',1);
+        topGaitAmtD1(i)=mean(a);
+        d1err(i)=std(a);
+    end
+    for i=1:length(gaitzD2)
+        b=cellfun(@(x) size(x,1),gaitzD2{i}(:,1),'uniformoutput',1);
+        topGaitAmtD2(i)=mean(b);
+        d2err(i)=std(b);
+    end
     figText(gcf,16);
-    xlabel('gait num');
-    ylabel('displacement (mm/cycle)')
+    errorbar(uRadD1,topGaitAmtD1,d1err,'r','linewidth',lw);
+    errorbar(uRadD2,topGaitAmtD2,d2err,'k','linewidth',lw);
+    xlabel('Gait size (\circ)');
+    ylabel('Gait cycles')
 end
 %% 4 plot average speed for left or right
 xx=4;
 if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
-    DIREC=0; %0 = left 1= right
+    DIREC=2; %0 = left 1= right 2= both
     %     first get number of gait radii used
     uRadD1=unique(allPars(D1,2));
     uRadD2=unique(allPars(D2,2));
@@ -233,15 +253,19 @@ if(showFigs(showFigs==xx))
         stdD2(i)=std(vtot)*1000;
     end
     
-    if DIREC
-        errorbar(uRadD1,VD1,stdD1,'linewidth',lw);
+    if DIREC==1 %only right
+        errorbar(uRadD1,VD1,stdD1,'o-r','markerfacecolor','r','linewidth',lw);
         title('Right Movement');
-    else
-        errorbar(uRadD2,VD2,stdD2,'linewidth',lw);
+        
+    elseif DIREC==2 %both directions
+        h=errorbar(uRadD1,VD1,stdD1,'o-','markerfacecolor','r','linewidth',lw);
+        errorbar(uRadD2,VD2,stdD2,'o-','markerfacecolor','k','linewidth',lw,'color',h.Color);
+    else%only left
+        errorbar(uRadD2,VD2,stdD2,'o-','markerfacecolor','k','linewidth',lw);
         title('Left Movement');
     end
     
-    xlabel('Gait radius (\circ)');
+    xlabel('Gait size (\circ)');
     ylabel('Velocity (mm/s)');
     %     legend({'Toward Right', 'Toward Left'});
     figText(gcf,16);
@@ -254,32 +278,82 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     
-    radii=[30 60 90];
+    radii=[65 80 89];
+    shape=1; %1=square, else=diamond
     
-%     set(gca,...
-%         'xtick',[-90 -75 -60 -45 -30 -15 0, 15 30 45 60 75 90],...
-%         'xticklabel',{'-90' '' '-60' '' '-30' '' '0', '' '30' '' '60' '' '90'},...
-%         'ytick',[-75 -60 -45 -30 -15 0, 15 30 45 60 75 90],...
-%         'yticklabel',{'' '-60' '' '-30' '' '0', '' '30' '' '60' '' '90'});
-%     
+    %     set(gca,...
+    %         'xtick',[-90 -75 -60 -45 -30 -15 0, 15 30 45 60 75 90],...
+    %         'xticklabel',{'-90' '' '-60' '' '-30' '' '0', '' '30' '' '60' '' '90'},...
+    %         'ytick',[-75 -60 -45 -30 -15 0, 15 30 45 60 75 90],...
+    %         'yticklabel',{'' '-60' '' '-30' '' '0', '' '30' '' '60' '' '90'});
+    %
     col=zeros(length(radii),3);
     get(gca,'colororder')
-    for i = 1:length(radii);
-        h=plot([-radii(i),radii(i),... %bottom x
-            radii(i),radii(i),...    %right x
-            radii(i),-radii(i),...    %top x
-            -radii(i),-radii(i)],...      %left x
-            [-radii(i),-radii(i)...
-            -radii(i),radii(i)...
-            radii(i),radii(i)...
-            radii(i),-radii(i)],...
-            'linewidth',1.5);
-        col(i,:)=h.Color;
-        text(-20/2,-radii(i)+6.5,['r=',num2str(radii(i)),'\circ'],'color',h.Color);
+    if shape
+        
+        for i = 1:length(radii);
+            h=plot([-radii(i),radii(i),... %bottom x
+                radii(i),radii(i),...    %right x
+                radii(i),-radii(i),...    %top x
+                -radii(i),-radii(i)],...      %left x
+                [-radii(i),-radii(i)...
+                -radii(i),radii(i)...
+                radii(i),radii(i)...
+                radii(i),-radii(i)],...
+                'linewidth',1.5);
+            col(i,:)=h.Color;
+            text(-20/2,-radii(i)+6.5,['r=',num2str(radii(i)),'\circ'],'color',h.Color);
+        end
+    else
+        for i = 1:length(radii);
+            h=plot([-radii(i),0,... %left x
+                radii(i),0,...    %right x
+                -radii(i),...    %top x
+                ],...      %left x
+                [0,radii(i)...
+                0,-radii(i)...
+                0],...
+                'linewidth',1.5);
+            col(i,:)=h.Color;
+            text(-20/2,-radii(i)+6.5,['r=',num2str(radii(i)),'\circ'],'color',h.Color);
+        end
+        
     end
     figText(gcf,30);
     xlabel('\alpha_1 ({\circ})');
     ylabel('\alpha_2 ({\circ})');
     axis square
+    xlim([-90 90]);
+    ylim([-90 90]);
 end
 
+%% 6. plotting out x vs t for dan and phase shifting
+xx=6;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
+    
+    plot(usedMovs(100).t,usedMovs(100).x,'o');
+    plot(usedMovs(101).t,-(usedMovs(101).x-usedMovs(100).x(1)),'o');
+    
+    
+    hold on
+    plot(usedMovs(1).t,usedMovs(1).x,'o');
+    plot(usedMovs(2).t,-(usedMovs(2).x-usedMovs(1).x(1)),'o');
+    
+    
+    %velocity
+    hold on
+    plot(usedMovs(1).t(2:end),diff(usedMovs(1).x),'-');
+    plot(usedMovs(2).t(2:end),diff(-(usedMovs(2).x-usedMovs(1).x(1))),'-');
+    
+    
+    %velocity phase shifted to match cycles
+    hold on
+    plot(usedMovs(100).t(2:end)+.5,diff(usedMovs(100).x),'-');
+    plot(usedMovs(101).t(2:end),diff(-(usedMovs(101).x-usedMovs(1).x(100))),'-');
+    %pick red
+    %finding which peaks are better (more square/diamond)
+    x=(9.55-8.1)/2+8.1; %these are particular peak locations in time
+    
+end

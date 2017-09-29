@@ -19,7 +19,7 @@ end
 movs=struct;
 nMovs=length(f);
 movs(nMovs).fname='';
-dec=12; %decimate amount
+dec=1; %decimate amount
 %HANDEDNESS IN QUATERNIONS ISNT CHANGED?
 conv=zeros(nMovs,1);
 closeWaitbar;

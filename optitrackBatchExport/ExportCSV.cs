@@ -27,7 +27,7 @@ public class ExportCSV : ITakeProcessingScript
 	// }
 	public Result ProcessTake(Take t, ProgressIndicator progress)
 	{	
-		string v="A:\\2DSmartData\\crawl\\trials 9-21-17\\crawl 1.0 43on";
+		string v="A:\\2DSmartData\\crawl\\diamond gait 9-27-17\\crawl 1.5";
 		
 		// // using (var f = new System.Windows.Forms.OpenFileDialog())
 		// // {
