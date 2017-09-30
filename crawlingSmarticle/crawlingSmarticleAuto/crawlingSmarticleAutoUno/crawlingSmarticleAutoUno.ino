@@ -19,7 +19,7 @@ void sendParamsToMini();
 int dir = 0;
 bool writeYes = true;
 //maxV,gaitRadInitial,gaitIncrease,v,dir
-int params[] = {20, 43, 2, 0, 1};
+int params[] = {10, 89, 2, 0, 1};
 ///////////initialize vars//////////
 //int maxV = 2;           //number of trials for each radius
 //int gaitRadInitial = 30;//initial gait radius
