@@ -1,8 +1,8 @@
 #include <Servo.h>
 
 /* Pin Definitions */
-int randAmp = 250;//units of milliseconds
-#define SERVOTYPE 1 //red=0, ross=1
+int randAmp = 0;//units of milliseconds
+#define SERVOTYPE 0 //red=0, ross=1
 
 #if SERVOTYPE==0 //RED
   #define servo1 5//5 red//10 ross
@@ -62,14 +62,15 @@ void activateSmarticle() {
 
   S1.writeMicroseconds(p1 = maxx * 10 + 600);
   S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del + periodDel);
+//  delay(del + periodDel);
+  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
   S1.writeMicroseconds(p1 = maxx * 10 + 600);
   S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del + periodDel);
+  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
   S1.writeMicroseconds(p1 = minn * 10 + 600);
   S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del + periodDel);
+  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
   S1.writeMicroseconds(p1 = minn * 10 + 600);
   S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del + periodDel);
+  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
 }
