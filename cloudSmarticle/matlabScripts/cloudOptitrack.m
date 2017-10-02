@@ -1,4 +1,4 @@
-function [t,x,y,tracks, varargout]=cloudOptitrack(file,dec,rigidBodyName)
+function [t,x,y,tracks,fps, varargout]=cloudOptitrack(file,dec,rigidBodyName)
 
 % figure(1);clf;
 
@@ -18,7 +18,9 @@ data = importdata(file);
 %Get data for the ring specifically (rigid body MUST be named with "ring")
 rigidBodyHeaders = lower(data.textdata{4,1}); %single line of text with csv
 ind = strfind(rigidBodyHeaders,rigidBodyName);
-
+tx=data.textdata{1};
+a=strfind(tx,'Frame Rate,');
+fps=str2double(tx(a(1)+11:a(1)+11+6));
 %TEMPORARY (if inactive particle wasn't labeled 'inactive' in optitrack,
 %assume first rigid body is inactive)
 if isempty(ind)
