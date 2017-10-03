@@ -184,8 +184,19 @@ player=audioplayer(sin(tt*freq*2*pi), sampRate);
 play(player);
 %pts(freq);
 
-% --- Executes on button press in pushbutton10.
 function pushbutton10_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global sampRate tt player
+freq=str2double(hObject.String);
+pause(player);
+player=audioplayer(sin(tt*freq*2*pi), sampRate);
+play(player);
+%pts(freq);
+
+% --- Executes on button press in pushbutton15.
+function pushbutton15_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton10 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
