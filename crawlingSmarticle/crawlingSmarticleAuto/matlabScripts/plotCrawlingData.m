@@ -1,4 +1,4 @@
-clear all;
+% clear all;
 % close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
@@ -17,7 +17,7 @@ fold
 %* 5. plot gait radius pic
 %* 6. plotting out x vs t for dan and phase shifting
 %************************************************************
-showFigs=[5];
+showFigs=[2];
 
 %params we wish to plot
 DIR=[]; RAD=[]; V=[];
@@ -120,9 +120,12 @@ if(showFigs(showFigs==xx))
     %     plot(uRadD2*ones(size(vtot2)),vtot2,'o');
     xlabel('Gait size (\circ)');
     ylabel('Velocity (mm/s)');
-    legend({'Toward Right', 'Toward Left'});
+    legend({'Exp (CCW)', 'Exp (CW)'});
+    axis([10 90 0 30])
     figText(gcf,16);
-    
+%     clearvars -except x1 x2 x3 y1 y2 y3
+%     d=get(gca,'children'); x2=d.XData; y2=d.YData;
+% plot(x1,-y1,'o-','linewidth',lw,'markerfacecolor','w')
 end
 %% 3 get position and time of all gait high&low points for
 xx=3;

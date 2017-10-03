@@ -3,7 +3,7 @@ close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\cloud\willData\equal delay\rigid bodies markers messup');
+fold=uigetdir('A:\2DSmartData\cloud\cloud 9-30');
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
 TIME_UNITS = 's';
@@ -17,8 +17,9 @@ pts(fold);
 %* 4. integral vs xi
 %* 5. polygon initial vs. final
 %* 6. granular temperature for ensemble
+%* 7. phi vs. time
 %************************************************************
-showFigs=[6];
+showFigs=[2];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -69,7 +70,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     
-    idx=3; %index of movie to look at
+    idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     for(idx=1:N)
         figure(1000+idx);
@@ -88,14 +89,14 @@ if(showFigs(showFigs==xx))
             hold on;
             plot(usedMovs(idx).t(:,i),usedMovs(idx).rot(:,i)*180/pi,'linewidth',lw);
             xlabel('t (s)');
-                        ylabel('\theta (\circ)');
+            ylabel('\theta (\circ)');
             axis([0,120,-180,180]);
-
+            
         end
     end
     pts('plotted: ',usedMovs(idx).fname);
-%     xlabel('x (m)');
-%     ylabel('y (m)');
+    %     xlabel('x (m)');
+    %     ylabel('y (m)');
     figText(gcf,16);
     axis equal
 end
@@ -131,10 +132,11 @@ end
 %% 3. granular temperature for translation for single run
 xx=3;
 if(showFigs(showFigs==xx))
+    clf
     figure(xx); lw=2;
     hold on;
-    idx=1;
-    GtM=cell(1,N);
+    idx=4;
+    %     GtM=cell(1);
     clear GtM2 GtM1
     %     [GrM,GtM2]=deal(zeros(minT-1,N));
     %     if(ROT), GrM=zeros(minT,N); end
@@ -142,34 +144,36 @@ if(showFigs(showFigs==xx))
     m=.032; %mass of red smarticle
     L=.14; %total length smarticle
     I=(1/12)*m*L^2;
-
-    for idx=1:N
-        Gt=zeros(size(usedMovs(idx).xdot,1),numBods);
-        if(ROT), Gr=Gt; end
-        for i=1:numBods %for the number of smarticles
-            Gt(:,i)=sqrt(usedMovs(idx).xdot(:,i).^2+usedMovs(idx).ydot(:,i).^2);
-            if(ROT),Gr(:,i)=sqrt(usedMovs(idx).rotdot(:,i).^2);end
-            
-            %     v=usedMovs(i).t
-        end
-        GtM{idx}=mean(Gt(1:minT-1),1);
-        %         GtM1(idx)=sum(sum(Gt(1:minT-1,:),1));
-%         GtM1(:,idx)=mean(mean(Gt(1:minT-1,:),1),2); %mean speed of each particle over each run
-%         GtM2(:,idx)=mean(Gt(1:minT-1,:),2); %mean speed of particles at each timestep
-  
-        GtM2=Gt(1:minT-1,:); %mean speed of particles at each timestep
-        TT(:,idx)=mean(.5*GtM2.^2*m,2);
-        
+    
+    %     for idx=1:N
+    Gt=zeros(size(usedMovs(idx).xdot,1),numBods);
+    if(ROT), Gr=Gt; end
+    for i=1:numBods %for the number of smarticles
+        Gt(:,i)=sqrt(usedMovs(idx).xdot(:,i).^2+usedMovs(idx).ydot(:,i).^2);
         if(ROT)
-%             GrM1(:,idx)=mean(mean(Gr(1:minT-1,:),1),2); %mean omega of each particle over each run
-%             GrM2(:,idx)=mean(Gr(1:minT-1,:),2); %mean omega of particles at each timestep
-            GrM1(:,idx)=mean(mean(Gr(1:minT-1,:),1),2); %mean omega of each particle over each run
-            GrM2=Gr(1:minT-1,:); %mean omega of particles at each timestep
-            TR(:,idx)=mean(I.*GrM2.^2,2);
-        else
-            TR=zeros(size(TT));
-        end 
+            Gr(:,i)=sqrt(usedMovs(idx).rotdot(:,i).^2);
+        end
+        
+        %     v=usedMovs(i).t
     end
+    GtM=mean(Gt(1:minT-1),1);
+    %         GtM1(idx)=sum(sum(Gt(1:minT-1,:),1));
+    %         GtM1(:,idx)=mean(mean(Gt(1:minT-1,:),1),2); %mean speed of each particle over each run
+    %         GtM2(:,idx)=mean(Gt(1:minT-1,:),2); %mean speed of particles at each timestep
+    
+    GtM2=mean(Gt(1:minT-1,:),2); %mean speed of particles at each timestep
+    TT=mean(.5*GtM2.^2*m,2);
+    
+    if(ROT)
+        %             GrM1(:,idx)=mean(mean(Gr(1:minT-1,:),1),2); %mean omega of each particle over each run
+        %             GrM2(:,idx)=mean(Gr(1:minT-1,:),2); %mean omega of particles at each timestep
+        GrM1=mean(mean(Gr(1:minT-1,:),1),2); %mean omega of each particle over each run
+        GrM2=mean(Gr(1:minT-1,:),2); %mean omega of particles at each timestep
+        TR=mean(I.*GrM2.^2,2);
+    else
+        TR=zeros(size(TT));
+    end
+    %     end
     ktot=TT+TR;
     
     G2=mean(GtM2,2);
@@ -177,30 +181,30 @@ if(showFigs(showFigs==xx))
     %     G2=sort(G2,'descend');
     %     plot(usedMovs(idx).t(1:minT,1),G2);
     xd=[0:length(G2)-1]./usedMovs(1).fps;
-%     plot(xd,G2);
-%      plot(1:size(ktot,1),ktot(:,1));
+    %     plot(xd,G2);
+    %      plot(1:size(ktot,1),ktot(:,1));
     xlabel('t (s)');
     ylabel('total kinetic energy J');
     figText(gcf,18);
-%     xlim([0 125]);
-%     err2=std(GtM1);
-%     fV=mean(GtM1);
-subplot(2,2,1)
-plot(1:size(TT,1),TT(:,1));
-title('translational');
-xlabel('time');
-ylabel('energy (J)');
-subplot(2,2,2)
-plot(1:size(TR,1),TR(:,1));
-xlabel('time');
-ylabel('energy (J)');
-title('rotational');
-subplot(2,2,[3 4])
-plot(1:size(ktot,1),ktot(:,1));
-title('total kinetic');
-xlabel('time');
-ylabel('energy (J)');
-figText(gcf,16);
+    %     xlim([0 125]);
+    %     err2=std(GtM1);
+    %     fV=mean(GtM1);
+    subplot(2,2,1)
+    plot(xd,TT(:,1));
+    title('translational');
+    xlabel('time');
+    ylabel('energy (J)');
+    subplot(2,2,2)
+    plot(xd,TR(:,1));
+    xlabel('time (s)');
+    ylabel('energy (J)');
+    title('rotational');
+    subplot(2,2,[3 4])
+    plot(xd,ktot(:,1));
+    title('total kinetic');
+    xlabel('time (s)');
+    ylabel('energy (J)');
+    figText(gcf,16);
 end
 
 %% 4. integral vs xi
@@ -250,12 +254,19 @@ if(showFigs(showFigs==xx))
         %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
     end
     
-    %     area(rI(:,1,1),rI(:,2,1));
-    %     [ord,v]=convhull(rI(:,1,1),rI(:,2,1));
+    %         area(rI(:,1,1),rI(:,2,1));
+    [ord,v]=convhull(rI(:,1,1),rI(:,2,1));
     %     plot(rI(:,1,1),rI(:,2,1),'-o');
-    cc(6)=mean(vF-vI);
+%     plot(vF-vI);
+    cc=mean(vF-vI)
+    cerr=std(vF-vI)
+        sigma = [0,   200    ,400   ,  800  ];
+        vChange=[.022 ,0.0244,.0202 ,0.0253 ];
+        vCerr=  [0.0053,0.0045,0.0074,0.008];
+%         plot(sigma,vChange);
+        errorbar(sigma,vChange,vCerr)
     xlabel('\xi');
-    ylabel('signal');
+    ylabel('Area Change');
     figText(gcf,16);
 end
 %% 6. granular temperature for ensemble
@@ -263,7 +274,7 @@ xx=6;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    idx=1;
+    idx=4;
     GtM=cell(1,N);
     clear GtM2 GtM1
     %     [GrM,GtM2]=deal(zeros(minT-1,N));
@@ -277,36 +288,38 @@ if(showFigs(showFigs==xx))
     Ib=(1/12)*mb*(.054^2+.022^2);
     I=2*Ia+Ib;
     
-%     m=.032; %mass of red smarticle
-%     L=Lb*; %total length smarticle
-%     I=(1/12)*m*L^2;
+    %     m=.032; %mass of red smarticle
+    %     L=Lb*; %total length smarticle
+    %     I=(1/12)*m*L^2;
     
     for idx=1:N
         Gt=zeros(size(usedMovs(idx).xdot,1),numBods);
         if(ROT), Gr=Gt; end
         for i=1:numBods %for the number of smarticles
             Gt(:,i)=sqrt(usedMovs(idx).xdot(:,i).^2+usedMovs(idx).ydot(:,i).^2);
-            if(ROT),Gr(:,i)=sqrt(usedMovs(idx).rotdot(:,i).^2);end
+            if(ROT)
+                Gr(:,i)=sqrt(usedMovs(idx).rotdot(:,i).^2);
+            end
             
             %     v=usedMovs(i).t
         end
         GtM{idx}=mean(Gt(1:minT-1),1);
         %         GtM1(idx)=sum(sum(Gt(1:minT-1,:),1));
-%         GtM1(:,idx)=mean(mean(Gt(1:minT-1,:),1),2); %mean speed of each particle over each run
-%         GtM2(:,idx)=mean(Gt(1:minT-1,:),2); %mean speed of particles at each timestep
-  
-        GtM2=Gt(1:minT-1,:); %mean speed of particles at each timestep
+        %         GtM1(:,idx)=mean(mean(Gt(1:minT-1,:),1),2); %mean speed of each particle over each run
+        %         GtM2(:,idx)=mean(Gt(1:minT-1,:),2); %mean speed of particles at each timestep
+        
+        GtM2=mean(Gt(1:minT-1,:),2); %mean speed of particles at each timestep
         TT(:,idx)=mean(.5*GtM2.^2*m,2);
         
         if(ROT)
-%             GrM1(:,idx)=mean(mean(Gr(1:minT-1,:),1),2); %mean omega of each particle over each run
-%             GrM2(:,idx)=mean(Gr(1:minT-1,:),2); %mean omega of particles at each timestep
+            %             GrM1(:,idx)=mean(mean(Gr(1:minT-1,:),1),2); %mean omega of each particle over each run
+            %             GrM2(:,idx)=mean(Gr(1:minT-1,:),2); %mean omega of particles at each timestep
             GrM1(:,idx)=mean(mean(Gr(1:minT-1,:),1),2); %mean omega of each particle over each run
-            GrM2=Gr(1:minT-1,:); %mean omega of particles at each timestep
+            GrM2=mean(Gr(1:minT-1,:),2); %mean omega of particles at each timestep
             TR(:,idx)=mean(I.*GrM2.^2,2);
         else
             TR=zeros(size(TT));
-        end 
+        end
     end
     ktot=TT+TR/2;
     
@@ -315,48 +328,88 @@ if(showFigs(showFigs==xx))
     %     G2=sort(G2,'descend');
     %     plot(usedMovs(idx).t(1:minT,1),G2);
     xd=[0:length(G2)-1]./usedMovs(1).fps;
-%     plot(xd,G2);
-%      plot(1:size(ktot,1),ktot(:,1));
+    %     plot(xd,G2);
+    %      plot(1:size(ktot,1),ktot(:,1));
     xlabel('t (s)');
     ylabel('total kinetic energy J');
     figText(gcf,18);
-%     xlim([0 125]);
-%     err2=std(GtM1);
-%     fV=mean(GtM1);
-subplot(2,2,1)
+    %     xlim([0 125]);
+    %     err2=std(GtM1);
+    %     fV=mean(GtM1);
+    subplot(2,2,1)
+    
+    plot(xd,mean(TT,2));
+    title('translational');
+    xlabel('time(s)');
+    ylabel('energy (J)');
+    % axis([0,1200,0,0.08]);
+    % xlim([0 1200]);
+    subplot(2,2,2)
+    % plot(1:size(TR,1),mean(TR(:,1),2));
+    TR2=mean(TR,2);
+    % TR2(TR2>3*mean(TR2))=median(TR2);
+    
+    plot(xd,TR2);
+    xlabel('time (s)');
+    ylabel('energy (J)');
+    title('rotational');
+    % axis([0,1200,0,0.08]);
+    % xlim([0 1200]);
+    
+    subplot(2,2,[3 4])
+    plot(xd,mean(ktot,2));
+    title('total kinetic');
+    xlabel('time (s)');
+    ylabel('energy (J)');
+    figText(gcf,16);
+    axis tight
+    % xlim([0 1200]);
+    ylim([0 max(mean(ktot,2)*1.2)]);
+    % axis([0,1200,0,0.08]);
+    
+    % figure(1123);
+    % a=usedMovs(1).rotdot*L/2;
+    % rr=reshape(a,[1,size(a,1)*size(a,2)]);
+    % hist(rr,50);
+    
+    
+end
 
-plot(1:size(TT,1),mean(TT,2));
-title('translational');
-xlabel('time');
-ylabel('energy (J)');
-% axis([0,1200,0,0.08]);
-xlim([0 1200]);
-subplot(2,2,2)
-% plot(1:size(TR,1),mean(TR(:,1),2));
- TR2=mean(TR,2);
-% TR2(TR2>3*mean(TR2))=median(TR2);
-
-plot(1:length(TR2),TR2);
-xlabel('time');
-ylabel('energy (J)');
-title('rotational');
-% axis([0,1200,0,0.08]);
-xlim([0 1200]);
-
-subplot(2,2,[3 4])
-plot(1:size(ktot,1),mean(ktot,2));
-title('total kinetic');
-xlabel('time');
-ylabel('energy (J)');
-figText(gcf,16);
-xlim([0 1200]);
-ylim([0 max(mean(ktot,2)*1.2)]);
-% axis([0,1200,0,0.08]);
-
-% figure(1123);
-% a=usedMovs(1).rotdot*L/2;
-% rr=reshape(a,[1,size(a,1)*size(a,2)]);
-% hist(rr,50);
-
-
+%% 7. phi vs time
+xx=7;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    ind=2;
+    single = 0;
+    for(idx=1:N)
+        
+        %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
+        %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
+        V=zeros(1,length(usedMovs(idx).x));
+        for i=1:length(usedMovs(idx).x)
+            R=[usedMovs(idx).x(i,:)',usedMovs(idx).y(i,:)'];
+            [~,V(i)]=convhull(R(:,1),R(:,2));
+            
+        end
+        %         %last point is first point
+        %         rI(end,:,idx)=[usedMovs(idx).x(1,1)',usedMovs(idx).y(1,1)'];
+        %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
+        phi{idx}=V;
+    end
+    A=.051*.021; %area (l*w) of smarticle in m
+    
+    if(single)
+        NS=size(usedMovs(single).x,2); %number of smarticles
+        plot((1:length(phi{single}))./usedMovs(single).fps,(A*NS)./phi{single});
+    else
+        for j=1:length(phi)
+            NS=size(usedMovs(j).x,2); %number of smarticles
+            plot((1:length(phi{j}))./usedMovs(j).fps,(A*NS)./phi{j});
+        end
+    end
+    
+    xlabel('time (s)');
+    ylabel('Area Fraction \phi');
+    figText(gcf,16);
 end

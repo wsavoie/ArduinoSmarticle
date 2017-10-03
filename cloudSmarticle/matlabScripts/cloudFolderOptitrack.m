@@ -1,6 +1,6 @@
-%clear all
+clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\cloud\willData\equal delay\rigid bodies markers messup');
+fold=uigetdir('A:\2DSmartData\cloud\cloud 9-30');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -10,7 +10,7 @@ a=strfind(pathFold, 'd');
 randAmp=str2double(pathFold(a+1:end));
 % randAmp=0; %eventually read from filename instead
 if RIGIDBODYNAMES
-    numBods = 6;
+    numBods = 7;
     %names of bodies will be "something #"
 else
     %     rigidBodyName = 'rigid body 1';
@@ -23,7 +23,7 @@ end
 movs=struct;
 nMovs=length(f);
 movs(nMovs).fname='';
-dec=12; %decimate amount
+dec=1; %decimate amount
 %HANDEDNESS IN QUATERNIONS ISNT CHANGED?
 conv=zeros(nMovs,1);
 
@@ -45,7 +45,7 @@ for i=1:nMovs
     %     try
     if RIGIDBODYNAMES
         for jj=1:numBods
-            [movs(idx).t(:,jj),movs(idx).x(:,jj),movs(idx).y(:,jj),~,movs(idx).rot(:,jj)]= cloudOptitrack(fullfile(fold,f(i).name),dec,[' ',num2str(jj)]);
+            [movs(idx).t(:,jj),movs(idx).x(:,jj),movs(idx).y(:,jj),~,fps,movs(idx).rot(:,jj)]= cloudOptitrack(fullfile(fold,f(i).name),dec,[' ',num2str(jj)]);
         end
         XX=cell(size(movs(idx).x,1),1);YY=XX;
         
@@ -53,8 +53,8 @@ for i=1:nMovs
             XX{jj}=movs(idx).x(jj,:);
             YY{jj}=movs(idx).y(jj,:);
         end
-        [movs(idx).x,movs(idx).y,idxs]=linkOptiTrackTimeStepsCMU(XX,YY,size(movs(idx).x,2),.03);
-        movs(idx).rot=movs(idx).rot(idxs);
+%         [movs(idx).x,movs(idx).y,idxs]=linkOptiTrackTimeStepsCMU(XX,YY,size(movs(idx).x,2),.03);
+%         movs(idx).rot=movs(idx).rot(idxs);
         
         
         r=diff(movs(idx).rot);
@@ -79,7 +79,7 @@ for i=1:nMovs
     
     
     
-    movs(idx).fps=120/dec;
+    movs(idx).fps=fps/dec;
     movs(idx).conv=1;
     %         [~,vals]=parseFileNames(f(i).name);
     vals=[8, randAmp];
