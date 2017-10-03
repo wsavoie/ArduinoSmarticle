@@ -64,8 +64,8 @@ static int lightThresh2 = 255;
 
 //this gives inertia different values for gait vs straight
 int iMax=5 ;
-int iOn = 2; //inertia max
-int iOff = -5; //inertia min
+int iOn = 5; //inertia max
+int iOff = -2; //inertia min
 int lightInertia = iOn;
 int inertia = iMax;
 
@@ -104,9 +104,9 @@ void loop() {
   
   ledVal = false;
   int meanCurr = 0;
-  
+  performFunc(currMoveType);
 
-  analyzeLight();
+
   
 //  // Poll the current sensor and mic
 //  for (int i = 0; i < 1<<samps; i++){
@@ -141,7 +141,7 @@ void analyzeLight()
     }
   }
   else
-  { // If the light exposure one either sensor is high
+  { // If neither sensors are high
       lightInertia<=iOff ? lightInertia=iOff : lightInertia--;
       if(lightInertia<=0)
       {
@@ -151,7 +151,7 @@ void analyzeLight()
       }
   }
 //  performFunc(currMoveType);
-    performFunc(currMoveType);
+ 
 }
 void currentRead(uint16_t meanCurrVal){
   static bool v = true;
@@ -286,7 +286,8 @@ void performFunc(int type){
   switch(type)
   {
     case 0:
-      rightSquareGait();
+//      rightSquareGait();
+      rightSquareGaitInterrupt();
       break;
     case 1:
       straighten();
@@ -302,19 +303,54 @@ void straighten() {
   S1.writeMicroseconds(p1=1500);
   S2.writeMicroseconds(p2=1500);
   delay(del);
+  analyzeLight();
 }
-void rightSquareGait() {
+void rightSquareGaitInterrupt() {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
+  delay(del);
+    analyzeLight();
+    if(currMoveType==1)
+      return;   
+      
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
   delay(del);   
+    analyzeLight();
+    if(currMoveType==1)
+      return;   
+    
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
   delay(del);   
+        analyzeLight();
+    if(currMoveType==1)
+      return;   
+      
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
   delay(300);
   delay(random(100));
+  analyzeLight();
+  if(currMoveType==1)
+    return;   
+}
+void rightSquareGait() {
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);
+    analyzeLight();   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+    analyzeLight();
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+    analyzeLight();
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(300);
+  delay(random(100));
+    analyzeLight();
 }
