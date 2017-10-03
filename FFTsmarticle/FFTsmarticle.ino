@@ -49,11 +49,11 @@ bool ledVal = false;
 /* FFT Stuff */
 arduinoFFT FFT = arduinoFFT(); //creates new FFT object
 const uint16_t samples = 64;
-int const fN= 9; %number of frequencies
+int const fN= 10; //number of frequencies
 int currFreq=6;
 //double samplingFrequency = 8300; //breadboard: elapsed time ~ 7700us
 double samplingFrequency = 7950; //smarticle: elapsed time ~ 8050us
-int freqCenters[fN] = {600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400};
+int freqCenters[fN] = {600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500};
 int freqAcceptThresh = 50;  //+-30Hz from freqCenter is accepted
 int freqUpperBounds[fN];
 int freqLowerBounds[fN];
@@ -178,16 +178,16 @@ void performFunc(int type){
   switch(type)
   {
     case 0:
-      positiveSquare();
-      break;
-    case 1:
       uShape();
       break;
-    case 2:
+    case 1:
       zShape();
       break;
-    case 3:
+    case 2:
       nShape();
+      break;
+    case 3:
+      straighten();
       break;
     case 4:
       leftDiamond();
@@ -202,9 +202,11 @@ void performFunc(int type){
       rightSquareGait();
       break;
     case 8:
-      straighten();
+      positiveSquare();
       break;     
-                             
+    case 9:
+      negativeSquare();
+      break;                              
     default:
       straighten();
       break;
@@ -284,32 +286,32 @@ void rightDiamond() {
     delay(random(100));
 }
 void positiveSquare() {
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=midd * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=midd * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
   S1.writeMicroseconds(p1=midd * 10 + 600);
   S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
   delay(300);
   delay(random(100));
 }
 void negativeSquare() {
-  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=midd * 10 + 600);
   delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=midd * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
   delay(del);   
   S1.writeMicroseconds(p1=midd * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
   delay(300);
   delay(random(100));
 }
