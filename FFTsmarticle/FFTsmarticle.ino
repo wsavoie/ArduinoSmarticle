@@ -9,7 +9,7 @@
 #define SCL_FREQUENCY 0x02
 
 
-#define SERVOTYPE 0 //red=0, ross=1
+#define SERVOTYPE 1 //red=0, ross=1
 
 #if SERVOTYPE==0 //RED
   #define servo1 5//5 red//10 ross
