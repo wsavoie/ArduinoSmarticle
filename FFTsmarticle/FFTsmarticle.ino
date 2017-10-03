@@ -1,17 +1,14 @@
 #include <arduinoFFT.h>
 #include <types.h>
 #include <defs.h>
-
-//#include <MegaServo.h>
-
 #include <Servo.h>
-//#include <avr/io.h>
-//#include <avr035.h>
 
 //#define F_CPU 8000000UL
-#define myabs(n) ((n) < 0 ? -(n) : (n))
+#define SCL_INDEX 0x00
+#define SCL_TIME 0x01
+#define SCL_FREQUENCY 0x02
 
-/* Pin Definitions */
+
 #define SERVOTYPE 0 //red=0, ross=1
 
 #if SERVOTYPE==0 //RED
@@ -24,28 +21,54 @@
 // Photoresistor reading definitions
 // Based on implementation seen at:
 // https://learn.sparkfun.com/tutorials/sik-experiment-guide-for-arduino---v32/experiment-6-reading-a-photoresistor
-#define pr1 A5 // front PR sensor
-#define pr2 A1 // back PR sensor
+
+
 #define mic     A6      // CHANGE BACK TO a6
-#define stressPin A3    // CHANGE BACK TO a7
+#define stressPin A7    // CHANGE BACK TO orig a7 or a3
 #define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
-#define stressMoveThresh 2
 
-/* Instance Data & Declarations */
+/*Stress related vars*/
+uint8_t stressMoveThresh = 8;
+uint8_t stressCount = 0;
+static int curr  = 0;
+uint8_t stress = 0;
+uint16_t samps = 9; 
+
+/*Servo pins*/
 Servo S1;
 Servo S2;
 const int SERVONUM = 1;
-uint8_t stress = 0;
-uint16_t samps = 9;
 uint16_t const del = 400;
-uint8_t stressCount = 0;
-uint16_t rangeType=0;
 static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
-static uint16_t currMoveType = 8;
-static int curr  = 0;
+
 bool ledVal = false;
+
+
+/* FFT Stuff */
+arduinoFFT FFT = arduinoFFT(); //creates new FFT object
+const uint16_t samples = 64;
+int const fN= 9; %number of frequencies
+int currFreq=6;
+//double samplingFrequency = 8300; //breadboard: elapsed time ~ 7700us
+double samplingFrequency = 7950; //smarticle: elapsed time ~ 8050us
+int freqCenters[fN] = {600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400};
+int freqAcceptThresh = 50;  //+-30Hz from freqCenter is accepted
+int freqUpperBounds[fN];
+int freqLowerBounds[fN];
+double computedFreqs[5];
+double vReal[samples];
+double vImag[samples];
+
+
+/*frequency inertia*/
+int iMax = 5; //inertia max
+int inertia = iMax;
+
+
+
+
 void stressMove(uint8_t stress);
 void currentRead(uint16_t meanCurrVal);
 void light(bool a);
@@ -62,34 +85,10 @@ void rightSquareGait();
 void leftDiamond();
 void rightDiamond();
 void positiveSquare();
+void negativeSquare();
 void zShape();
 void uShape();
 void nShape();
-
-
-/* FFT Stuff */
-arduinoFFT FFT = arduinoFFT(); //creates new FFT object
-const uint16_t samples = 64;
-//double samplingFrequency = 8300; //breadboard: elapsed time ~ 7700us
-double samplingFrequency = 7950; //smarticle: elapsed time ~ 8050us
-//SERVONUM:            1    2    3    4    5    6    7    8
-int const fN= 9;
-int freqCenters[fN] = {600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400};
-int freqAcceptThresh = 50;  //+-30Hz from freqCenter is accepted
-//int freqCenters[8] = {600, 650, 700, 750, 800, 850, 900, 950};
-//int freqAcceptThresh = 20;  //+-30Hz from freqCenter is accepted
-int freqUpperBounds[fN];
-int freqLowerBounds[fN];
-double computedFreqs[5];
-double vReal[samples];
-double vImag[samples];
-#define SCL_INDEX 0x00
-#define SCL_TIME 0x01
-#define SCL_FREQUENCY 0x02
-int iMax = 5;
-int inertia = iMax;
-
-int currFreq=6;
 
 void setup() {
   S1.attach(servo1,600,2400);
@@ -99,7 +98,7 @@ void setup() {
   
   pinMode(stressPin,INPUT);
   pinMode(mic,INPUT);
-  randomSeed(analogRead(0));
+  randomSeed(analogRead(randPin));
   deactivateSmarticle();
 
   //Compute Frequency Bounds
@@ -116,14 +115,6 @@ void loop()
   ledVal=false;
   double freq = findFrequency();
   analyzeFrequency(freq);
-  
-  /*int freqSum = 0;
-  for (int k = 0; k < 5; k++) {
-    computedFreqs[k] = findFrequency();
-    freqSum += computedFreqs[k];
-  }
-  double avgFreq = freqSum/5;
-  analyzeFrequency(avgFreq);*/
   
   /*int meanCurr = 0;
   for (int i = 0; i < 1<<samps; i++)
@@ -307,6 +298,22 @@ void positiveSquare() {
   delay(300);
   delay(random(100));
 }
+void negativeSquare() {
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(300);
+  delay(random(100));
+}
+
 void deactivateSmarticle() {
   S1.writeMicroseconds(p1=1500);
   S2.writeMicroseconds(p2=1500);
@@ -340,7 +347,7 @@ void light(bool a)
   else
   {
     stressCount++;
-    if(stressCount>=stressMoveThresh && rangeType!=6 && rangeType!=7)
+    if(stressCount>=stressMoveThresh && currFreq!=6 && currFreq!=7)
     {
                         v=!v;
                         light(v);
