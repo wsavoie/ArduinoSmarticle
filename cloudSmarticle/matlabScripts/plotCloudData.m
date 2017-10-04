@@ -13,13 +13,13 @@ pts(fold);
 %* Fig numbers:
 %* 1. plot each smarticle's tracks for a particular run
 %* 2. plot COM trail of each run
-%* 3. granular temperature for translation for single run
-%* 4. integral vs xi
-%* 5. polygon initial vs. final
+%* 3. integral vs xi
+%* 4. polygon initial vs. final
+%* 5. granular temperature for translation for single run
 %* 6. granular temperature for ensemble
 %* 7. phi vs. time
 %************************************************************
-showFigs=[2];
+showFigs=[1 2 6];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -46,22 +46,7 @@ for i=1:length(movs)
 end
 N=length(usedMovs); %number of used movs
 ROT=isfield(usedMovs(1),'rot');
-% allPars=zeros(length(usedMovs),3); %all mov params saved into a single var
-% for i=1:length(usedMovs)
-%     allPars(i,:)=usedMovs(i).pars;
-% end
-% if isempty(DIR)
-%     D1=find(allPars(:,1)==1);
-%     D2=find(allPars(:,1)==2);
-% else
-%     if(DIR==1)
-%         D1=allPars(:,1);
-%         D2=[];
-%     else
-%         D1=[];
-%         D2=allPars(:,1);
-%     end
-% end
+
 
 %% 1 plot each smarticle's tracks for a particular run
 xx=1;
@@ -72,10 +57,9 @@ if(showFigs(showFigs==xx))
     
     idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
-    for(idx=1:N)
-        figure(1000+idx);
-        hold on;
-        for i=1:1 %for the number of smarticles
+
+        for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+            figure(1000+i);
             x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
             y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
             t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
@@ -90,10 +74,9 @@ if(showFigs(showFigs==xx))
             plot(usedMovs(idx).t(:,i),usedMovs(idx).rot(:,i)*180/pi,'linewidth',lw);
             xlabel('t (s)');
             ylabel('\theta (\circ)');
-            axis([0,120,-180,180]);
+            
             
         end
-    end
     pts('plotted: ',usedMovs(idx).fname);
     %     xlabel('x (m)');
     %     ylabel('y (m)');
@@ -129,13 +112,77 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
     
 end
-%% 3. granular temperature for translation for single run
+%% 3. integral vs xi
 xx=3;
 if(showFigs(showFigs==xx))
-    clf
     figure(xx); lw=2;
     hold on;
-    idx=4;
+    %     xi=[0:100:500];
+    %     y1=[0.0261,0.0299,0.0035,0.0073,0.0175,0.0057]; %integral area
+    %     cc=[0.00520,0.00522,0.00439,1.90782e-05,0.00215,0.00628];%area change
+    %     cc=cc/max(cc);
+    %     y2=y1.*cc;
+    xi=[0 50 100 150 200 250];
+    y1=[0.2382,0.1946,0.2525,.2230,0.1689,0]; %integral area
+    
+    y2=[1.7126,1.5242 ,1.6495, 1.5532,1.3841,1.5857];
+    %     cc=[0.00520,0.00522,0.00439,1.90782e-05,0.00215,0.00628];%area change
+    %     cc=cc/max(cc);
+    %     y2=y1.*cc;
+    
+    %     plot(xi,y1,'o-');
+    plot(xi,y2,'o-');
+    xlabel('\xi (ms)');
+    ylabel('signal (m)');
+    figText(gcf,16);
+    axis tight
+end
+%% 4. polygon initial vs. final
+xx=4;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    rI=zeros(numBods,2,N); %initial points
+    rF=zeros(numBods,2,N); %final points
+    vI=zeros(1,N);
+    vF=zeros(1,N);
+    
+    for(idx=1:N)
+        
+        rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
+        rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
+        
+        [~, vI(idx)]=convhull(rI(:,1,idx),rI(:,2,idx));
+        [~, vF(idx)]=convhull(rF(:,1,idx),rF(:,2,idx));
+        %         %last point is first point
+        %         rI(end,:,idx)=[usedMovs(idx).x(1,1)',usedMovs(idx).y(1,1)'];
+        %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
+    end
+    
+    %         area(rI(:,1,1),rI(:,2,1));
+    [ord,v]=convhull(rI(:,1,1),rI(:,2,1));
+    %     plot(rI(:,1,1),rI(:,2,1),'-o');
+%     plot(vF-vI);
+    cc=mean(vF-vI)
+    cerr=std(vF-vI)
+        sigma = [0,   200    ,400   ,  800  ];
+        vChange=[.022 ,0.0244,.0202 ,0.0253 ];
+        vCerr=  [0.0053,0.0045,0.0074,0.008];
+%         plot(sigma,vChange);
+        errorbar(sigma,vChange,vCerr)
+    xlabel('\xi');
+    ylabel('Area Change');
+    figText(gcf,16);
+end
+%% 5. granular temperature for translation for single run
+xx=5;
+if(showFigs(showFigs==xx))
+
+    figure(xx); lw=2;
+%         clf
+    hold on;
+    idx=1;
+    pts(usedMovs(idx).fname);
     %     GtM=cell(1);
     clear GtM2 GtM1
     %     [GrM,GtM2]=deal(zeros(minT-1,N));
@@ -190,16 +237,19 @@ if(showFigs(showFigs==xx))
     %     err2=std(GtM1);
     %     fV=mean(GtM1);
     subplot(2,2,1)
+    hold on;
     plot(xd,TT(:,1));
     title('translational');
     xlabel('time');
     ylabel('energy (J)');
     subplot(2,2,2)
+      hold on;
     plot(xd,TR(:,1));
     xlabel('time (s)');
     ylabel('energy (J)');
     title('rotational');
     subplot(2,2,[3 4])
+      hold on;
     plot(xd,ktot(:,1));
     title('total kinetic');
     xlabel('time (s)');
@@ -207,68 +257,7 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
 end
 
-%% 4. integral vs xi
-xx=4;
-if(showFigs(showFigs==xx))
-    figure(xx); lw=2;
-    hold on;
-    %     xi=[0:100:500];
-    %     y1=[0.0261,0.0299,0.0035,0.0073,0.0175,0.0057]; %integral area
-    %     cc=[0.00520,0.00522,0.00439,1.90782e-05,0.00215,0.00628];%area change
-    %     cc=cc/max(cc);
-    %     y2=y1.*cc;
-    xi=[0 50 100 150 200 250];
-    y1=[0.2382,0.1946,0.2525,.2230,0.1689,0]; %integral area
-    
-    y2=[1.7126,1.5242 ,1.6495, 1.5532,1.3841,1.5857];
-    %     cc=[0.00520,0.00522,0.00439,1.90782e-05,0.00215,0.00628];%area change
-    %     cc=cc/max(cc);
-    %     y2=y1.*cc;
-    
-    %     plot(xi,y1,'o-');
-    plot(xi,y2,'o-');
-    xlabel('\xi (ms)');
-    ylabel('signal (m)');
-    figText(gcf,16);
-    axis tight
-end
-%% 5. polygon initial vs. final
-xx=5;
-if(showFigs(showFigs==xx))
-    figure(xx); lw=2;
-    hold on;
-    rI=zeros(numBods,2,N); %initial points
-    rF=zeros(numBods,2,N); %final points
-    vI=zeros(1,N);
-    vF=zeros(1,N);
-    
-    for(idx=1:N)
-        
-        rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
-        rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
-        
-        [~, vI(idx)]=convhull(rI(:,1,idx),rI(:,2,idx));
-        [~, vF(idx)]=convhull(rF(:,1,idx),rF(:,2,idx));
-        %         %last point is first point
-        %         rI(end,:,idx)=[usedMovs(idx).x(1,1)',usedMovs(idx).y(1,1)'];
-        %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
-    end
-    
-    %         area(rI(:,1,1),rI(:,2,1));
-    [ord,v]=convhull(rI(:,1,1),rI(:,2,1));
-    %     plot(rI(:,1,1),rI(:,2,1),'-o');
-%     plot(vF-vI);
-    cc=mean(vF-vI)
-    cerr=std(vF-vI)
-        sigma = [0,   200    ,400   ,  800  ];
-        vChange=[.022 ,0.0244,.0202 ,0.0253 ];
-        vCerr=  [0.0053,0.0045,0.0074,0.008];
-%         plot(sigma,vChange);
-        errorbar(sigma,vChange,vCerr)
-    xlabel('\xi');
-    ylabel('Area Change');
-    figText(gcf,16);
-end
+
 %% 6. granular temperature for ensemble
 xx=6;
 if(showFigs(showFigs==xx))
@@ -293,6 +282,7 @@ if(showFigs(showFigs==xx))
     %     I=(1/12)*m*L^2;
     
     for idx=1:N
+        %translation granTemp
         Gt=zeros(size(usedMovs(idx).xdot,1),numBods);
         if(ROT), Gr=Gt; end
         for i=1:numBods %for the number of smarticles
@@ -382,6 +372,14 @@ if(showFigs(showFigs==xx))
     hold on;
     ind=2;
     single = 0;
+    
+%      figure(123123)
+%      [k,v]=convhull(R(:,1),R(:,2));
+%      A=R(k,:)
+% plot(A(:,1),A(:,2),'o-')
+% axis square
+    
+    
     for(idx=1:N)
         
         %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
@@ -398,18 +396,30 @@ if(showFigs(showFigs==xx))
         phi{idx}=V;
     end
     A=.051*.021; %area (l*w) of smarticle in m
+    n=size(usedMovs(idx).x,2);%number of particles
+    s=0.1428;%straight leg length of smarticle
+    otherAngs=(180-(1-2/n)*180)/2*pi/180;
+    sig=s*cos(otherAngs);%optitrack straight length of regular polygon
+    maxAreaOpti=1/4*n*sig^2*cot(pi/n); %max optitrack convex hull area
     
     if(single)
-        NS=size(usedMovs(single).x,2); %number of smarticles
-        plot((1:length(phi{single}))./usedMovs(single).fps,(A*NS)./phi{single});
+        plot((1:length(phi{single}))./usedMovs(single).fps,(A*n)./phi{single});
+        id=single;
     else
-        for j=1:length(phi)
-            NS=size(usedMovs(j).x,2); %number of smarticles
-            plot((1:length(phi{j}))./usedMovs(j).fps,(A*NS)./phi{j});
+        for j=1:length(phi)     
+            plot((1:length(phi{j}))./usedMovs(j).fps,(A*n)./phi{j});
+                meanx = mean(usedMovs(j).x(end,:));
+                meany = mean(usedMovs(j).y(end,:),2);
+allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
         end
+        id=j;
     end
-    
+    plot([0,usedMovs(id).t(end)],[n*A/maxAreaOpti,n*A/maxAreaOpti],'r--');
     xlabel('time (s)');
     ylabel('Area Fraction \phi');
     figText(gcf,16);
+    
+    %mean distance btween points
+
+    
 end

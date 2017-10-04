@@ -2,7 +2,7 @@ clear all;
 close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
-fold=uigetdir('A:\2DSmartData\superlightRing\redSmarts\metal_singleInactive_3-1_inactive_frame');
+fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\superlightring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\metal_singleInactive_1-1_frame_inactive');
 % fold=uigetdir('A:\2DSmartData\');
 load(fullfile(fold,'movieInfo.mat'));
@@ -44,7 +44,7 @@ fold
 % 29. Rot each track by the rotation of inactive smart and project
 % 30. partial Rot each track by the rotation of inactive smart and project
 %************************************************************
-showFigs=[1 22 29];
+showFigs=[1 23 29];
 % showFigs=[1 23];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 

@@ -79,7 +79,7 @@ if ~isempty(ind) || data.textdata{7,6}=='W' %has ring rigid body
     for(i=1:length(nanIndsrot))
         ang(nanIndsrot(i))=ang(nanIndsrot(i)-1);
     end
-    
+    ang=unwrap(ang);
     for(i=1:size(x,1))
         XX{i}=x(i,:);
         YY{i}=y(i,:);

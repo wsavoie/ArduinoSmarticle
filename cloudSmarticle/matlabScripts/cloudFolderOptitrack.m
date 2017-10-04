@@ -23,7 +23,7 @@ end
 movs=struct;
 nMovs=length(f);
 movs(nMovs).fname='';
-dec=1; %decimate amount
+dec=10; %decimate amount
 %HANDEDNESS IN QUATERNIONS ISNT CHANGED?
 conv=zeros(nMovs,1);
 
@@ -58,10 +58,18 @@ for i=1:nMovs
         
         
         r=diff(movs(idx).rot);
+%         for(i=1:size(movs(idx).rot
+%         [R,C]=find(abs(r)_<pi,1);
+%         while(R)
+%         movs(idx).rot(a+1)
+%         r=diff(movs(idx).rot);
+% %         end
+%         find(r>pi,1)
+%         movs(idx).rot(
         qp=find(r>pi);
         qm=find(r<-pi);
-        r(qp)=r(qp)-2*pi;
-        r(qm)=r(qm)+2*pi;
+%         r(qp)=r(qp)-2*pi;
+%         r(qm)=r(qm)+2*pi;
         
         
         movs(idx).rotdot=r./diff(movs(idx).t);
