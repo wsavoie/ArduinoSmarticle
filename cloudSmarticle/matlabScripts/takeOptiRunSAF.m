@@ -1,6 +1,6 @@
 t=120; %seconds
 client = natnet();
-
+vidOn=1;
 %keypresses for starting recording for OBS
 robot = java.awt.Robot;
 
@@ -14,14 +14,17 @@ client.connect();
 client.stopRecord;
 %make sure to set OBS's hotkeys for record/stop record to f3/f4
 %respectively
-robot.keyPress(java.awt.event.KeyEvent.VK_F3);
-pause(.05);
+if vidOn
+    robot.keyPress(java.awt.event.KeyEvent.VK_F3);
+    pause(.05);
+    robot.keyRelease(java.awt.event.KeyEvent.VK_F3)
+end
 client.startRecord;
-robot.keyRelease(java.awt.event.KeyEvent.VK_F3)
 pause(t);
 client.stopRecord;
-robot.keyPress(java.awt.event.KeyEvent.VK_F4);
-pause(.1);
-robot.keyRelease(java.awt.event.KeyEvent.VK_F4);
-
+if vidOn
+    robot.keyPress(java.awt.event.KeyEvent.VK_F4);
+    pause(.1);
+    robot.keyRelease(java.awt.event.KeyEvent.VK_F4);
+end
 beep;
