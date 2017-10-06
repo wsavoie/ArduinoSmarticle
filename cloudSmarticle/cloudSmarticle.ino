@@ -30,7 +30,16 @@ static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 void activateSmarticle();
 void deactivateSmarticle();
-
+void straighten();
+void leftSquareGait();
+void rightSquareGait();
+void leftDiamond();
+void rightDiamond();
+void positiveSquare();
+void negativeSquare();
+void zShape();
+void uShape();
+void nShape();
 
 void setup() {
   S1.attach(servo1, 600, 2400);
@@ -42,7 +51,7 @@ void setup() {
 
 void loop()
 {
-  activateSmarticle();
+  rightSquareGait();
   //deactivateSmarticle();
 }
 
@@ -74,3 +83,116 @@ void activateSmarticle() {
   S2.writeMicroseconds(p2 = minn * 10 + 600);
   delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
 }
+
+void uShape() {
+  S1.writeMicroseconds(1500 - 900);
+  S2.writeMicroseconds(1500 + 900);
+  delay(del);
+}
+void nShape() {
+  S1.writeMicroseconds(1500 + 900);
+  S2.writeMicroseconds(1500 - 900);
+}
+void zShape() {
+  S1.writeMicroseconds(1500 + 900);
+  S2.writeMicroseconds(1500 + 900);
+}
+void rightSquareGait() {
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(300);
+  delay(random(200));
+}
+void leftSquareGait() {
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(300);
+  delay(random(200));
+}
+void leftDiamond() {
+    S1.writeMicroseconds(maxx * 10 + 600);
+    S2.writeMicroseconds((midd) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(midd * 10 + 600);
+    S2.writeMicroseconds((maxx) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(minn * 10 + 600);
+    S2.writeMicroseconds((midd) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(midd * 10 + 600);
+    S2.writeMicroseconds((minn) * 10 + 600);
+    delay(300);
+    delay(random(200));
+}
+void rightDiamond() {
+    S1.writeMicroseconds(maxx * 10 + 600);
+    S2.writeMicroseconds((180-midd) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(midd * 10 + 600);
+    S2.writeMicroseconds((180-maxx) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(minn * 10 + 600);
+    S2.writeMicroseconds((180-midd) * 10 + 600);
+    delay(del);
+    S1.writeMicroseconds(midd * 10 + 600);
+    S2.writeMicroseconds((180-minn) * 10 + 600);
+    delay(300);
+    delay(random(200));
+}
+void positiveSquare() {
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(300);
+  delay(random(200));
+}
+void negativeSquare() {
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=midd * 10 + 600);
+  S2.writeMicroseconds(p2=midd * 10 + 600);
+  delay(300);
+  delay(random(200));
+}
+
+
+
+void straighten() {
+  S1.writeMicroseconds(p1=1500);
+  S2.writeMicroseconds(p2=1500);
+  delay(del);
+}
+
