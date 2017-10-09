@@ -1,6 +1,6 @@
 clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\cloud\cloud 9-30');
+fold=uigetdir('A:\2DSmartData\cloud\cloudTests\leftsquare');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
