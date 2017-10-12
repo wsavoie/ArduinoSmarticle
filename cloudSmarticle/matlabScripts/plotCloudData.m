@@ -3,7 +3,7 @@ close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\cloud\cloud 9-30');
+fold=uigetdir('A:\2DSmartData\cloud\cloudTests 10-10 nuclei\glued static');
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
 TIME_UNITS = 's';
@@ -19,7 +19,7 @@ pts(fold);
 %* 6. granular temperature for ensemble
 %* 7. phi vs. time
 %************************************************************
-showFigs=[1 2 6];
+showFigs=[2 5 7];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -410,7 +410,7 @@ if(showFigs(showFigs==xx))
             plot((1:length(phi{j}))./usedMovs(j).fps,(A*n)./phi{j});
                 meanx = mean(usedMovs(j).x(end,:));
                 meany = mean(usedMovs(j).y(end,:),2);
-allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
+%                 allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
         end
         id=j;
     end
@@ -421,5 +421,12 @@ allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
     
     %mean distance btween points
 
-    
+    ylim([0.1 0.5])
+end
+%% 8. vector field plot of positions
+xx=8;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+
 end

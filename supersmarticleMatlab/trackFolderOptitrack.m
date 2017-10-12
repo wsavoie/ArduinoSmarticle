@@ -1,6 +1,6 @@
 %clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\superlightring');
+fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 f=dir2(fullfile(fold,'*.csv'));
 
