@@ -7,13 +7,14 @@
 #define led 13
 
 bool diamond = true;
+bool negativeSquare=true
 SoftwareSerial AS(8, 9);
 /* Instance Data & Declarations */
 Servo S1;
 Servo S2;
 const int SERVONUM = 3;
-uint16_t const del = 400;
-uint16_t const endDel = 300;
+uint16_t const del = 500;
+uint16_t const endDel = 500;
 static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 uint8_t gaitRadius = 20; //between 0 and 90 degrees
@@ -23,6 +24,18 @@ void activateForward();
 void activateBackward();
 void stopLoop();
 int getValue(String data, char separator, int index);
+
+void squareForward();
+void squareBackward();
+void diamondForward();
+void diamondBackward();
+
+void NegativeCW();
+void NegativeCCW();
+
+void PositiveCW();
+void PositiveCCW();
+
 void readFromUno();
 //counter variables for automation//////////////
 
@@ -114,76 +127,12 @@ void deactivate() {
 
 /* Moves the Smarticle forward (convention: switch on left side) */
 void activateForward() {
-    if(diamond)
-    {
-      //left diamond
-      S1.writeMicroseconds(maxx * 10 + 600);
-      S2.writeMicroseconds((midd) * 10 + 600);
-      delay(del);
-      S1.writeMicroseconds(midd * 10 + 600);
-      S2.writeMicroseconds((maxx) * 10 + 600);
-      delay(del);
-      S1.writeMicroseconds(minn * 10 + 600);
-      S2.writeMicroseconds((midd) * 10 + 600);
-      delay(del);
-      S1.writeMicroseconds(midd * 10 + 600);
-      S2.writeMicroseconds((minn) * 10 + 600);
-      delay(endDel);
-    }
-    else
-    { //right square gait
-      //left movement
-    S1.writeMicroseconds(p1 = maxx * 10 + 600);
-    S2.writeMicroseconds(p2 = minn * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(p1 = maxx * 10 + 600);
-    S2.writeMicroseconds(p2 = maxx * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(p1 = minn * 10 + 600);
-    S2.writeMicroseconds(p2 = maxx * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(p1 = minn * 10 + 600);
-    S2.writeMicroseconds(p2 = minn * 10 + 600);
-    delay(endDel);
-    }
+  squareForward();
 }
-
 /* Moves the Smarticle backward (convention: switch on left side) */
 void activateBackward() {
-
-  if(diamond)
-  {   
-    //right diamond
-      S1.writeMicroseconds(maxx * 10 + 600);
-      S2.writeMicroseconds((180-midd) * 10 + 600);
-      delay(del);
-      S1.writeMicroseconds(midd * 10 + 600);
-      S2.writeMicroseconds((180-maxx) * 10 + 600);
-      delay(del);
-      S1.writeMicroseconds(minn * 10 + 600);
-      S2.writeMicroseconds((180-midd) * 10 + 600);
-      delay(del);
-      S1.writeMicroseconds(midd * 10 + 600);
-      S2.writeMicroseconds((180-minn) * 10 + 600);
-      delay(endDel);
-  }
-  else
-  {
-    //left square gait
-    //right movement
-    S1.writeMicroseconds(p1 = maxx * 10 + 600);
-    S2.writeMicroseconds(p2 = (180 - minn) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(p1 = maxx * 10 + 600);
-    S2.writeMicroseconds(p2 = (180 - maxx) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(p1 = minn * 10 + 600);
-    S2.writeMicroseconds(p2 = (180 - maxx) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(p1 = minn * 10 + 600);
-    S2.writeMicroseconds(p2 = (180 - minn) * 10 + 600);
-    delay(endDel);
-    }
+  squareBackward();
+//  diamondBackward();
 }
 
 void readFromUno()
@@ -232,4 +181,73 @@ void readFromUno()
 
 }
 
+void diamondForward()//left gait right movement
+{
+  S1.writeMicroseconds(maxx * 10 + 600);
+  S2.writeMicroseconds((midd) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(midd * 10 + 600);
+  S2.writeMicroseconds((maxx) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(minn * 10 + 600);
+  S2.writeMicroseconds((midd) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(midd * 10 + 600);
+  S2.writeMicroseconds((minn) * 10 + 600);
+  delay(endDel);
+}
+void diamondBackward()//right
+{
+  S1.writeMicroseconds(maxx * 10 + 600);
+  S2.writeMicroseconds((180-midd) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(midd * 10 + 600);
+  S2.writeMicroseconds((180-maxx) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(minn * 10 + 600);
+  S2.writeMicroseconds((180-midd) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(midd * 10 + 600);
+  S2.writeMicroseconds((180-minn) * 10 + 600);
+  delay(endDel);
+}
+void squareForward()   //left square gait left movement
+{
+  S1.writeMicroseconds(p1 = maxx * 10 + 600);
+  S2.writeMicroseconds(p2 = minn * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1 = maxx * 10 + 600);
+  S2.writeMicroseconds(p2 = maxx * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1 = minn * 10 + 600);
+  S2.writeMicroseconds(p2 = maxx * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1 = minn * 10 + 600);
+  S2.writeMicroseconds(p2 = minn * 10 + 600);
+  delay(endDel);
+}
+void squareBackward() //right square gait right movement
+{    
+  S1.writeMicroseconds(p1 = maxx * 10 + 600);
+  S2.writeMicroseconds(p2 = (180 - minn) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1 = maxx * 10 + 600);
+  S2.writeMicroseconds(p2 = (180 - maxx) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1 = minn * 10 + 600);
+  S2.writeMicroseconds(p2 = (180 - maxx) * 10 + 600);
+  delay(del);
+  S1.writeMicroseconds(p1 = minn * 10 + 600);
+  S2.writeMicroseconds(p2 = (180 - minn) * 10 + 600);
+  delay(endDel);
+}
 
+
+void NegativeCW()
+{
+  
+}
+
+void NegativeCCW();
+{
+}

@@ -35,6 +35,8 @@ Code for Smarticles running on an Arduino Pro Mini
 
 Servo S1;
 Servo S2;
+uint16_t const del = 500;
+uint16_t const endDel = 500;
 int silenceCount = 0;
 uint8_t stress = 0;
 uint16_t samps = 9; 

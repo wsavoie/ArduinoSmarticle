@@ -23,7 +23,7 @@ static int p1 = 1500; static int p2 = 1500;
 uint8_t minn = 0; uint8_t maxx = 180; uint8_t midd = 90;
 void activateSmarticle();
 void deactivateSmarticle();
-
+void zShape();
 
 void setup() {
   S1.attach(servo1,600,2400);
@@ -34,8 +34,9 @@ void setup() {
 
 void loop() 
 {
-  activateSmarticle();
-  //deactivateSmarticle();
+  //activateSmarticle();
+//  deactivateSmarticle();
+   zShape();
 }
 
 
@@ -61,4 +62,8 @@ void activateSmarticle() {
   S2.writeMicroseconds(p2=minn * 10 + 600);
   delay(300);
   delay(random(100));
+}
+void zShape() {
+  S1.writeMicroseconds(1500 + 900);
+  S2.writeMicroseconds(1500 + 900);
 }

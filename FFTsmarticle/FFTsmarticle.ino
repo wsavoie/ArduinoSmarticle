@@ -29,11 +29,15 @@
 #define led 13    //13 SCK
 
 /*Stress related vars*/
-uint8_t stressMoveThresh = 8;
+int stressMoveThresh = 9;
 uint8_t stressCount = 0;
 static int curr  = 0;
-uint8_t stress = 0;
-uint16_t samps = 9; 
+bool stress = false;
+uint16_t samps = 10; 
+
+/*current inertia*/
+int ciMax = 2; //current inertia max
+int cInertia = ciMax;
 
 /*Servo pins*/
 Servo S1;
@@ -69,6 +73,7 @@ int inertia = iMax;
 
 
 
+
 void stressMove(uint8_t stress);
 void currentRead(uint16_t meanCurrVal);
 void light(bool a);
@@ -89,7 +94,7 @@ void negativeSquare();
 void zShape();
 void uShape();
 void nShape();
-
+void rightSquareGaitCS();
 void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
@@ -127,6 +132,37 @@ void loop()
   currentRead(meanCurr);*/
 }
 
+int pollCurrent()
+{
+  int meanCurr = 0;
+  for (int i = 0; i < 1<<samps; i++)
+  {
+    curr    = analogRead(stressPin);
+    meanCurr  = meanCurr+curr;
+  }
+  meanCurr >>= samps;
+  return meanCurr;
+}
+bool stressReact(int meanCurr)
+{
+  if(meanCurr>stressMoveThresh)
+  {
+    cInertia++;
+    (cInertia>=ciMax) ? stress=true : stress=false;
+  }
+  else
+  {
+    cInertia--;
+    stress=false;
+    return false;
+  }
+  
+  if(stress)
+  {
+    straighten();
+  }
+  return stress;
+}
 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
 double findFrequency(){
@@ -199,7 +235,7 @@ void performFunc(int type){
       leftSquareGait();
       break;
     case 7:
-      rightSquareGait();
+      rightSquareGaitCS();
       break;
     case 8:
       positiveSquare();
@@ -225,18 +261,26 @@ void zShape() {
   S1.writeMicroseconds(1500 + 900);
   S2.writeMicroseconds(1500 + 900);
 }
-void rightSquareGait() {
+void rightSquareGaitCS() {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
+  if(stressReact(pollCurrent()))
+    return;
   delay(del);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
+    if(stressReact(pollCurrent()))
+    return;
   delay(del);   
   S1.writeMicroseconds(p1=minn * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
+    if(stressReact(pollCurrent()))
+    return;
   delay(del);   
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
+    if(stressReact(pollCurrent()))
+    return;
   delay(300);
   delay(random(100));
 }
@@ -244,6 +288,21 @@ void leftSquareGait() {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=minn * 10 + 600);
   delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=minn * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(del);   
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=maxx * 10 + 600);
+  delay(300);
+  delay(random(100));
+}
+void rightSquareGait() {
+  S1.writeMicroseconds(p1=maxx * 10 + 600);
+  S2.writeMicroseconds(p2=minn * 10 + 600);
+  delay(del);   
   S1.writeMicroseconds(p1=maxx * 10 + 600);
   S2.writeMicroseconds(p2=maxx * 10 + 600);
   delay(del);   
@@ -255,7 +314,7 @@ void leftSquareGait() {
   delay(300);
   delay(random(100));
 }
-void leftDiamond() {
+void rightDiamond() {
     S1.writeMicroseconds(maxx * 10 + 600);
     S2.writeMicroseconds((midd) * 10 + 600);
     delay(del);
@@ -270,7 +329,7 @@ void leftDiamond() {
     delay(300);
     delay(random(100));
 }
-void rightDiamond() {
+void leftDiamond() {
     S1.writeMicroseconds(maxx * 10 + 600);
     S2.writeMicroseconds((180-midd) * 10 + 600);
     delay(del);
