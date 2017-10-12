@@ -3,7 +3,7 @@ close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\cloud\cloudTests\leftsquare');
+fold=uigetdir('A:\2DSmartData\cloud\cloudTests 10-10 nuclei\glued static');
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
 TIME_UNITS = 's';
@@ -181,7 +181,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
 %         clf
     hold on;
-    idx=5;
+    idx=1;
     pts(usedMovs(idx).fname);
     %     GtM=cell(1);
     clear GtM2 GtM1
@@ -421,5 +421,12 @@ if(showFigs(showFigs==xx))
     
     %mean distance btween points
 
-    
+    ylim([0.1 0.5])
+end
+%% 8. vector field plot of positions
+xx=8;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+
 end

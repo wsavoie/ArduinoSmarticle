@@ -1,6 +1,6 @@
 clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\cloud\cloudTests\leftsquare');
+fold=uigetdir('A:\2DSmartData\cloud\cloudTests 10-10 nuclei\glued static');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -23,7 +23,7 @@ end
 movs=struct;
 nMovs=length(f);
 movs(nMovs).fname='';
-dec=10; %decimate amount
+dec=12; %decimate amount
 %HANDEDNESS IN QUATERNIONS ISNT CHANGED?
 conv=zeros(nMovs,1);
 
