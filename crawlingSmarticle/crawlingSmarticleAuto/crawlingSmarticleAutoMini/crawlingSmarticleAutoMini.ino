@@ -7,7 +7,6 @@
 #define led 13
 
 bool diamond = true;
-bool negativeSquare=true
 SoftwareSerial AS(8, 9);
 /* Instance Data & Declarations */
 Servo S1;
@@ -40,7 +39,7 @@ void readFromUno();
 //counter variables for automation//////////////
 
 //maxV,gaitRadInitial,gaitIncrease,v,dir
-int params[]={3,37,5,0,1};
+int params[]={5,89,5,0,1};
 int maxV = params[0];
 int gaitRadInitial = params[1];
 int gaitIncrease = params[2];
@@ -127,12 +126,17 @@ void deactivate() {
 
 /* Moves the Smarticle forward (convention: switch on left side) */
 void activateForward() {
-  squareForward();
+//  squareForward();
+//  diamondForward();
+  NegativeCCW();
+  //PositiveCW();
 }
 /* Moves the Smarticle backward (convention: switch on left side) */
 void activateBackward() {
-  squareBackward();
+//  squareBackward();
 //  diamondBackward();
+  NegativeCW();
+  //PositiveCCW();
 }
 
 void readFromUno()
@@ -243,11 +247,60 @@ void squareBackward() //right square gait right movement
 }
 
 
-void NegativeCW()
+
+void NegativeCW() //red area forward movement 
 {
   
+//  int A1[] = {110,100,136,170,180,180,145};
+//  int A2[] = {80,70,36,0,0,10,45};
+  int A1[] = {110,100,170,180,180};
+  int A2[] = {80,70,0,0,10};
+  
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    delay(del);
+  }
 }
 
-void NegativeCCW();
+void NegativeCCW()//red area backwards movement 
 {
+//  int A1[] = {110,145,180,180,170,136,100};
+//  int A2[] = {80,45,10,0,0,36,70};
+  int A1[] = {110,180,180,170,100};
+  int A2[] = {80,10,0,0,70};
+  
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    delay(del);
+  }
 }
+
+void PositiveCW()//blue area backwards movement 
+{
+  int A1[] = {100,77,55,75,94,110,147,180,180,140};
+  int A2[] = {80,39,0,0,38,70,89,105,125,102};
+  
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    delay(del);
+  }
+}
+void PositiveCCW()//blue area forwards movement 
+{
+  int A1[] = {100,140,180,180,147,110,94,75,55,77};
+  int A2[] = {80,102,125,105,89,70,38,0,0,39};
+
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    delay(del);
+  }
+}
+
