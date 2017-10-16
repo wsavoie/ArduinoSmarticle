@@ -1,7 +1,9 @@
 
 % [filez,pName]=uigetfile({'*.csv'},'F/T data file','D:\RobAndFT\Results');
-foldz=uigetdir('D:\RobAndFT\Results');
+foldz=uigetdir('D:\ArduinoSmarticle\entangledSmarticle\Results');
 filez= dir(fullfile(foldz,'\*.csv'));
+
+
 NF=length(filez);
 for i=1:NF
     
