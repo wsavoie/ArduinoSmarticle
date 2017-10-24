@@ -6,15 +6,66 @@ close all; clear all; clc;
 % Open Robcomm v4.20 in compatibility mode (need this to see files)
 % Send the program to the A465
 
+% MASTER:         R!<ENQ>
+% ROBOT:           R!<ACK>
+% MASTER:         <SOH>!ÿ<NUL>H<NUL><SOH><NUL><NUL><NUL><NUL><ETX>i
+% ROBOT:           <ACK><STX><NUL><ETX><NUL>
+% MASTER:         <ACK>
+% ROBOT:           <EOT>
+% MASTER:        <ACK>
+% ROBOT:           <EOT>
+% MASTER:         <ETX>
+% ROBOT:           <CR><LF>>>
+% enq = hex2dec( reshape('522105',[],2) );
+enq=char('R','!',5)';
+% reads 3
 
-c = [1 1];
-a = [];
-chanReq=ddeinit('ROBCOMM', 'ROBOT_STATUS');
-a = ddereq(chanReq, '0', c, 10000);
+s=1;
+fclose(instrfindall)
 
-chanExec = ddeinit('ROBCOMM', 'RUN');
-vv = ddeexec(chanExec,'BLAH', c, 1000000);
+s = serial('COM1');
+set(s,'BaudRate',38400,'StopBits',1);
+set(s,'RequestToSend','off');
+set(s,'Parity','none');
+set(s,'Terminator','');
+set(s,'DataBits',8);
 
+pt = 0.1; %pause time
+
+
+
+fopen(s);
+
+% flushinput(s);
+TurnOffACI(s,pt);
+fclose(s);
+
+
+s.BytesAvailableFcnCount =1;
+s.BytesAvailableFcnMode = 'byte';
+s.BytesAvailableFcn = @runRobProgram;
+
+fopen(s);
+file='SS';
+comm=horzcat('RUN ',file,13);
+
+% flushinput(s);
+
+fwrite(s,comm);
+
+% s.bytesavailable
+% fclose(s);
+
+
+
+% x = 'FAFF3000D1';
+% c = [1 1];
+% a = [];
+% a = ddereq(chanReq, '0', c, 10000);
+% 
+% chanExec = ddeinit('ROBCOMM', 'RUN');
+% vv = ddeexec(chanExec,'BLAH', c, 1000000);
+% 
 
 % if(exist('ROB','var'))
 %     fclose(ROB);

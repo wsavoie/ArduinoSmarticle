@@ -1,18 +1,18 @@
-/016 2
-/002 SSLOC4,.1,S
-/010
-/070 C = 0
-/070 A = 1
-/088
-/055 1,'%d',A
-/198 -26,S
-/010
-/081 4
-/192 A
-/198 26,S
-/010
-/055 1,'%d',A
-/192 C
-/128 C < 1
-/078
+SPEED 2
+APPRO SSLOC4,.1,S
+FINISH
+! C = 0
+! A = 1
+DO
+PRINTF 1,'{'
+Z -26,S
+FINISH
+DELAY 4
+++ A
+Z 26,S
+FINISH
+PRINTF 1,'}'
+++ C
+WHILE C < 1
+STOP
 $
