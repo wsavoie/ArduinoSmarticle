@@ -1,0 +1,26 @@
+SPEED 2
+APPRO SSLOC4,.1,S
+FINISH
+! A = 0
+PRINTF 1,'%d',A
+! C = 0
+DO
+! A = 1
+PRINTF 1,'%d',A
+Z -125,S
+FINISH
+! A = 2
+PRINTF 1,'%d',A
+DELAY 4
+! A = 3
+PRINTF 1,'%d',A
+Z 125,S
+FINISH
+! A = 4
+PRINTF 1,'%d',A
+++ C
+WHILE C < 1
+! A = 5
+PRINTF 1,'%d',A
+STOP
+$

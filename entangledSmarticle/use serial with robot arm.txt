@@ -1,0 +1,35 @@
+to communicate with robot arm via serial
+
+open robcomm and terminal
+get current baud rate  (SERIAL)
+change baudrate to 19200 or 38400 (whichever it currently is not at)
+CONFIG 1,19200,N,8,1,N,E
+close terminal
+open serial program and connect
+
+
+LRC= sum of bytes%255
+
+
+<SOH>!ÿ<NUL>H<NUL><SOH><NUL><NUL><NUL><NUL><ETX>i
+<SOH> 0x20 0x1 nul H nul 
+
+master: R!<ENQ>
+slave:  R!<ACK>
+master  <SOH> HEADER <ETX> LRC
+
+
+
+1.	<SOH>
+2.	\D(33)  
+3.	\D(255)
+4.	<NUL>
+5.	H
+6.	<NUL>
+7.	\D(128)
+8.	<NUL>
+9.	<NUL>
+10.	<NUL>
+11.	<NUL>
+12.	<ETX>
+13.	\d(105)
