@@ -22,7 +22,7 @@ function varargout = smartSoundGUI(varargin)
 
 % Edit the above text to modify the response to help smartSoundGUI
 
-% Last Modified by GUIDE v2.5 28-Sep-2017 17:22:25
+% Last Modified by GUIDE v2.5 02-Nov-2017 18:20:31
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -185,6 +185,17 @@ play(player);
 %pts(freq);
 
 function pushbutton10_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+global sampRate tt player
+freq=str2double(hObject.String);
+pause(player);
+player=audioplayer(sin(tt*freq*2*pi), sampRate);
+play(player);
+%pts(freq);
+
+function pushbutton11_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
