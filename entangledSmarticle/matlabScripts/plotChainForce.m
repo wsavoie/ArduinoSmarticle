@@ -5,13 +5,13 @@
 %* 3. stress vs strain with delay
 
 %************************************************************
-clear all
+clearvars -except t
 showFigs=[1 2 3];
 
 
 
 % close all
-fold = 'A:\2DSmartData\entangledData\smarticlesON';
+fold = 'A:\2DSmartData\entangledData\';
 [filez,pName]=uigetfile(fullfile(fold,'*.csv'),'ft data');
 % foldz=uigetdir('D:\RobAndFT\Results');
 [~,vals]=parseFileNames(filez);

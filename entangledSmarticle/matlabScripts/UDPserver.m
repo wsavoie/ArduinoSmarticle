@@ -23,17 +23,17 @@ roboip='130.207.140.133';
 % % t.localhost='localhost';
 % % t.localport=55000;
 % t.name='MAT';
-if(existcontrol('t'))
-fclose(t);
-delete(t);
-clear t;
-fclose(instrfindall)
+if(exist('udpServ'))
+fclose(udpServ);
+delete(udpServ);
+clear udpServ;
+fclose(instrfindall);
 end
-t = udp('', 'LocalHost', '', 'LocalPort', 1520);
-t.bytesavailablefcn=@takeOptitrackData;
-t.BytesAvailableFcnCount=1;
-t.BytesAvailableFcnMode='byte';
-fopen(t);
+udpServ = udp('', 'LocalHost', '', 'LocalPort', 1520);
+udpServ.BytesAvailableFcn=@takeOptitrackData;
+udpServ.BytesAvailableFcnCount=1;
+udpServ.BytesAvailableFcnMode='byte';
+fopen(udpServ);
 
 
 % 

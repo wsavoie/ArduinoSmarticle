@@ -6,9 +6,10 @@ if(ba>15)
     
     tt=fread(obj,ba);
     char(tt')
-    matchStr=regexp(char(tt'),'\w*|','match');
-    t=str2double(matchStr{1})%seconds
-    takeName=matchStr{2}
+%     matchStr=regexp(char(tt'),'\w*|','match');
+%     t=str2double(matchStr{1})%seconds
+    runNameOut=strsplit(char(tt'),'|');
+    takeName=runNameOut{2}(1:end-4);
     %     t=str2double(char(tt'))
     %     t=5;
     client = natnet();
@@ -26,7 +27,7 @@ if(ba>15)
     client.stopRecord;
     
     pts(takeName);
-    client.setTakeName(takeName);
+    client.setTakeName(['OPTI_',takeName]);
     
     %make sure to set OBS's hotkeys for record/stop record to f3/f4
     %respectively
