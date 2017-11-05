@@ -5,11 +5,11 @@ FINISH
 ! A = 1
 DO
 PRINTF 1,'{'
-Z -26,S
+Z -K,S
 FINISH
-DELAY 4
+DELAY D
 ++ A
-Z 26,S
+Z K,S
 FINISH
 PRINTF 1,'}'
 ++ C
