@@ -1,13 +1,14 @@
 %************************************************************
 %* Fig numbers:
 %* 1. force vs time with strain overlay
-%* 2. stress vs strain
-%* 3. stress vs strain with delay
+%* 2. plot comparison b/w activated system and regular, Force vs. Time
+%* 3. plot single Force vs. Strain
+%* 4. plot comparison b/w activated system and regular, Force vs. Strain
 
 %************************************************************
 % clearvars -except t
 close all;
-showFigs=[1];
+showFigs=[1 3];
 fold=uigetdir('A:\2DSmartData\entangledData');
 filez=dir2(fullfile(fold,'Stretch*'));
 N=length(filez);
@@ -40,24 +41,84 @@ plot(s(ind).t,s(ind).F);
 maxF=max(s(ind).F);
 maxS=max(s(ind).strain);
 
+if(overlayStrain)
 h=plot(s(ind).t,maxF*s(ind).strain/maxS);
 % text(0.4,0.9,'scaled strain','units','normalized','color',h.Color)
 legend({'Force','Scaled Strain'},'location','south')
+end
 xlabel('time (s)','fontsize',18);
 ylabel('force (N)','fontsize',18);
 
 
 figText(gcf,16)
 end
+%% 2.plot comparison b/w activated system and regular, Force vs. Time
+xx=2;
+if(showFigs(showFigs==xx))
+figure(xx); lw=2; fz=18;
+hold on;
+xlab = 'time (s)';
+ylab = 'Force (N)';
+xlimz=[0,12];
+ylimz=[-1,1];
+subplot(1,2,1);
+hold on;
+title('Regular Chain');
+xlabel(xlab);
+ylabel(ylab);
 
-%% 6 plot comparison b/w activated system and regular, Force vs. Strain
-xx=6;
+%[type,strain, sys width,del,version]
+setP1=find(ismember(fpars(:,[1 2 3 4]),[1 0.065,0.105,4],'rows'))';
+setP2=find(ismember(fpars(:,[1 2 3 4]),[2 0.065,0.105,4],'rows'))';
+for i=setP1
+    plot(s(i).t,s(i).F);
+%     pause;
+end
+
+axis([xlimz,ylimz])
+axis square
+figText(gcf,fz);
+subplot(1,2,2);
+hold on;
+
+title('Activate First 2 Smarts During Delay Period');
+xlabel(xlab);
+for i=setP2
+    plot(s(i).t,s(i).F);
+%     pause
+end
+axis([xlimz,ylimz])
+axis square
+figText(gcf,fz);
+end
+
+%% 3. plot single Force vs. Strain
+xx=3;
+if(showFigs(showFigs==xx))
+figure(xx); lw=2;
+hold on;
+ind=1;
+
+pts('F vs. Strain for ',s(ind).name);
+plot(s(ind).strain,s(ind).F);
+
+xlabel('Strain');
+ylabel('force (N)');
+figText(gcf,16)
+end
+%% 4 plot comparison b/w activated system and regular, Force vs. Strain
+xx=4;
 if(showFigs(showFigs==xx))
    
 figure(xx); lw=2; fz=18;
 hold on;
 xlab = 'Strain';
 ylab = 'Force (N)';
+xlimz=[0,0.25];
+ylimz=[-0.65,0.65];
+% 
+% xlimz=[-0.7,0.7];
+% ylimz=[-0.7,0.7];
 
 subplot(1,2,1);
 hold on;
@@ -68,9 +129,8 @@ for i=find(type==1)'
     plot(s(i).strain,s(i).F);
 %     pause;
 end
-
-xlim([0,0.5]);
-ylim([-0.6,1]);
+axis([xlimz,ylimz])
+% ylim([-0.6,0.6]);
 axis square
 figText(gcf,fz);
 subplot(1,2,2);
@@ -82,9 +142,10 @@ for i=find(type==2)'
     plot(s(i).strain,s(i).F);
 %     pause
 end
-xlim([0,0.5]);
-ylim([-0.6,1]);
+axis([xlimz,ylimz])
 axis square
+% axis equal
+
 figText(gcf,fz);
 end
 
