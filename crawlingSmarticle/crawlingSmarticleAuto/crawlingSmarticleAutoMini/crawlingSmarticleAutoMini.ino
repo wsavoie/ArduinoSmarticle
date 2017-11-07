@@ -217,6 +217,15 @@ void diamondBackward()//right
 }
 void squareForward()   //left square gait left movement
 {
+  int A1[] = {maxx,maxx,minn,minn};
+  int A2[] = {minn,maxx,maxx,minn};
+  
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    delay(del);
+  }
   S1.writeMicroseconds(p1 = maxx * 10 + 600);
   S2.writeMicroseconds(p2 = minn * 10 + 600);
   delay(del);
@@ -231,19 +240,17 @@ void squareForward()   //left square gait left movement
   delay(endDel);
 }
 void squareBackward() //right square gait right movement
-{    
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = (180 - minn) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = (180 - maxx) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = (180 - maxx) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = (180 - minn) * 10 + 600);
-  delay(endDel);
+{ 
+
+  int A1[] = {maxx,maxx,minn,minn};
+  int A2[] = {maxx,minn,minn,maxx};
+  
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    delay(del);
+  }
 }
 
 

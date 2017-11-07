@@ -251,7 +251,6 @@ void performFunc(int type){
 void uShape() {
   S1.writeMicroseconds(1500 - 900);
   S2.writeMicroseconds(1500 + 900);
-  delay(del);
 }
 void nShape() {
   S1.writeMicroseconds(1500 + 900);
@@ -283,94 +282,100 @@ void rightSquareGaitCS() {
   }
 }
 void leftSquareGait() {
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,minn,minn,maxx};
+  int A2[] = {minn,minn,maxx,maxx};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void rightSquareGait() {
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,maxx,minn,minn};
+  int A2[] = {minn,maxx,maxx,minn};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void rightDiamond() {
-    S1.writeMicroseconds(maxx * 10 + 600);
-    S2.writeMicroseconds((midd) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(midd * 10 + 600);
-    S2.writeMicroseconds((maxx) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(minn * 10 + 600);
-    S2.writeMicroseconds((midd) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(midd * 10 + 600);
-    S2.writeMicroseconds((minn) * 10 + 600);
-    delay(300);
-    delay(random(100));
+  int A1[] = {maxx,midd,minn,midd};
+  int A2[] = {midd,maxx,midd,minn};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void leftDiamond() {
-    S1.writeMicroseconds(maxx * 10 + 600);
-    S2.writeMicroseconds((180-midd) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(midd * 10 + 600);
-    S2.writeMicroseconds((180-maxx) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(minn * 10 + 600);
-    S2.writeMicroseconds((180-midd) * 10 + 600);
-    delay(del);
-    S1.writeMicroseconds(midd * 10 + 600);
-    S2.writeMicroseconds((180-minn) * 10 + 600);
-    delay(300);
-    delay(random(100));
+  int A1[] = {maxx,midd,minn,midd};
+  int A2[] = {midd,minn,midd,maxx};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void positiveSquare() {
-  S1.writeMicroseconds(p1=midd * 10 + 600);
-  S2.writeMicroseconds(p2=midd * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=midd * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=midd * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {midd,minn,minn,midd};
+  int A2[] = {midd,midd,maxx,maxx};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void negativeSquare() {
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=midd * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=midd * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  delay(del);   
-  S1.writeMicroseconds(p1=midd * 10 + 600);
-  S2.writeMicroseconds(p2=midd * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,maxx,midd,midd};
+  int A2[] = {midd,minn,minn,midd};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 
 void deactivateSmarticle() {
