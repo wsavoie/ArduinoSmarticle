@@ -262,27 +262,25 @@ void zShape() {
   S2.writeMicroseconds(1500 + 900);
 }
 void rightSquareGaitCS() {
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
-  if(stressReact(pollCurrent()))
-    return;
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=minn * 10 + 600);
+  int A1[] = {maxx,minn,minn,maxx};
+  int A2[] = {minn,minn,maxx,maxx};
+
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
     if(stressReact(pollCurrent()))
-    return;
-  delay(del);   
-  S1.writeMicroseconds(p1=minn * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-    if(stressReact(pollCurrent()))
-    return;
-  delay(del);   
-  S1.writeMicroseconds(p1=maxx * 10 + 600);
-  S2.writeMicroseconds(p2=maxx * 10 + 600);
-    if(stressReact(pollCurrent()))
-    return;
-  delay(300);
-  delay(random(100));
+      return;
+    
+    
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void leftSquareGait() {
   S1.writeMicroseconds(p1=maxx * 10 + 600);
