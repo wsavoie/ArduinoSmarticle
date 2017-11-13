@@ -29,14 +29,14 @@
 #define led 13    //13 SCK
 
 /*Stress related vars*/
-int stressMoveThresh = 9;
+int stressMoveThresh =5;
 uint8_t stressCount = 0;
 static int curr  = 0;
 bool stress = false;
-uint16_t samps = 10;
+uint16_t samps = 8;
 
 /*current inertia*/
-int ciMax = 2; //current inertia max
+int ciMax = 4; //current inertia max
 int cInertia = ciMax;
 
 /*Servo pins*/
@@ -96,15 +96,16 @@ void uShape();
 void nShape();
 void rightSquareGaitCS();
 void setup() {
-  S1.attach(servo1, 600, 2400);
-  S2.attach(servo2, 600, 2400);
+  S1.attach(servo1, 400, 2600);
+  S2.attach(servo2, 400, 2600);
 
   pinMode(led, OUTPUT);
 
   pinMode(stressPin, INPUT);
   pinMode(mic, INPUT);
   randomSeed(analogRead(randPin));
-  deactivateSmarticle();
+//  deactivateSmarticle();
+  uShape();
 
   //Compute Frequency Bounds
   for (int k = 0; k < fN; k++) {
@@ -119,8 +120,16 @@ void loop()
 {
   ledVal = false;
   double freq = findFrequency();
-  analyzeFrequency(freq);
-
+  int mcurr=0;
+  for (int i = 0; i < 1<<samps; i++)
+    {
+      mcurr  = mcurr+analogRead(stressPin);
+    }
+    mcurr >>= samps;
+  bool notStress=currentMove(mcurr);
+//  if(notStress)
+//    analyzeFrequency(freq);
+  
   /*int meanCurr = 0;
     for (int i = 0; i < 1<<samps; i++)
     {
@@ -163,6 +172,46 @@ bool stressReact(int meanCurr)
   }
   return stress;
 }
+bool currentMove(int sp)
+{
+//   if (sp > 5)
+//  {
+//    cInertia=cInertia+1;
+//    
+//    if(cInertia > ciMax) 
+//    {
+//      S1.writeMicroseconds(p1 = p1-50);
+//      S2.writeMicroseconds(p2 = p2+50); 
+//      cInertia=0;
+//      return false;
+//    }    
+//  }
+//  else
+//  {
+//    cInertia=cInertia-1;;
+//    return true;
+//  }
+  if(sp<20)
+  {
+    if(p1>500&& p2<2500)
+    {
+      S1.writeMicroseconds(p1 = p1-50);
+      S2.writeMicroseconds(p2 = p2+50);
+    }
+    
+  }
+  else
+  {
+    if(p1<1000&& p2>1900)
+    {
+      S1.writeMicroseconds(p1 = p1+50);
+      S2.writeMicroseconds(p2 = p2-50);
+    }
+    
+  }
+  delay(50);  
+return true;
+} 
 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
 double findFrequency() {
@@ -216,10 +265,14 @@ void performFunc(int type) {
   switch (type)
   {
     case 0:
-      uShape();
+      slightClose();
       break;
     case 1:
+      uShape();
+      break;
+    case 2:
       slightOpen();
+//      uShape();
       break;
     default:
       uShape();
@@ -227,135 +280,144 @@ void performFunc(int type) {
   }
 }
 void uShape() {
-  S1.writeMicroseconds(1500 - 900);
-  S2.writeMicroseconds(1500 + 900);
+  S1.writeMicroseconds(p1 = 1500 - 900);
+  S2.writeMicroseconds(p2 = 1500 + 900);
   delay(del);
 }
 void slightOpen() {
-  S1.writeMicroseconds(1500 - 700);
-  S2.writeMicroseconds(1500 + 700);
+  S1.writeMicroseconds(p1 = 1500 - 700);
+  S2.writeMicroseconds(p2 = 1500 + 700);
+  delay(del);
+}
+void slightClose() {
+  S1.writeMicroseconds(p1 = 1500 - 1000);
+  S2.writeMicroseconds(p2 = 1500 + 1000);
   delay(del);
 }
 void nShape() {
-  S1.writeMicroseconds(1500 + 900);
-  S2.writeMicroseconds(1500 - 900);
+  S1.writeMicroseconds(p1 =1500 + 900);
+  S2.writeMicroseconds(p2 = 1500 - 900);
 }
 void zShape() {
-  S1.writeMicroseconds(1500 + 900);
-  S2.writeMicroseconds(1500 + 900);
+  S1.writeMicroseconds(p1 =1500 + 900);
+  S2.writeMicroseconds(p2 = 1500 + 900);
 }
 void rightSquareGaitCS() {
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  if (stressReact(pollCurrent()))
-    return;
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  if (stressReact(pollCurrent()))
-    return;
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  if (stressReact(pollCurrent()))
-    return;
-  delay(del);
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  if (stressReact(pollCurrent()))
-    return;
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,minn,minn,maxx};
+  int A2[] = {minn,minn,maxx,maxx};
+
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    if(stressReact(pollCurrent()))
+      return;
+    
+    
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void leftSquareGait() {
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,minn,minn,maxx};
+  int A2[] = {minn,minn,maxx,maxx};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void rightSquareGait() {
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,maxx,minn,minn};
+  int A2[] = {minn,maxx,maxx,minn};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void rightDiamond() {
-  S1.writeMicroseconds(maxx * 10 + 600);
-  S2.writeMicroseconds((midd) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(midd * 10 + 600);
-  S2.writeMicroseconds((maxx) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(minn * 10 + 600);
-  S2.writeMicroseconds((midd) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(midd * 10 + 600);
-  S2.writeMicroseconds((minn) * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,midd,minn,midd};
+  int A2[] = {midd,maxx,midd,minn};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void leftDiamond() {
-  S1.writeMicroseconds(maxx * 10 + 600);
-  S2.writeMicroseconds((180 - midd) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(midd * 10 + 600);
-  S2.writeMicroseconds((180 - maxx) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(minn * 10 + 600);
-  S2.writeMicroseconds((180 - midd) * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(midd * 10 + 600);
-  S2.writeMicroseconds((180 - minn) * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,midd,minn,midd};
+  int A2[] = {midd,minn,midd,maxx};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void positiveSquare() {
-  S1.writeMicroseconds(p1 = midd * 10 + 600);
-  S2.writeMicroseconds(p2 = midd * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = midd * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = minn * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = midd * 10 + 600);
-  S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {midd,minn,minn,midd};
+  int A2[] = {midd,midd,maxx,maxx};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 void negativeSquare() {
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = midd * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = maxx * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = midd * 10 + 600);
-  S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del);
-  S1.writeMicroseconds(p1 = midd * 10 + 600);
-  S2.writeMicroseconds(p2 = midd * 10 + 600);
-  delay(300);
-  delay(random(100));
+  int A1[] = {maxx,maxx,midd,midd};
+  int A2[] = {midd,minn,minn,midd};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    if(i==(sizeof(A1)/sizeof(int))-1)
+    {
+      delay(del-100);
+      delay(random(100));
+    }
+    else
+      delay(del);
+  }
 }
 
 void deactivateSmarticle() {

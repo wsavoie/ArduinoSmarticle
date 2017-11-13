@@ -267,7 +267,7 @@ void rightSquareGaitCS() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(stressReact(pollCurrent()))
       return;
     
@@ -287,7 +287,7 @@ void leftSquareGait() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -303,7 +303,7 @@ void rightSquareGait() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -319,7 +319,7 @@ void rightDiamond() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -335,7 +335,7 @@ void leftDiamond() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -351,7 +351,7 @@ void positiveSquare() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -367,7 +367,7 @@ void negativeSquare() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);

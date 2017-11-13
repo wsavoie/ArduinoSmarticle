@@ -28,6 +28,22 @@
 #define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
 
+#define pr1 A2 // front PR sensor
+#define pr2 A3 // back PR sensor
+
+static int lightLevel1 = 0;
+static int lightLevel2 = 0;
+static int lightThresh1 = 255;
+static int lightThresh2 = 255;
+
+
+/*light vars */
+int liMax=5 ;
+int iOn = 5; //inertia max
+int iOff = -2; //inertia min
+int lightInertia = iOn;
+//int inertia = liMax;
+
 /*Stress related vars*/
 int stressMoveThresh = 9;
 uint8_t stressCount = 0;
@@ -99,13 +115,13 @@ void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
  
-  pinMode(led,OUTPUT);
+  //pinMode(led,OUTPUT);
   pinMode(vibrationMotor,OUTPUT);
   pinMode(stressPin,INPUT);
   pinMode(mic,INPUT);
   randomSeed(analogRead(randPin));
   deactivateSmarticle();
-
+  
   //Compute Frequency Bounds
   for (int k = 0; k < fN; k++) {
     freqUpperBounds[k] = freqCenters[k] + freqAcceptThresh;
@@ -117,10 +133,21 @@ void setup() {
 
 void loop() 
 {
-  ledVal=false;
+//  uShape();
+//  delay(3000);
+//  straighten();
+//  delay(3000);
+  //ledVal=false;
+
+  
+  bool dark = analyzeLight();
+
+  if(!dark)
+  {
   double freq = findFrequency();
-  //analyzeFrequency(freq);
-  vibrate();
+  analyzeFrequency(freq);
+  }
+//  vibrate();
   /*int meanCurr = 0;
   for (int i = 0; i < 1<<samps; i++)
   {
@@ -276,7 +303,7 @@ void rightSquareGaitCS() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(stressReact(pollCurrent()))
       return;
     
@@ -296,7 +323,7 @@ void leftSquareGait() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -312,7 +339,7 @@ void rightSquareGait() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -328,7 +355,7 @@ void rightDiamond() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -344,7 +371,7 @@ void leftDiamond() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -355,12 +382,14 @@ void leftDiamond() {
   }
 }
 void positiveSquare() {
-  int A1[] = {midd,minn,minn,midd};
-  int A2[] = {midd,midd,maxx,maxx};
+//  int A1[] = {midd,minn,minn,midd};
+//  int A2[] = {midd,midd,maxx,maxx};
+  int A1[] = {minn,minn,midd,midd};
+  int A2[] = {midd,maxx,maxx,midd};
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -376,7 +405,7 @@ void negativeSquare() {
   for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
   {
     S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p1 = A2[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
     if(i==(sizeof(A1)/sizeof(int))-1)
     {
       delay(del-100);
@@ -409,7 +438,41 @@ void light(bool a)
     digitalWrite(led, LOW);
 }
 
-
+bool analyzeLight()
+{
+  bool state = false; //lighted
+  // Get the light levels from the voltage dividers
+  lightLevel1 = analogRead(pr1);
+  lightLevel2 = analogRead(pr2);
+  
+  // High readings are associated with light exposure
+  if (lightLevel1>lightThresh1 || lightLevel2>lightThresh2)
+  { // If the light exposure one either sensor is high
+    lightInertia>=iOn ? lightInertia=iOn : lightInertia++; 
+    if(lightInertia>=0)
+    {
+//      performFunc(10);
+      if(lightInertia==0)
+      {lightInertia=iOn;}
+      state=false;
+    }
+  }
+  else
+  { // If neither sensors are high
+      lightInertia<=iOff ? lightInertia=iOff : lightInertia--;
+      if(lightInertia<=0)
+      {
+//        currMoveType=0; do nothing
+        if(lightInertia==0)
+        {lightInertia=iOff;}
+        performFunc(10);
+        
+      }
+      state=true;
+  }
+//  performFunc(currMoveType);
+ return state;
+}
 /*void currentRead(uint16_t meanCurrVal)
 {
   static bool v = true;

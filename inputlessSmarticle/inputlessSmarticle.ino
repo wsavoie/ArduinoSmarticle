@@ -35,7 +35,7 @@ void setup() {
 void loop() 
 {
   activateSmarticle();
-//  deactivateSmarticle();
+  deactivateSmarticle();
    //zShape();
 }
 
