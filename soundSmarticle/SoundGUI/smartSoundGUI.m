@@ -22,7 +22,7 @@ function varargout = smartSoundGUI(varargin)
 
 % Edit the above text to modify the response to help smartSoundGUI
 
-% Last Modified by GUIDE v2.5 02-Nov-2017 18:20:31
+% Last Modified by GUIDE v2.5 06-Nov-2017 16:53:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
