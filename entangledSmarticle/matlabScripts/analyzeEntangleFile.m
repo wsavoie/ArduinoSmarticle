@@ -23,7 +23,7 @@ q_op=q_op(dd_ind:end);
 
 %interpolate opti data to length of FT data
 q1=interp1(t_op,q_op,t,'linear','extrap');
-strain=q1/chainLen;
+strain=[q1/chainLen]';
 
 %get parameters from file
 [~,fpars]=parseFileNames(fname);
