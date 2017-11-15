@@ -34,7 +34,7 @@ uint8_t stressCount = 0;
 static int curr  = 0;
 bool stress = false;
 uint16_t samps = 8;
-
+uint8_t sdel=50;
 /*current inertia*/
 int ciMax = 4; //current inertia max
 int cInertia = ciMax;
@@ -95,9 +95,12 @@ void zShape();
 void uShape();
 void nShape();
 void rightSquareGaitCS();
+int smin=600; //affects left servo u-shape (from back)
+int smax=2400;//=affects right servo u-shape (from back)
+
 void setup() {
-  S1.attach(servo1, 400, 2600);
-  S2.attach(servo2, 400, 2600);
+  S1.attach(servo1, smin, smax); 
+  S2.attach(servo2, smin, smax);
 
   pinMode(led, OUTPUT);
 
@@ -119,26 +122,30 @@ void setup() {
 void loop()
 {
   ledVal = false;
-  double freq = findFrequency();
-  int mcurr=0;
-  for (int i = 0; i < 1<<samps; i++)
-    {
-      mcurr  = mcurr+analogRead(stressPin);
-    }
-    mcurr >>= samps;
-  bool notStress=currentMove(mcurr);
-//  if(notStress)
-//    analyzeFrequency(freq);
+
+/////////USHAPE/////////
+  uShape();
+////////////////////////
+
   
-  /*int meanCurr = 0;
-    for (int i = 0; i < 1<<samps; i++)
-    {
-    curr    = analogRead(stressPin);
-    meanCurr  = meanCurr+curr;
-    }
-    //bitshift divide by sample, meancurr=meancurr/(2^samps)
-    meanCurr >>= samps;
-    currentRead(meanCurr);*/
+//////////STRESS RESPONSE///////////////
+//  int mcurr=0;
+//  for (int i = 0; i < 1<<samps; i++)
+//    {
+//      mcurr  = mcurr+analogRead(stressPin);
+//    }
+//    mcurr >>= samps;
+//  bool notStress=currentMove(mcurr);
+////////////////////////////////////////
+
+
+
+
+///////////different maneuvers///////////
+//  if(notStress)
+  //double freq = findFrequency();
+//    analyzeFrequency(freq);
+/////////////////////////////////////////
 }
 
 int pollCurrent()
@@ -193,7 +200,7 @@ bool currentMove(int sp)
 //  }
   if(sp<20)
   {
-    if(p1>500&& p2<2500)
+    if(p1>smin&& p2<smax)
     {
       S1.writeMicroseconds(p1 = p1-50);
       S2.writeMicroseconds(p2 = p2+50);
@@ -209,7 +216,7 @@ bool currentMove(int sp)
     }
     
   }
-  delay(50);  
+  delay(sdel);  
 return true;
 } 
 
