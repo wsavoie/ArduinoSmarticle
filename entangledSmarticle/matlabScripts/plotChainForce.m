@@ -8,10 +8,11 @@
 %* 6. plot force vs. time for usedS
 %************************************************************
 % clearvars -except t
-close all;
+% close all;
 clear all;
 
-fold=uigetdir('A:\2DSmartData\entangledData');
+% fold=uigetdir('A:\2DSmartData\entangledData');
+fold='A:\2DSmartData\entangledData\strechAll 11-14\ON';
 filez=dir2(fullfile(fold,'Stretch*'));
 N=length(filez);
 fpars=zeros(N,7); % [type,SD,H,del,v]
@@ -29,7 +30,7 @@ end
 [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
 typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smarticles','Elastic, close all smarticles','','Stress Avoiding Chain'};
 %%%%%%%%%%%%%%%%%%
-types=[]; strains=[65]/1000; Hs=[]; dels=[]; spds=[2]; its=[1]; vs=[];
+types=[]; strains=[65]/1000; Hs=[]; dels=[]; spds=[1:5]; its=[1]; vs=[];
 %%%%%%%%%%%%%%%%%%%%%%%%
 props={types strains Hs dels spds its vs};
 
@@ -213,14 +214,24 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     % ind=2;
+    tArea=zeros(uN,1);
+    strMax=0;
     for(i=1:uN)
-        pts('F vs. Strain for ',s(i).name);
+        pts('F vs. Strain for ',usedS(i).name);
         plot(usedS(i).strain,usedS(i).F);
         %     colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
-        
+        tArea(i)=trapz(usedS(i).strain,usedS(i).F);
+%         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
+        strMax=max(strMax,max(usedS(i).strain));
     end
     xlabel('Strain');
     ylabel('Force (N)');
     figText(gcf,18)
-    axis([0,.25,-0.2,0.6]);
+    axis([0,round(strMax,2),-0.4,0.8]);
+    
+    figure(100);
+    plot([1:5],tArea,'o-','linewidth',2,'markerfacecolor','w');
+    xlabel('Speed');
+    ylabel('Work (Nm)');
+    figText(gcf,18);
 end
