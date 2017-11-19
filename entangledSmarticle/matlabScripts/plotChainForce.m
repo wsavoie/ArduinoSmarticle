@@ -4,15 +4,17 @@
 %* 2. plot comparison b/w activated system and regular, Force vs. Time
 %* 3. plot single Force vs. Strain
 %* 4. plot comparison b/w activated system and regular, Force vs. Strain
-%* 5. plot force vs. strain for usedS
-%* 6. plot force vs. time for usedS
+%* 5. plot force vs. time for usedS
+%* 6. plot force vs. strain for usedS
+%* 7. plot force vs. strain for usedS with slope bar
+%* 8. find and save fracture point
 %************************************************************
 % clearvars -except t
 % close all;
 clear all;
 
 % fold=uigetdir('A:\2DSmartData\entangledData');
-fold='A:\2DSmartData\entangledData\strechAll 11-14\ON';
+fold='A:\2DSmartData\entangledData\strechAll 11-19 paperTrials';
 filez=dir2(fullfile(fold,'Stretch*'));
 N=length(filez);
 fpars=zeros(N,7); % [type,SD,H,del,v]
@@ -28,9 +30,10 @@ for i=1:N
     
 end
 [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
-typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smarticles','Elastic, close all smarticles','','Stress Avoiding Chain'};
+typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smarticles','Elastic, close all smarticles','Fracture','Stress Avoiding Chain'};
 %%%%%%%%%%%%%%%%%%
-types=[]; strains=[65]/1000; Hs=[]; dels=[]; spds=[1:5]; its=[1]; vs=[];
+% strains=[65]/1000;
+types=[4]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[1]; vs=[];
 %%%%%%%%%%%%%%%%%%%%%%%%
 props={types strains Hs dels spds its vs};
 
@@ -55,7 +58,7 @@ if ~exist('usedS','var')
     error('No file with specified parameters exists in folder');
 end
 uN=length(usedS);
-showFigs=[6];
+showFigs=[8];
 
 %% 1. single force vs time with strain overlay
 xx=1;
@@ -130,7 +133,7 @@ xx=3;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    % ind=2;
+    ind=1;
     
     pts('F vs. Strain for ',s(ind).name);
     % plot(s(ind).strain,s(ind).F);
@@ -196,10 +199,12 @@ if(showFigs(showFigs==xx))
         maxS(i)=max(usedS(i).strain);
         
         if(overlayStrain)
-            h2(i)=plot(usedS(i).t,maxF(i)*usedS(i).strain/maxS(i),'color',h(i).Color);
-            % text(0.4,0.9,'scaled strain','units','normalized','color',h.Color)
-            %         legend({'Force','Scaled Strain'},'location','south')
-            set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%             h2(i)=plot(usedS(i).t,maxF(i)*usedS(i).strain/maxS(i),'k','linewidth',4);
+            h3(i)=plot(usedS(i).t,maxF(i)*usedS(i).strain/maxS(i),'linewidth',2);
+            legend({'Force','Scaled Strain'},'location','south')
+%             set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+            set(get(get(h3(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+            
         end
     end
     xlabel('time (s)','fontsize',18);
@@ -218,11 +223,14 @@ if(showFigs(showFigs==xx))
     strMax=0;
     for(i=1:uN)
         pts('F vs. Strain for ',usedS(i).name);
-        plot(usedS(i).strain,usedS(i).F);
-        %     colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
+%         plot(usedS(i).strain,usedS(i).F);
+            colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
         tArea(i)=trapz(usedS(i).strain,usedS(i).F);
 %         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
-        strMax=max(strMax,max(usedS(i).strain));
+        [sm(i),smidx]=max(usedS(i).strain);
+        strMax=max(strMax,sm(i));
+        
+%         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
     end
     xlabel('Strain');
     ylabel('Force (N)');
@@ -230,8 +238,126 @@ if(showFigs(showFigs==xx))
     axis([0,round(strMax,2),-0.4,0.8]);
     
     figure(100);
+    hold on;
     plot([1:5],tArea,'o-','linewidth',2,'markerfacecolor','w');
     xlabel('Speed');
-    ylabel('Work (Nm)');
+
+%     plot(sm,tArea,'o-','linewidth',2,'markerfacecolor','w');
+%     xlabel('Strain');
+        
+    ylabel('Work');
     figText(gcf,18);
+end
+%% 7. plot force vs. strain for usedS with slope bar
+xx=7;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    subplot(1,2,1)
+    hold on;
+    % ind=2;
+    tArea=zeros(uN,1);
+    strMax=0;
+    legText={};
+
+    for(i=uN:-1:1)
+        pts('F vs. Strain for ',usedS(i).name);
+        h1(i)=plot(usedS(i).strain,usedS(i).F);
+%             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
+        tArea(i)=trapz(usedS(i).strain,usedS(i).F);
+%         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
+        [sm(i),smidx]=max(usedS(i).strain);
+        strMax=max(strMax,sm(i));
+        
+        h2(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'k','linewidth',4);
+        h3(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'color',h1(i).Color,'linewidth',2);
+        
+        set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
+        k(i)=usedS(i).F(smidx)/sm(i);
+        legText(i)={['k=',num2str(k(i),2)]};
+        
+    end
+    legend(legText);
+    xlabel('Strain');
+    ylabel('Force (N)');
+    figText(gcf,20)
+    axis([0,round(strMax,2),-0.4,0.8]);
+    
+    subplot(1,2,2)
+    hold on;
+    xlabel('Strain');
+    ylabel('k');
+    figText(gcf,20);
+    plot(sm,k,'-o','linewidth',2,'markerfacecolor','w')
+
+end
+%% 8. find and save fracture point
+xx=8;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    % ind=2;
+    tArea=zeros(uN,1);
+    strMax=0;
+    fractData=struct;
+    xlabel('Strain');
+    ylabel('Force (N)');
+    for(i=1:uN)
+        fractData(i).fname=usedS(i).name;
+        fractData(i).F=usedS(i).F;
+        fractData(i).H=usedS(i).H;
+        fractData(i).strain=usedS(i).strain;
+        plot(usedS(i).strain,usedS(i).F);
+        [fracPt,~]=ginput(1);
+        [fractData(i).ind,fractData(i).strainMax]=findNearestInd(fracPt,usedS(i).strain);
+        fractData(i).Fmax=usedS(i).F(fractData(i).ind);
+        pts(i,'/',uN);
+    end
+    save('fractData.mat','fractData');
+end
+%% 9. plot fracture strain vs height
+xx=7;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    subplot(1,2,1)
+    hold on;
+    % ind=2;
+    tArea=zeros(uN,1);
+    strMax=0;
+    legText={};
+
+    for(i=uN:-1:1)
+        pts('F vs. Strain for ',usedS(i).name);
+        h1(i)=plot(usedS(i).strain,usedS(i).F);
+%             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
+        tArea(i)=trapz(usedS(i).strain,usedS(i).F);
+%         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
+        [sm(i),smidx]=max(usedS(i).strain);
+        strMax=max(strMax,sm(i));
+        
+        h2(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'k','linewidth',4);
+        h3(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'color',h1(i).Color,'linewidth',2);
+        
+        set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
+        k(i)=usedS(i).F(smidx)/sm(i);
+        legText(i)={['k=',num2str(k(i),2)]};
+        
+    end
+    legend(legText);
+    xlabel('Strain');
+    ylabel('Force (N)');
+    figText(gcf,20)
+    axis([0,round(strMax,2),-0.4,0.8]);
+    
+    subplot(1,2,2)
+    hold on;
+    xlabel('Strain');
+    ylabel('k');
+    figText(gcf,20);
+    plot(sm,k,'-o','linewidth',2,'markerfacecolor','w')
+
 end
