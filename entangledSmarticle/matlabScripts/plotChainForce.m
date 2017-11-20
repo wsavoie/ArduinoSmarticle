@@ -16,8 +16,12 @@
 % close all;
 clear all;
 
+% maxSpeed= 1.016; %m/s
+% pctSpeed=.0173;
+% speed=pctSpeed*maxSpeed; 
+
 % fold=uigetdir('A:\2DSmartData\entangledData');
-fold='A:\2DSmartData\entangledData\strechAll 11-19 fracture against walls';
+fold='A:\2DSmartData\entangledData\stretchAll 11-20 paperTrials\type6only';
 filez=dir2(fullfile(fold,'Stretch*'));
 N=length(filez);
 fpars=zeros(N,7); % [type,SD,H,del,v]
@@ -33,10 +37,12 @@ for i=1:N
     
 end
 [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
-typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smarticles','Elastic, close all smarticles','Fracture','Stress Avoiding Chain'};
+typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smarticles',...
+    'Elastic, close all smarticles','Fracture On','Stress Avoiding Chain'...
+    'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 % strains=[65]/1000;
-types=[4]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[1]; vs=[];
+types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[1]; vs=[];
 %%%%%%%%%%%%%%%%%%%%%%%%
 props={types strains Hs dels spds its vs};
 
@@ -304,15 +310,17 @@ if(showFigs(showFigs==xx))
     tArea=zeros(uN,1);
     strMax=0;
     fractData=struct;
-    xlabel('Strain');
-    ylabel('Force (N)');
+    set(0,'defaultAxesFontSize',20)
     for(i=1:uN)
         fractData(i).fname=usedS(i).name;
         fractData(i).F=usedS(i).F;
         fractData(i).H=usedS(i).H;
         fractData(i).strain=usedS(i).strain;
+        
         hold off
         h=plot(usedS(i).strain,usedS(i).F);
+        xlabel('Strain');
+        ylabel('Force (N)');
         hold on;
         [fracStrainMax,fracFmax,~,fracInd]=MagnetGInput(h,1);
         plot(fracStrainMax,fracFmax,'ko');
@@ -353,21 +361,21 @@ if(showFigs(showFigs==xx))
     subplot(1,2,1)
     hold on;
     title('Force at Fracture');
-    errorbar(uH*100,uFm,uFerr,'linewidth',2);
+    errorbar(uH,uFm,uFerr,'linewidth',2);
     ylabel('Force (N)');
-    xlabel('Height (cm)');
+    xlabel('Width (smarticle widths)');
     figText(gcf,16)
     axis tight;
     
     subplot(1,2,2)
     hold on;
     title('Strain at Fracture');
-    errorbar(uH*100,uSm,uSerr,'linewidth',2);
+    errorbar(uH,uSm,uSerr,'linewidth',2);
     ylabel('Strain');
-    xlabel('Height (cm)');
+    xlabel('Width (smarticle widths)');
     figText(gcf,16);
     axis tight;
-    xlim([9.9,13.1])
+    
     
 end
 %% 10. plot max force recorded on fracture runs
@@ -391,10 +399,10 @@ if(showFigs(showFigs==xx))
         uFerr(i)=std(uF{i});
     end
     
-    title('Max force vs. Height');
-    errorbar(uH*100,uFm,uFerr,'linewidth',2);
+    title('Max force vs. Width');
+    errorbar(uH,uFm,uFerr,'linewidth',2);
     ylabel('Force (N)');
-    xlabel('Height (cm)');
+    xlabel('Width (smarticle widths)');
     figText(gcf,16)
     axis tight;
 end
@@ -415,8 +423,8 @@ if(showFigs(showFigs==xx))
     ferr=std(FAll,1,2);
     errorbar(conf,fm,ferr,'linewidth',2);
     
-    xlabel('H (cm)','fontsize',18);
-    ylabel('force (N)','fontsize',18);
+    xlabel('Width (smarticle widths)','fontsize',18);
+    ylabel('Force (N)','fontsize',18);
     xlim([9.4,12.1]);
     figText(gcf,16);
 end
