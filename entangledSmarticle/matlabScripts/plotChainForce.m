@@ -8,6 +8,8 @@
 %* 6. plot force vs. strain for usedS
 %* 7. plot force vs. strain for usedS with slope bar
 %* 8. find and save fracture point
+%* 9. plot fracture force vs height and strain vs height
+%* 10. plot max force recorded force on fracture runs
 %************************************************************
 % clearvars -except t
 % close all;
@@ -58,7 +60,7 @@ if ~exist('usedS','var')
     error('No file with specified parameters exists in folder');
 end
 uN=length(usedS);
-showFigs=[8];
+showFigs=[9 10];
 
 %% 1. single force vs time with strain overlay
 xx=1;
@@ -308,56 +310,80 @@ if(showFigs(showFigs==xx))
         fractData(i).F=usedS(i).F;
         fractData(i).H=usedS(i).H;
         fractData(i).strain=usedS(i).strain;
-        plot(usedS(i).strain,usedS(i).F);
-        [fracPt,~]=ginput(1);
-        [fractData(i).ind,fractData(i).strainMax]=findNearestInd(fracPt,usedS(i).strain);
-        fractData(i).Fmax=usedS(i).F(fractData(i).ind);
+        hold off
+        h=plot(usedS(i).strain,usedS(i).F);
+        hold on;
+        [strmax,fmax,~,ind]=MagnetGInput(h,1);
+        plot(strmax,fmax,'ko');
+        fractData(i).strainMax=strmax;
+        fractData(i).Fmax=fmax;
+        fractData(i).ind=ind;
+%         plot(usedS(i).strain(1:ind),usedS(i).F(1:ind));
         pts(i,'/',uN);
+        pause();
     end
     save('fractData.mat','fractData');
 end
-%% 9. plot fracture strain vs height
-xx=7;
+%% 9. plot fracture force vs height and strain vs height
+xx=9;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
-    subplot(1,2,1)
     hold on;
-    % ind=2;
-    tArea=zeros(uN,1);
-    strMax=0;
-    legText={};
-
-    for(i=uN:-1:1)
-        pts('F vs. Strain for ',usedS(i).name);
-        h1(i)=plot(usedS(i).strain,usedS(i).F);
-%             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
-        tArea(i)=trapz(usedS(i).strain,usedS(i).F);
-%         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
-        [sm(i),smidx]=max(usedS(i).strain);
-        strMax=max(strMax,sm(i));
-        
-        h2(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'k','linewidth',4);
-        h3(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'color',h1(i).Color,'linewidth',2);
-        
-        set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-        set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-%         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-%         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
-        k(i)=usedS(i).F(smidx)/sm(i);
-        legText(i)={['k=',num2str(k(i),2)]};
-        
+    
+    load('fractData.mat');
+    uH=sort(unique([fractData(:).H]),'ascend');
+    allH=[fractData(:).H];
+    uF=cell(length(uH),1);
+    uS=cell(length(uH),1);
+    for i=1:length(uH)
+        inds=find(allH==uH(i));
+        uF(i)={[fractData(inds).Fmax]};
+        uS(i)={[fractData(inds).strainMax]};
+        uFm(i)=mean(uF{i});
+        uFerr(i)=std(uF{i});
+        uSm(i)=mean(uS{i});
+        uSerr(i)=std(uS{i});
     end
-    legend(legText);
-    xlabel('Strain');
+    
+    subplot(1,2,1)
+    errorbar(uH*100,uFm,uFerr,'linewidth',2);
     ylabel('Force (N)');
-    figText(gcf,20)
-    axis([0,round(strMax,2),-0.4,0.8]);
+    xlabel('Height (cm)');
+    figText(gcf,16)
+    axis tight;
     
     subplot(1,2,2)
+    errorbar(uH*100,uSm,uSerr,'linewidth',2);
+    ylabel('Strain');
+    xlabel('Height (cm)');
+    figText(gcf,16);
+    axis tight;
+    xlim([9.9,13.1])
+    
+end
+%% 10. plot max force recorded force on fracture runs
+xx=10;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
     hold on;
-    xlabel('Strain');
-    ylabel('k');
-    figText(gcf,20);
-    plot(sm,k,'-o','linewidth',2,'markerfacecolor','w')
+    
+    load('fractData.mat');
+    uH=sort(unique([fractData(:).H]),'ascend');
+    allH=[fractData(:).H];
+    uF=cell(length(uH),1);
+    for i=1:length(uH)
+        inds=find(allH==uH(i));
+        eSIdx=[fractData(inds).ind]; %end strain idx
+        for j=1:length(eSIdx)
+        uF{i}=[uF{i},max(fractData(inds(j)).F(1:eSIdx))];
+        end
+        uFm(i)=mean(uF{i});
+        uFerr(i)=std(uF{i});
+    end
 
+    errorbar(uH*100,uFm,uFerr,'linewidth',2);
+    ylabel('Force (N)');
+    xlabel('Height (cm)');
+    figText(gcf,16)
+    axis tight;
 end
