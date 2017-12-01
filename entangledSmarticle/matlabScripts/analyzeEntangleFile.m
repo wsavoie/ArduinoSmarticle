@@ -25,7 +25,8 @@ q_op=q_op(dd_ind:end);
 q1=interp1(t_op,q_op,t,'linear','extrap');
 strain=[q1/chainLen]';
 
-smartWidth=6.4; %6.4 cms from back to arm tip in u-shape
+smartWidth=5.4; %5.4 cm for center link width
+%6.4 cms from back to arm tip in u-shape
 %get parameters from file
 [~,fpars]=parseFileNames(fname);
 fpars(2)=fpars(2)/1000; %put strain in meters

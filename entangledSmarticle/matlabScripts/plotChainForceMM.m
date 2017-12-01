@@ -1,3 +1,6 @@
+% has much of same plots as plotChainForce.m except this is for systems
+% with markers on robot arm, first and last smarticle
+
 %************************************************************
 %* Fig numbers:
 %* 1. force vs time with strain overlay
@@ -10,7 +13,9 @@
 %* 8. find and save fracture point
 %* 9. plot fracture force vs height and strain vs height
 %*10. plot max recorded force on fracture runs
-%*11. old force vs H data
+%*11. plot select iterations of strain for single run
+%*12. get work from select strain iterations for single run
+%*17. old force vs H data
 %************************************************************
 % clearvars -except t
 % close all;
@@ -18,25 +23,32 @@ clear all;
 
 % maxSpeed= 1.016; %m/s
 % pctSpeed=.0173;
-% speed=pctSpeed*maxSpeed; 
+% speed=pctSpeed*maxSpeed;
 
 % fold=uigetdir('A:\2DSmartData\entangledData');
-fold='A:\2DSmartData\entangledData\initial hysteresis\';
-filez=dir2(fullfile(fold,'Stretch*'));
-N=length(filez);
-fpars=zeros(N,7); % [type,SD,H,del,v]
-L=.26;%meters smarticle chain length
+fold='A:\2DSmartData\entangledData\initial hysteresis\multimarker string';
 freq=1000; %hz rate for polling F/T sensor
-s=struct;
-for i=1:N
-    [fpars(i,:),s(i).t,s(i).strain,s(i).F]=analyzeEntangleFile(...
-        fold,filez(i).name,L,freq);
-    s(i).name=filez(i).name;
-    s(i).fpars=fpars(i,:);
-    [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(fpars(i,:),1);
-    
+
+if ~exist(fullfile(fold,'dataOut.mat'),'file')
+    filez=dir2(fullfile(fold,'Stretch*'));
+    N=length(filez);
+    allFpars=zeros(N,7); % [type,SD,H,del,v]
+    s=struct;
+    for i=1:N
+        pts(i,'/',N);
+        [allFpars(i,:),s(i).t,s(i).strain,s(i).F,L,s(i).rob,s(i).chain,s(i).dsPts]=analyzeEntangleFileMM(...
+            fold,filez(i).name,freq);
+        s(i).name=filez(i).name;
+        s(i).fpars=allFpars(i,:);
+        %     [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(fpars(i,:),1);
+        [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(allFpars(i,:),1);
+    end
+    save(fullfile(fold,'dataOut.mat'),'s','allFpars');
+else
+    load(fullfile(fold,'dataOut.mat'));
 end
-[type,SD,H,del,spd,it,v]=separateVec(fpars,1);
+
+
 typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smarticles',...
     'Elastic, close all smarticles','Fracture On','Stress Avoiding Chain'...
     'Fracture SAC'};
@@ -67,7 +79,13 @@ if ~exist('usedS','var')
     error('No file with specified parameters exists in folder');
 end
 uN=length(usedS);
-showFigs=[3];
+fpars=zeros(uN,7);
+for i=1:uN
+    fpars(i,:)=usedS.fpars;
+end
+[type,SD,H,del,spd,it,v]=separateVec(fpars,1);
+
+showFigs=[3 11 12];
 
 %% 1. single force vs time with strain overlay
 xx=1;
@@ -83,7 +101,7 @@ if(showFigs(showFigs==xx))
     maxS=max(s(ind).strain);
     
     if(overlayStrain)
-        h=plot(s(ind).t,maxF*s(ind).strain/maxS);
+        h=plot(s(ind).t,6*maxF*s(ind).strain);
         % text(0.4,0.9,'scaled strain','units','normalized','color',h.Color)
         legend({'Force','Scaled Strain'},'location','south')
     end
@@ -107,11 +125,11 @@ if(showFigs(showFigs==xx))
     
     xlabel(xlab);
     ylabel(ylab);
-    types=[5 5];
-    title(typeTitles{types(1)+1});
+    typesZ=[5 5];
+    title(typeTitles{typesZ(1)+1});
     %[type,strain, sys width,del,spd, its,version]
-    setP1=find(ismember(fpars(:,[1 2 3 4 5 6]),[types(1) 0.026,0.105,4, 2,1],'rows'))';
-    setP2=find(ismember(fpars(:,[1 2 3 4 5 6]),[types(2) 0.065,0.105,4, 2,2],'rows'))';
+    setP1=find(ismember(fpars(:,[1 2 3 4 5 6]),[typesZ(1) 0.026,0.105,4, 2,1],'rows'))';
+    setP2=find(ismember(fpars(:,[1 2 3 4 5 6]),[typesZ(2) 0.065,0.105,4, 2,2],'rows'))';
     for i=setP1
         plot(s(i).t,s(i).F);
         %     pause;
@@ -125,7 +143,7 @@ if(showFigs(showFigs==xx))
     hold on;
     ylabel(ylab);
     
-    title(typeTitles{types(2)+1});
+    title(typeTitles{typesZ(2)+1});
     % title('Activate First 2 Smarts During Delay Period');
     xlabel(xlab);
     for i=setP2
@@ -142,11 +160,11 @@ xx=3;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    ind=3;
+    ind=1;
     
-    pts('F vs. Strain for ',s(ind).name);
+    pts('F vs. Strain for ',usedS(ind).name);
     % plot(s(ind).strain,s(ind).F);
-    colormapline(s(ind).strain,s(ind).F,[],jet(100));
+    colormapline(usedS(ind).strain,usedS(ind).F,[],jet(100));
     xlabel('Strain');
     ylabel('Force (N)');
     figText(gcf,18)
@@ -167,11 +185,11 @@ if(showFigs(showFigs==xx))
     
     figure(xx)
     hold on;
-    types=[5 5];
-    title(typeTitles{types(1)+1});
+    typesZ=[1 5];
+    title(typeTitles{typesZ(1)+1});
     xlabel(xlab);
     ylabel(ylab);
-    for i=find(type==types(1))'
+    for i=find(type==typesZ(1))'
         plot(s(i).strain,s(i).F);
         %     pause;
     end
@@ -182,9 +200,9 @@ if(showFigs(showFigs==xx))
     figure(55)
     hold on;
     
-    title(typeTitles{types(2)+1});
+    title(typeTitles{typesZ(2)+1});
     xlabel(xlab);
-    for i=find(type==types(2))'
+    for i=find(type==typesZ(2))'
         plot(s(i).strain,s(i).F);
         %     pause
     end
@@ -322,7 +340,7 @@ if(showFigs(showFigs==xx))
         xlabel('Strain');
         ylabel('Force (N)');
         hold on;
-        [fracStrainMax,fracFmax,~,fracInd]=MagnetGInput(h,1);
+        [fracStrainMax,fracFmax,~,fracInd]=MagnetGInput(h,1,1);
         plot(fracStrainMax,fracFmax,'ko');
         fractData(i).fracStrainMax=fracStrainMax;
         fractData(i).fracFmax=fracFmax;
@@ -390,11 +408,11 @@ if(showFigs(showFigs==xx))
     uF=cell(length(uH),1);
     for i=1:length(uH)
         inds=find(allH==uH(i));
-%         eSIdx=[fractData(inds).ind]; %end strain idx
+        %         eSIdx=[fractData(inds).ind]; %end strain idx
         uF{i}=[fractData(inds).fMax];
-%         for j=1:length(eSIdx)
-%             uF{i}=[uF{i},fractData(i).fMax];
-%         end
+        %         for j=1:length(eSIdx)
+        %             uF{i}=[uF{i},fractData(i).fMax];
+        %         end
         uFm(i)=mean(uF{i});
         uFerr(i)=std(uF{i});
     end
@@ -406,8 +424,70 @@ if(showFigs(showFigs==xx))
     figText(gcf,16)
     axis tight;
 end
-%% 11. old force vs h data
+
+%% 11. plot certain parts of strain
 xx=11;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    ind=1;
+    startIt=2; %iteration to consider as "zero point"
+    
+    pts('F vs. Strain for ',usedS(ind).name);
+    % plot(s(ind).strain,s(ind).F);
+
+    time2use=usedS(ind).dsPts((startIt-1)*4,3);
+    x=usedS(ind).strain(time2use:end);
+    y=usedS(ind).F(time2use:end);
+    
+    x=x-x(1);%zero at start iteration
+    y=y-y(1);
+    
+    colormapline(x,y,[],jet(100));
+    xlabel('Strain');
+    ylabel('Force (N)');
+    xlim([0,inf]);
+    figText(gcf,18)
+end
+%% 12. get work from select strain iterations for single run
+xx=12;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    ind=1;
+    startIt=2; %iteration to consider as "zero point"
+    
+    pts('F vs. Strain for ',usedS(ind).name);
+    % plot(s(ind).strain,s(ind).F);
+
+    time2use=usedS(ind).dsPts((startIt-1)*4,3);
+    x=usedS(ind).strain(time2use:end);
+    y=usedS(ind).F(time2use:end)';
+    
+    x=x-x(1);%zero at start iteration
+    y=y-y(1);
+    
+    tArea(i)=trapz(x,y);
+        %         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
+    [sm(i),smidx]=max(x);
+    
+%     colormapline(x,y,[],jet(100));
+    fill([x,x(1)],[y,y(1)],'k','facecolor','c')
+    xlabel('Strain');
+    ylabel('Force (N)');
+    
+     text(0.4,0.9,['W=',num2str(tArea,3)],'units','normalized')
+    
+    xlim([0,inf]);
+    figText(gcf,18)
+end
+        
+        
+        %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
+
+
+%% 17. old force vs h data
+xx=17;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
