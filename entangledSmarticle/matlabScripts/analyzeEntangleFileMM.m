@@ -1,4 +1,4 @@
-function [fpars,t,strain,F,L,rob,chain,dsPts]=analyzeEntangleFileMM(fold,fname,FTfreq)
+function [fpars,t,strain,F,L,rob,chain,dsPts vel]=analyzeEntangleFileMM(fold,fname,FTfreq)
 %fpars = params from files [type,strain, sys width,del,version
 %time in seconds
 %strain, unitless
@@ -41,9 +41,22 @@ strain=[(L-L0)/L0]';
 fpars(2)=fpars(2)/1000; %put strain in meters
 fpars(3)=fpars(3); %put system (H) width in smart widths
 figure(1000);
+clf;
 h=plot(t,strain);
 %[strainT,strainY,~,idx]
 dsPts=zeros(fpars(6)*4,3); %time1,strain1,idx1
 [dsPts(:,1),dsPts(:,2),~,dsPts(:,3)]=MagnetGInput(h,fpars(6)*4,1);
 
+if ~isempty(find(isnan(strain), 1))
+    id=find(isnan(strain),1);
+    prevVal=strain(id-1);
+    strain(id-1:end)=prevVal;
+    pts('error in:',fullfile(fold,fname));
+end
+ %get indices between first two points
+ptSpan=dsPts(1:2,3);
+d=diff(ptSpan)/4;
+%get middle range of points
+ptSpan=[ptSpan(1)+floor(d),ptSpan(1)+2*floor(d)];
+vel=diff(strain(ptSpan))/diff(t(ptSpan));
 %%%%%%%%%%%%%%%%%%%%%%%
