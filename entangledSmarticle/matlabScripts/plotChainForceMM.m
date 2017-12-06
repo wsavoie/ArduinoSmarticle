@@ -16,7 +16,9 @@
 %*11. plot select iterations of strain for single run
 %*12. get work from select strain iterations for single run
 %*13. get work from select strain iterations for many runs
-% 14. get work vs strain rate for many runs
+%*14. get work vs strain rate for many runs
+%*15. elastic response vs strain
+%*16. elastic response vs strain rate
 %*17. old force vs H data
 %************************************************************
 % clearvars -except t
@@ -28,7 +30,7 @@ clear all;
 % speed=pctSpeed*maxSpeed;
 
 % fold=uigetdir('A:\2DSmartData\entangledData');
-fold='A:\2DSmartData\entangledData\12-5 multimarker SAC\';
+fold='A:\2DSmartData\entangledData\11-30 multimarker\';
 freq=1000; %hz rate for polling F/T sensor
 
 if ~exist(fullfile(fold,'dataOut.mat'),'file')
@@ -87,7 +89,7 @@ for i=1:uN
 end
 [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
 
-showFigs=[13 14];
+showFigs=[13 14 15 16];
 
 %% 1. single force vs time with strain overlay
 xx=1;
@@ -284,7 +286,7 @@ if(showFigs(showFigs==xx))
     subplot(1,2,1)
     hold on;
     % ind=2;
-    tArea=zeros(uN,1);
+    %     tArea=zeros(uN,1);
     strMax=0;
     legText={};
     
@@ -292,7 +294,7 @@ if(showFigs(showFigs==xx))
         pts('F vs. Strain for ',usedS(i).name);
         h1(i)=plot(usedS(i).strain,usedS(i).F);
         %             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
-        tArea(i)=trapz(usedS(i).strain,usedS(i).F);
+        %         tArea(i)=trapz(usedS(i).strain,usedS(i).F);
         %         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
         [sm(i),smidx]=max(usedS(i).strain);
         strMax=max(strMax,sm(i));
@@ -489,12 +491,12 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ind=1;
-    timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
-
+    timePts=[2,2]; %start and end pts, iteration to consider as "zero point"
+    
     % plot(s(ind).strain,s(ind).F);
     
-    gammaAmt=unique(spd);
-    strAmt=unique(SD);
+    gammaAmt=sort(unique(spd),'ascend');
+    strAmt=sort(unique(SD),'ascend');
     
     %     strF=struct; %strainFinal
     %     strFerr;
@@ -504,32 +506,37 @@ if(showFigs(showFigs==xx))
         %I want to find number of SD's for for the given gamma I'm
         %searching
         a=find(spd==gammaAmt(i));
-        usd=unique([usedS(a).SD]); %number of unique SD for a certain gamma
-        strM=0;
-        strE=0;
-        wkM=0;
-        wkE=0;
+        usd=sort(unique([usedS(a).SD]),'ascend'); %number of unique SD for a certain gamma
+        strM=zeros(size(usd));
+        strE=zeros(size(usd));
+        wkM=zeros(size(usd));
+        wkE=zeros(size(usd));
         for j=1:length(usd)
             %             [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
             ids=find(fpars(:,2)==usd(j)&fpars(:,5)==gammaAmt(i));
-            strMax=0;
-            tArea=0;
+            strMax=zeros(size(ids));
+            tArea=zeros(size(ids));
             for k=1:length(ids)
-                time2useS=usedS(ids(k)).dsPts(((timePts(1))*4-3),3);%4 points per iteration
-                time2useE=usedS(ids(k)).dsPts(timePts(2)*4,3);
+                R=usedS(ids(k)); %to shorten eqns
+                time2useS=R.dsPts(((timePts(1))*4-3),3);%4 points per iteration
+                time2useE=R.dsPts(timePts(2)*4,3);
                 
-                x=usedS(ids(k)).strain(time2useS:time2useE);
-                y=usedS(ids(k)).F(time2useS:time2useE)';
+                x=R.strain(time2useS:time2useE);
+                y=R.F(time2useS:time2useE)';
                 x=x-x(1);%zero at start iteration
                 y=y-y(1);
                 
                 tArea(k)=trapz(x,y);
-                strMax(k)=max(usedS(ids(k)).strain);
+                strMax(k)=max(R.strain);
+                
+                L=diff(R.chain,1,2);
+                velMax(k)=max(R.vel*L(1));
             end
             strM(j)=mean(strMax);
             strE(j)=std(strMax);
             wkM(j)=mean(tArea);
             wkE(j)=std(tArea);
+            velM(j,i)=mean(velMax);
         end
         errorbar(strM,wkM,-wkE,wkE,-strE,strE);
     end
@@ -537,12 +544,14 @@ if(showFigs(showFigs==xx))
     xlabel('Strain $\varepsilon$','interpreter','latex');
     ylabel('Work (F $\varepsilon$])','interpreter','latex');
     legz={};
-    for(i=1:length(gammaAmt))
-        legz(i)={['$\dot{\varepsilon}$=',num2str(gammaAmt(i),3)]};
+    velM=round(mean(velM,1),3)*100;
+    for(i=1:length(velM))
+        legz(i)={['$\dot{\varepsilon}$=',num2str(velM(i),2),' cm/s']};
     end
-    legend(legz,'interpreter','latex');
+    l=legend(legz,'interpreter','latex');
     axis([0.05,.25,0,.12]);
     figText(gcf,18)
+    l.FontSize=12;
 end
 %% 14. get work vs strain rate for many runs
 xx=14;
@@ -550,12 +559,12 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     %     ind=2;
-    timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
-
+    timePts=[2,2]; %start and end pts, iteration to consider as "zero point"
+    
     % plot(s(ind).strain,s(ind).F);
     
-    gammaAmt=unique(spd);
-    strAmt=unique(SD);
+    gammaAmt=sort(unique(spd),'ascend');
+    strAmt=sort(unique(SD),'ascend');
     
     %     strF=struct; %strainFinal
     %     strFerr;
@@ -565,66 +574,237 @@ if(showFigs(showFigs==xx))
         %I want to find number of SD's for for the given gamma I'm
         %searching
         a=find(SD==strAmt(i));
-        uspd=unique([usedS(a).spd]); %number of unique spd for a certain strain
-        velM=0;
-        velE=0;
-        wkM=0;
-        wkE=0;
+        uspd=sort(unique([usedS(a).spd]),'ascend'); %number of unique spd for a certain strain
+        
+        wkM=zeros(size(uspd));
+        wkE=zeros(size(uspd));
+        velM=zeros(size(uspd));
+        velE=zeros(size(uspd));
+        
         for j=1:length(uspd)
             %             [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
             ids=find(fpars(:,5)==uspd(j)&fpars(:,2)==strAmt(i));
-            velMax=0;
-            tArea=0;
+            velMax=zeros(size(ids));
+            tArea=zeros(size(ids));
             for k=1:length(ids)
-                time2useS=usedS(ids(k)).dsPts(((timePts(1))*4-3),3);%4 points per iteration
-                time2useE=usedS(ids(k)).dsPts(timePts(2)*4,3);
-                x=usedS(ids(k)).strain(time2useS:time2useE);
-                y=usedS(ids(k)).F(time2useS:time2useE)';
+                R=usedS(ids(k));
+                time2useS=R.dsPts(((timePts(1))*4-3),3);%4 points per iteration
+                time2useE=R.dsPts(timePts(2)*4,3);
+                x=R.strain(time2useS:time2useE);
+                y=R.F(time2useS:time2useE)';
                 
                 x=x-x(1);%zero at start iteration
                 y=y-y(1);
                 
                 tArea(k)=trapz(x,y);
-                velMax(k)=max(usedS(ids(k)).vel);
-                
-%                 figure(100);
-%                
-%                 subplot(2,2,1);
-%                 colormapline(usedS(ids(k)).strain,usedS(ids(k)).F,[],jet(100));
-%                 subplot(2,2,2);
-%                  hold on;
-%                 plot(x,y);
-%                 subplot(2,2,[3,4]);
-%                 hold on;
-%                 if k==1
-%                     plot(usedS(ids(k)).t,usedS(ids(k)).strain)
-%                 end
-%                 plot(usedS(ids(k)).t(time2useS:time2useE),usedS(ids(k)).strain(time2useS:time2useE),'-');
-%                 
+                velMax(k)=max(R.vel);
+                strMax(k)=max(R.strain);
+                %                 figure(100);
+                %
+                %                 subplot(2,2,1);
+                %                 colormapline(R.strain,R.F,[],jet(100));
+                %                 subplot(2,2,2);
+                %                  hold on;
+                %                 plot(x,y);
+                %                 subplot(2,2,[3,4]);
+                %                 hold on;
+                %                 if k==1
+                %                     plot(R.t,R.strain)
+                %                 end
+                %                 plot(R.t(time2useS:time2useE),R.strain(time2useS:time2useE),'-');
+                %
             end
             velM(j)=mean(velMax);
             velE(j)=std(velMax);
             wkM(j)=mean(tArea);
             wkE(j)=std(tArea);
-            
+            sM(j,i)=mean(strMax);
         end
         
         errorbar(velM,wkM,-wkE,wkE,-velE,velE);
     end
     
     legz={};
-    for(i=1:length(strAmt))
-        legz(i)={['$\varepsilon$=',num2str(strAmt(i),3)]};
+    sM=round(mean(sM,1),3);
+    for(i=1:length(sM))
+        legz(i)={['$\varepsilon$=',num2str(sM(i),2)]};
     end
     
     xlabel('Strain Rate $\dot{\varepsilon}$','interpreter','latex');
     ylabel('Work ([F $\varepsilon$])','interpreter','latex');
-    legend(legz,'interpreter','latex');
+    l=legend(legz,'interpreter','latex');
     figText(gcf,18)
     axis([0 .25 -.05 .15])
+    l.FontSize=12;
 end
-%% 17. old force vs h data
-xx=17;
+%% 15. elastic response vs strain
+xx=15;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    % ind=2;
+    tArea=zeros(uN,1);
+    timePts=[2,2];
+    strMax=0;
+    legText={};
+    gammaAmt=sort(unique(spd),'ascend');
+    strAmt=sort(unique(SD),'ascend');
+    
+    %     strF=struct; %strainFinal
+    %     strFerr;
+    
+    
+    for i=1:length(gammaAmt)
+        %I want to find number of SD's for for the given gamma I'm
+        %searching
+        a=find(spd==gammaAmt(i));
+        usd=sort(unique([usedS(a).SD]),'ascend'); %number of unique SD for a certain gamma
+        kkM=zeros(size(usd));
+        kkE=zeros(size(usd));
+        smM=zeros(size(usd));
+        smE=zeros(size(usd));
+        
+        for j=1:length(usd)
+            %             [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
+            ids=find(fpars(:,2)==usd(j)&fpars(:,5)==gammaAmt(i));
+            kk=zeros(size(ids));
+            sm=zeros(size(ids));
+            for k=1:length(ids)
+                R=usedS(ids(k)); %to shorten eqns
+                time2useS=R.dsPts((timePts(1)*4-3),3);%4 points per iteration
+                time2useE=R.dsPts(timePts(2)*4,3);
+                x=R.strain(time2useS:time2useE);
+                y=R.F(time2useS:time2useE)';
+                
+                x=x-x(1);%zero at start iteration
+                y=y-y(1);
+                
+                %get index at middle of plateau of iteration interested in
+                smidx=floor((R.dsPts(timePts(2)*4-1,3)+R.dsPts(timePts(2)*4-2,3))/2+1);
+                smidx=smidx-time2useS;
+                sm(k)=x(smidx);
+                strMax=max(strMax,sm(k));
+                kk(k)=y(smidx)/sm(k);
+                
+                %                 figure(100);
+                %                 hold on;
+                %                 h1(i)=plot(x,y);
+                %                 h2(i)=plot([0,sm(i)],[0,y(smidx)],'k','linewidth',4);
+                %                 h3(i)=plot([0,sm(i)],[0,y(smidx)],'color',h1(i).Color,'linewidth',2);
+                %                 set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+                %                 set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+                %         %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+                %         %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
+                %
+                L=diff(R.chain,1,2);
+                velMax(k)=max(R.vel*L(1));
+            end
+            kkM(j)=mean(kk);
+            kkE(j)=std(kk);
+            smM(j)=mean(sm);
+            smE(j)=std(sm);
+            velM(j,i)=mean(velMax);
+        end
+        
+        errorbar(smM,kkM,-kkE,kkE,-smE,smE);
+    end
+    legz=cell(size(gammaAmt));
+    velM=round(mean(velM,1),3)*100;
+    
+    for(i=1:length(velM))
+        legz(i)={['$\dot{\varepsilon}$=',num2str(velM(i),3),' cm/s']};
+    end
+    l=legend(legz,'interpreter','latex');
+    xlabel('Strain $\varepsilon$','interpreter','latex');
+    ylabel('k [$F/\varepsilon$]','interpreter','latex');
+    figText(gcf,20)
+    l.FontSize=12;
+end
+%% 16. elastic response vs strain rate
+xx=16;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    % ind=2;
+    tArea=zeros(uN,1);
+    timePts=[2,2];
+    strMax=0;
+    legText={};
+    gammaAmt=sort(unique(spd),'ascend');
+    strAmt=sort(unique(SD),'ascend');
+    
+    %     strF=struct; %strainFinal
+    %     strFerr;
+    
+    for i=1:length(strAmt)
+        %I want to find number of SD's for for the given gamma I'm
+        %searching
+        a=find(SD==strAmt(i));
+        uspd=sort(unique([usedS(a).spd]),'ascend'); %number of unique SD for a certain gamma
+        kkM=zeros(size(uspd));
+        kkE=zeros(size(uspd));
+        velM=zeros(size(uspd));
+        velE=zeros(size(uspd));
+        
+        for j=1:length(uspd)
+            %             [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
+            ids=find(fpars(:,5)==uspd(j)&fpars(:,2)==strAmt(i));
+            kk=zeros(size(ids));
+            sm=zeros(size(ids));
+            for k=1:length(ids)
+                R=usedS(ids(k)); %to shorten eqns
+                time2useS=R.dsPts((timePts(1)*4-3),3);%4 points per iteration
+                time2useE=R.dsPts(timePts(2)*4,3);
+                x=R.strain(time2useS:time2useE);
+                y=R.F(time2useS:time2useE)';
+                
+                x=x-x(1);%zero at start iteration
+                y=y-y(1);
+                
+                %get index at middle of plateau of iteration interested in
+                smidx=floor((R.dsPts(timePts(2)*4-1,3)+R.dsPts(timePts(2)*4-2,3))/2+1);
+                smidx=smidx-time2useS;
+                sm(k)=x(smidx);
+                strMax(k)=max(R.strain);
+                velMax(k)=max(R.vel);
+                kk(k)=y(smidx)/sm(k);
+                
+                %                 figure(100);
+                %                 hold on;
+                %                 h1(i)=plot(x,y);
+                %                 h2(i)=plot([0,sm(i)],[0,y(smidx)],'k','linewidth',4);
+                %                 h3(i)=plot([0,sm(i)],[0,y(smidx)],'color',h1(i).Color,'linewidth',2);
+                %                 set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+                %                 set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+                %         %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+                %         %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
+                %
+                
+            end
+            kkM(j)=mean(kk);
+            kkE(j)=std(kk);
+            velM(j)=mean(velMax);
+            velE(j)=std(velMax);
+            sM(j,i)=mean(strMax);
+        end
+        
+        errorbar(velM,kkM,-kkE,kkE,-velE,velE);
+    end
+    legz=cell(size(strAmt));
+    sM=round(mean(sM,1),3);
+    for(i=1:length(sM))
+        legz(i)={['$\varepsilon$=',num2str(sM(i),2)]};
+    end
+    l=legend(legz,'interpreter','latex');
+    xlabel('Strain Rate $\dot{\varepsilon}$','interpreter','latex');
+    ylabel('k [$F/\varepsilon$]','interpreter','latex');
+    figText(gcf,20)
+    l.FontSize=12;
+    %     xlim([0,round(strMax,2)]);
+    
+end
+%% 55. old force vs h data
+xx=55;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
