@@ -124,18 +124,18 @@ void loop()
   ledVal = false;
 
 /////////USHAPE/////////
-  uShape();
+//  uShape();
 ////////////////////////
 
   
 //////////STRESS RESPONSE///////////////
-//  int mcurr=0;
-//  for (int i = 0; i < 1<<samps; i++)
-//    {
-//      mcurr  = mcurr+analogRead(stressPin);
-//    }
-//    mcurr >>= samps;
-//  bool notStress=currentMove(mcurr);
+  int mcurr=0;
+  for (int i = 0; i < 1<<samps; i++)
+    {
+      mcurr  = mcurr+analogRead(stressPin);
+    }
+    mcurr >>= samps;
+  bool notStress=currentMove(mcurr);
 ////////////////////////////////////////
 
 
