@@ -1,4 +1,4 @@
-function [fpars,t,strain,F,L,rob,chain,dsPts vel]=analyzeEntangleFileMM(fold,fname,FTfreq)
+function [fpars,t,strain,F,L,rob,chain,dsPts, vel]=analyzeEntangleFileMM(fold,fname,FTfreq)
 %fpars = params from files [type,strain, sys width,del,version
 %time in seconds
 %strain, unitless
@@ -18,9 +18,26 @@ F=-ft(:,2);%y+ is backwards
 
 %fix timing between scripts optitrack starts slightly first
 dd=t_op(end)-t(end);
-dd_ind=find(dd<t_op,1,'first');
+
+%old way of doing this
+% dd_ind=find(dd<t_op,1,'first');
+% t_op=t_op(dd_ind:end)-t_op(dd_ind);
+% z_op=z_op(dd_ind:end,:);
+
+
+%fix timing between scripts optitrack starts slightly first
+dd=t_op(end)-t(end);
+if dd>0 %op runs longer
+%cut beginning off op
+dd_ind=find(abs(dd)<t_op,1,'first');
 t_op=t_op(dd_ind:end)-t_op(dd_ind);
-z_op=z_op(dd_ind:end,:);
+z_op=z_op(dd_ind:end)-z_op(dd_ind);
+else %ft runs longer
+dd_ind=find(abs(dd)<t,1,'first');
+t=t(dd_ind:end)-t(dd_ind);
+F=F(dd_ind:end)-F(dd_ind);
+end
+
 
 %interpolate chain opti to length of FT data
 chain=interp1(t_op,z_op(:,1),t,'linear','extrap');

@@ -1,6 +1,6 @@
 %% combine older files
 clear all
-fold='A:\2DSmartData\entangledData\12-5 multimarker SAC\';
+fold='A:\2DSmartData\entangledData\12-6 multimark w=10\dataAll';
 f=dir2(fold,0);
 finalPars=[];
 finalS=struct;
@@ -18,6 +18,13 @@ s=finalS;
 allFpars=finalPars;
 save(fullfile(fold,'dataOutAll.mat'),'s','allFpars')
 
+%% resaving files
+s0=s; y=allFpars;
+indS0=19;
+indS=1;
+s0(indS0)=s(indS); 
+y(indS0,:)=allFpars(indS,:);
+allFpars=y; s=s0;save('dataOut.mat','s','allFpars');
 %% finds any nans in strain and removes them by placing setting them equal to previous value
 
 fold='A:\2DSmartData\entangledData\11-30 multimarker\fixing data';

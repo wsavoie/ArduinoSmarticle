@@ -30,13 +30,13 @@ clear all;
 % speed=pctSpeed*maxSpeed;
 
 % fold=uigetdir('A:\2DSmartData\entangledData');
-fold='A:\2DSmartData\entangledData\11-30 multimarker\';
+fold='A:\2DSmartData\entangledData\12-6 multimark w=10';
 freq=1000; %hz rate for polling F/T sensor
 
 if ~exist(fullfile(fold,'dataOut.mat'),'file')
     filez=dir2(fullfile(fold,'Stretch*'));
     N=length(filez);
-    allFpars=zeros(N,7); % [type,SD,H,del,v]
+    allFpars=zeros(N,7); % [type,SD,H,del,spd,its,v]
     s=struct;
     for i=1:N
         pts(i,'/',N);
@@ -459,14 +459,16 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ind=1;
-    startIt=2; %iteration to consider as "zero point"
+    timePts=[2,2]; %iteration to consider as "zero point"
     
     pts('F vs. Strain for ',usedS(ind).name);
     % plot(s(ind).strain,s(ind).F);
     
-    time2use=usedS(ind).dsPts((startIt-1)*4,3);
-    x=usedS(ind).strain(time2use:end);
-    y=usedS(ind).F(time2use:end)';
+    time2useS=usedS(ind).dsPts(((timePts(1))*4-3),3);%4 points per iteration
+    time2useE=usedS(ind).dsPts(timePts(2)*4,3);
+    
+    x=usedS(ind).strain(time2useS:time2useE);
+    y=usedS(ind).F(time2useS:time2useE)';
     
     x=x-x(1);%zero at start iteration
     y=y-y(1);
@@ -689,8 +691,8 @@ if(showFigs(showFigs==xx))
                 %                 figure(100);
                 %                 hold on;
                 %                 h1(i)=plot(x,y);
-                %                 h2(i)=plot([0,sm(i)],[0,y(smidx)],'k','linewidth',4);
-                %                 h3(i)=plot([0,sm(i)],[0,y(smidx)],'color',h1(i).Color,'linewidth',2);
+                %                 h2(i)=plot([0,sm(k)],[0,y(smidx)],'k','linewidth',4);
+                %                 h3(i)=plot([0,sm(k)],[0,y(smidx)],'color',h1(i).Color,'linewidth',2);
                 %                 set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
                 %                 set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
                 %         %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
@@ -732,7 +734,7 @@ if(showFigs(showFigs==xx))
     legText={};
     gammaAmt=sort(unique(spd),'ascend');
     strAmt=sort(unique(SD),'ascend');
-    
+                 warning('change smidx');   
     %     strF=struct; %strainFinal
     %     strFerr;
     
@@ -763,23 +765,25 @@ if(showFigs(showFigs==xx))
                 
                 %get index at middle of plateau of iteration interested in
                 smidx=floor((R.dsPts(timePts(2)*4-1,3)+R.dsPts(timePts(2)*4-2,3))/2+1);
+
+%                 smidx=floor((R.dsPts(timePts(2)*4-2,3)));
                 smidx=smidx-time2useS;
                 sm(k)=x(smidx);
                 strMax(k)=max(R.strain);
                 velMax(k)=max(R.vel);
                 kk(k)=y(smidx)/sm(k);
                 
-                %                 figure(100);
-                %                 hold on;
-                %                 h1(i)=plot(x,y);
-                %                 h2(i)=plot([0,sm(i)],[0,y(smidx)],'k','linewidth',4);
-                %                 h3(i)=plot([0,sm(i)],[0,y(smidx)],'color',h1(i).Color,'linewidth',2);
-                %                 set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-                %                 set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-                %         %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-                %         %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
-                %
+%                                 figure(100);
+%                                 hold on;
+%                                 h1(i)=plot(x,y);
+%                                 h2(i)=plot([0,sm(k)],[0,y(smidx)],'k','linewidth',4);
+%                                 h3(i)=plot([0,sm(k)],[0,y(smidx)],'color',h1(i).Color,'linewidth',2);
+%                                 set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%                                 set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%                         %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%                         %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
                 
+%                 
             end
             kkM(j)=mean(kk);
             kkE(j)=std(kk);
