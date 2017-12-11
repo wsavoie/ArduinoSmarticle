@@ -198,34 +198,48 @@ void performFunc(int type){
 void leftDiamond(int MIN,int MID, int MAX) {
   int A1[] = {MAX,MID,MIN,MID};
   int A2[] = {MID,MIN,MID,MAX};
-  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+
+  S1.writeMicroseconds(p1 = A1[0] * 10 + 600);
+  S2.writeMicroseconds(p2 = A2[0] * 10 + 600);  
+  delay(5000);
+  
+  for(int j=0; j<5; j++)
   {
-    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
-    if(i==(sizeof(A1)/sizeof(int))-1)
+    for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
     {
-      delay(del-100);
-      delay(random(100));
+      S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+      S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+      if(i==(sizeof(A1)/sizeof(int))-1)
+      {
+        delay(del-100);
+        delay(random(100));
+      }
+      else
+        delay(del);
     }
-    else
-      delay(del);
   }
 }
 
 void rightDiamond(int MIN,int MID, int MAX) {
   int A1[] = {MAX,MID,MIN,MID};
   int A2[] = {MID,MAX,MID,MIN};
-  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  S1.writeMicroseconds(p1 = A1[0] * 10 + 600);
+  S2.writeMicroseconds(p2 = A2[0] * 10 + 600);  
+  delay(5000);
+  for(int j=0; j<5; j++)
   {
-    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
-    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
-    if(i==(sizeof(A1)/sizeof(int))-1)
+    for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
     {
-      delay(del-100);
-      delay(random(100));
+      S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+      S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+      if(i==(sizeof(A1)/sizeof(int))-1)
+      {
+        delay(del-100);
+        delay(random(100));
+      }
+      else
+        delay(del);
     }
-    else
-      delay(del);
   }
 }
 void uShape() {
