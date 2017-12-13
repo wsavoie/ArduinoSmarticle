@@ -3,7 +3,9 @@ close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\cloud\cloudTests 10-10 nuclei\glued static');
+% f='A:\2DSmartData\singleSmarticleTrack';
+f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+fold=uigetdir(f);
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
 TIME_UNITS = 's';
@@ -17,9 +19,11 @@ pts(fold);
 %* 4. polygon initial vs. final
 %* 5. granular temperature for translation for single run
 %* 6. granular temperature for ensemble
+%* 8. vector field plot of positions
 %* 7. phi vs. time
+%* 9. displacement vs time and theta vs time for single smarticle
 %************************************************************
-showFigs=[2 5 7];
+showFigs=[9];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -430,3 +434,61 @@ if(showFigs(showFigs==xx))
     hold on;
 
 end
+%% 9 displacement vs time and theta vs time for single smarticle
+xx=9;
+if(showFigs(showFigs==xx))
+    
+    figure(xx); lw=2;
+    hold on;
+    
+    idx=1; %index of movie to look at
+    %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+
+        for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+            figure(2000+i);
+            x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
+            x=x-x(1);
+            
+            y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
+            y=y-y(1);
+            t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
+%             y= usedMovs(idx).rot(:,i);%-usedMovs(idx).y(1,i);
+            
+            thet=usedMovs(idx).rot(:,i);
+            thet=thet-thet(1);
+            
+            subplot(2,1,1);
+            hold on;
+%             plot( usedMovs(idx).x(:,i),usedMovs(idx).y(:,i),'linewidth',lw);
+            q=sqrt((x*100).^2+(y*100).^2);
+%             plot( x*100,y*100,'linewidth',lw);
+             plot(t,q,'linewidth',lw);
+%             xlabel('x (cm)','interpreter','latex');
+%             ylabel('y (cm)','interpreter','latex');
+            xlabel('time (s)','interpreter','latex');
+            ylabel('displacement (cm)','interpreter','latex');
+            axis([0,120,-6,6])
+            subplot(2,1,2);
+            
+            hold on;
+            plot(t,wrapTo2Pi(thet),'linewidth',lw);
+%             axis([0 120 -pi-.01,pi+.01]);
+            
+            axis([0 120 0 2*pi]);
+            xlabel('time (s)','interpreter','latex');
+            ylabel('$\theta$ (rads)','interpreter','latex');
+%             set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
+%                 'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
+            
+            set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
+                'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
+%             ='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+%2004 idx 1 for paper fig
+        end
+    pts('plotted: ',usedMovs(idx).fname);
+    %     xlabel('x (m)');
+    %     ylabel('y (m)');
+    figText(gcf,16);
+%     axis equal
+end
+

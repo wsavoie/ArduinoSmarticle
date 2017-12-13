@@ -1,6 +1,6 @@
 clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\cloud\cloudTests 10-10 nuclei\glued static');
+fold=uigetdir('A:\2DSmartData\singleSmarticleTrack');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -10,7 +10,9 @@ a=strfind(pathFold, 'd');
 randAmp=str2double(pathFold(a+1:end));
 % randAmp=0; %eventually read from filename instead
 if RIGIDBODYNAMES
-    numBods = 7;
+    numBods = 1;
+    warning(['make sure to correct "numBods" to the number of '...
+        'smarticles in the cloud data taken current set at numBods=',num2str(numBods)]);
     %names of bodies will be "something #"
 else
     %     rigidBodyName = 'rigid body 1';

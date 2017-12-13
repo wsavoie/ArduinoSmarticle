@@ -28,7 +28,9 @@ if isempty(ind)
     ind = strfind(rigidBodyHeaders,rigidBodyName);
 end
 
-if ~isempty(ind) || data.textdata{7,6}=='W' %has ring rigid body
+[r,c] = find(strcmp(data.textdata, 'Frame')); %row with 'W' in it
+
+if ~isempty(ind) || data.textdata{r,6}=='W' %has ring rigid body
     if isempty(ind)  %one rigid body without 'ring' in name
         ringInd = 3;
     else

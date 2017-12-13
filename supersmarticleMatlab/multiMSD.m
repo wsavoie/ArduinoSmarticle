@@ -2,9 +2,10 @@ clear all;
 close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
-fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\superlightring');
+% fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\superlightring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\metal_singleInactive_1-1_frame_inactive');
 % fold=uigetdir('A:\2DSmartData\');
+fold=uigetdir('A:\2DSmartData\chordRing');
 load(fullfile(fold,'movieInfo.mat'));
 figure(1)
 SPACE_UNITS = 'm';
@@ -38,14 +39,15 @@ fold
 % 23. Plot Y vs. X endpoints
 % 24. Plot crawling smarticle velocities
 % 25. Rotated inactive smarticle histogram
-% 26 rotate each each track by the rotation of inactive smarticle OLDER
+% 26. rotate each each track by the rotation of inactive smarticle OLDER
 % 27. for each msd traj get linear fit of log
 % 28. plot inactive particle position rotate by its rotation
 % 29. Rot each track by the rotation of inactive smart and project
 % 30. partial Rot each track by the rotation of inactive smart and project
+% 30. rotate chord trajectory ring about chord
 %************************************************************
-showFigs=[1 23 29];
-% showFigs=[1 23];
+% showFigs=[1 23 29];
+showFigs=[1 26 29];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
 %define curve params [] for all
@@ -126,6 +128,7 @@ if(showFigs(showFigs==xx))
         hold on
         x=['v',num2str(usedMovs(i).pars(5))];
         legT{i}=['v',num2str(usedMovs(i).pars(5))];
+        
     end
     legend(legT);
     legend off;
@@ -1085,22 +1088,8 @@ if(showFigs(showFigs==xx))
             rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
             rs = rs./norm(rs);
             ns=[-rs(2) rs(1)];
-            %             rs=[1 0]; ns=[0 1];
-            
-            % Project deltaR onto rs(t-1)
-            %             deltay = ((rs*deltaR')/norm(rs)^2)*rs;
-            %             deltax = deltaR - deltay;
-            %             if sign((rs./norm(rs))*(deltax'./norm(deltax))) > 0
-            %                 error 'asdasd'
-            %             end
-            %
-            %              newpos(j, :) = [newpos(j-1,1) + sign((rs./norm(rs))*(deltax'./norm(deltax)))*norm(deltax),...
-            %                             newpos(j-1,2) + sign((rs./norm(rs))*(deltay'./norm(deltay)))*norm(deltay)];
             newpos(j, 1) = newpos(j-1,1)+dot(deltaR,ns);
             newpos(j, 2) = newpos(j-1,2)+dot(deltaR,rs);
-            %             newpos(j, :) = [newpos(j-1,1) + sign(rs*deltax')*norm(deltax),...
-            %                             newpos(j-1,2) + sign(rs*deltay')*norm(deltay)];
-            %            b(j,1)=[deltax,deltay];
             if newpos(end,2)>0
                 correctDir=correctDir+1;
             end
@@ -1348,21 +1337,21 @@ if(showFigs(showFigs==xx))
             rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
             rs = rs./norm(rs);
             ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
-            ns=-ns;%this gets direction of perpendicular movement correct
+%             ns=-ns;%this gets direction of perpendicular movement correct
             %             deltay = ((rs*deltaR')/norm(rs)^2)*rs;
             %             deltax = deltaR - deltay;
             newpos(j, :) =[deltaR*ns',deltaR*rs'];
             %       newpos(j, :) = [sign((rs./norm(rs))*(deltax'./norm(deltax)))*norm(deltax),...
             %                           sign((rs./norm(rs))*(deltay'./norm(deltay)))*norm(deltay)];
             
-            
         end
+%         newpos=cumsum(newpos,2);           
         newpos=cumsum(newpos);
         if newpos(end,2)>0
             correctDir=correctDir+1;
         end
-        %         plot(newpos(:,1),newpos(:,2));
-        plot(ones(1,length(newpos(:,2)))*.025*i-length(usedMovs)/2*.025,newpos(:,2));
+                plot(newpos(:,1),newpos(:,2));
+%         plot(ones(1,length(newpos(:,2)))*.025*i-length(usedMovs)/2*.025,newpos(:,2));
         %         h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         endPos(i)=newpos(end,2);
@@ -1409,6 +1398,7 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
     xl=xlim;
     plot(xl,[0,0],'k');
+%     x=usedMovs(1).x;y=usedMovs(1).y;ix=usedMovs(1).Ix;iy=usedMovs(1).Iy;x0=x(1);y0=y(1);
 end
 %% 30. partial Rot each track by the rotation of inactive smart and project
 xx=30;
@@ -1525,3 +1515,5 @@ if(showFigs(showFigs==xx))
 %     xl=xlim;
 %     plot(xl,[0,0],'k');
 end
+%% 30. partial Rot each track by the rotation of inactive smart and project
+xx=31;

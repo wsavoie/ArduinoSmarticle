@@ -1,4 +1,4 @@
-function [t,x,y,tracks, varargout]=trackOptitrack(file,dec,rigidBodyName)
+function [t,x,y,tracks,fps varargout]=trackOptitrack(file,dec,rigidBodyName)
 
 % figure(1);clf;
 
@@ -15,7 +15,11 @@ data = importdata(file);
 %y->z
 
 %Get data for the ring specifically (rigid body MUST be named with "ring")
-rigidBodyHeaders = lower(data.textdata{4,1}); %single line of text with csv
+rigidBodyHeaders = lower(data.textdata{3,1}); %single line of text with csv
+tx=data.textdata{1};
+a=regexp(tx,'Export Frame Rate,(\d+)','tokens');
+fps=str2double(a{1}{1});
+fps=fps/dec;
 if(iscell(rigidBodyName))
     i=1;
     while(1)  
@@ -39,8 +43,8 @@ if isempty(ind)
     rigidBodyName = 'rigid body 1';
     ind = strfind(rigidBodyHeaders,rigidBodyName);
 end
-
-if ~isempty(ind) || data.textdata{7,6}=='W' %has ring rigid body
+[r,c] = find(strcmp(data.textdata, 'Frame')); %row with 'W' in it
+if ~isempty(ind) || data.textdata{r,6}=='W' %has ring rigid body
     if isempty(ind)  %one rigid body without 'ring' in name
         ringInd = 3;
     else

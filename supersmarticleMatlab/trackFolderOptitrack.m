@@ -1,7 +1,8 @@
 %clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
+% fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
+fold=uigetdir('A:\2DSmartData\chordRing');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -9,8 +10,10 @@ clearvars rigidBodyName
 if RIGIDBODYNAMES
     rigidBodyName{1} = ' ring';
     rigidBodyName{2} = ' frame';
+    chordFlat=' flat';
     activeName= ' active';
     inactiveName=' inactive';
+    
 else
     rigidBodyName = 'rigid body 1';
 end
@@ -33,6 +36,7 @@ steps = nMovs;
 idx=1;
 badIdx=0;
 failedAttempts=struct;
+warning('may want to change last argument in RIGIDBODYNAMES if statement (inactive, chord, etc.)')
 for i=1:nMovs
     
     % for i =1:length(f)
@@ -41,13 +45,13 @@ for i=1:nMovs
     %     [t,x,y,tracks]
     
     try
-        [movs(idx).t,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
+        [movs(idx).t,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).fps, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
         if RIGIDBODYNAMES
+            
             %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
-            [movs(idx).t,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
+            [movs(idx).t,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).fps, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,chordFlat);
         end
         movs(idx).fname=f(i).name;
-        movs(idx).fps=120/dec;
         movs(idx).conv=1;
         [~,vals]=parseFileNames(f(i).name);
         vals=[0 0 1 5 i];
