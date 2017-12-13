@@ -9,6 +9,16 @@ t = data.data(:,2);
 
 x= data.data(:,[6 9 12 3]);
 y= data.data(:,[8 11 14 5]);
+
+    [row,col]=find(isnan(x));
+    for i=1:length(row)
+        x(row(i),col(i))=x(row(i)-1,col(i));
+    end
+	[row,col]=find(isnan(y));
+    for i=1:length(row)
+        y(row(i),col(i))=y(row(i)-1,col(i));
+    end
+
 y1av=mean(y,1);
 [~,I] = sort(y1av);
 x=x(:,I);
@@ -19,5 +29,12 @@ ycom=mean([y(:,2:3)],2); %get ypos of center at all times
 xcom=xcom-xcom(1);
 ycom=ycom-ycom(1);
 
-q=([xcom(end),ycom(end)]./norm([xcom(end),ycom(end)]))*[xcom,ycom]';
+
+nB=[diff(x(:,[2:3]),1,2),diff(y(:,[2:3]),1,2)];
+nB=nB/norm(nB);
+nB0=mean(nB);
+q=nB0/norm(nB0)*[xcom,ycom]';
+
+
+% q=([xcom(end),ycom(end)]./norm([xcom(end),ycom(end)]))*[xcom,ycom]';
 

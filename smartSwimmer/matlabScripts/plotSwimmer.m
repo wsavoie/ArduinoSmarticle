@@ -2,9 +2,11 @@
 %* Fig numbers:
 %* 1. plot q vs. time for left and right
 %* 2. plot travel distance vs. gait size for left and right for all angles
+%* 3. plot comx,comy for single ang
+%* 4. plot alpha1 vs alpha2 *not done*
 %************************************************************
 clear all
-fold='D:\Projects\arduinoSmart\smartSwimmer\matlabScripts\data';
+fold='D:\Projects\arduinoSmart\smartSwimmer\matlabScripts\data\heavy';
 if ~exist(fullfile(fold,'dataOut.mat'),'file')
     filez=dir2(fullfile(fold,'*.csv'));
     N=length(filez);
@@ -54,7 +56,7 @@ for i=1:uN
 end
 [ang,d,v]=separateVec(fpars,1);
 
-showFigs=[1 2];
+showFigs=[1 2 3];
 
 %% 1. plot q vs. time for left and right for a single ang
 xx=1;
@@ -64,16 +66,16 @@ if(showFigs(showFigs==xx))
     angz=90;
     
     
-    idxs=find(allFpars(:,1)==angz);
+    idxs=find(fpars(:,1)==angz);
     
     for i=1:length(idxs)
-        pts('q vs. t',s(idxs(i)).name);
-        if(allFpars(idxs(i),2)==0)
+        pts('q vs. t',usedS(idxs(i)).name);
+        if(fpars(idxs(i),2)==0)
             col='k';
         else
             col='r';
         end
-        plot(s(idxs(i)).t,s(idxs(i)).q*100,'color',col,'linewidth',2);
+        plot(usedS(idxs(i)).t,usedS(idxs(i)).q*100,'color',col,'linewidth',2);
     end
     title(['R=',num2str(angz),'$^\circ$'],'interpreter','latex');
     %     legend({'Left','Right'},'location','south')
@@ -91,15 +93,15 @@ if(showFigs(showFigs==xx))
     
     uang=unique(ang);
     for(i=1:length(uang))
-        idxs=find(allFpars(:,1)==uang(i));
+        idxs=find(fpars(:,1)==uang(i));
         Lall=[];
         Rall=[];
         for j=1:length(idxs)
 %             pts('q vs. t',s(idxs(i)).name);
-            if(allFpars(idxs(j),2)==0)
-                Lall=[Lall s(idxs(j)).q(end)*100];
+            if(fpars(idxs(j),2)==0)
+                Lall=[Lall usedS(idxs(j)).q(end)*100];
             else
-                Rall=[Rall s(idxs(j)).q(end)*100];
+                Rall=[Rall usedS(idxs(j)).q(end)*100];
             end
         end
         Lm(i)=mean(Lall);
@@ -117,4 +119,59 @@ if(showFigs(showFigs==xx))
     leg=legend({'Left','Right'},'location','NorthWest','interpreter','latex');
     figText(gcf,18);
     leg.FontSize=12;
+end
+
+%% 3. plot comx comy for single ang
+xx=3;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    angz=90;
+    
+    
+    idxs=find(fpars(:,1)==angz);
+    
+    for i=1:length(idxs)
+        pts('q vs. t',usedS(idxs(i)).name);
+        if(fpars(idxs(i),2)==0)
+            col='k';
+        else
+            col='r';
+        end
+        plot(usedS(idxs(i)).xcom*100,usedS(idxs(i)).ycom*100,'color',col,'linewidth',2);
+    end
+    title(['R=',num2str(angz),'$^\circ$'],'interpreter','latex');
+    %     legend({'Left','Right'},'location','south')
+    
+    xlabel('x (cm)','interpreter','latex');
+    ylabel('y (cm)','interpreter','latex');
+    
+    figText(gcf,18);
+end
+%% 4. plot alpha1 vs alpha2 *not done*
+xx=4;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    angz=90;
+    
+    
+    idxs=find(fpars(:,1)==angz);
+    
+    for i=1:length(idxs)
+        pts('q vs. t',usedS(idxs(i)).name);
+        if(fpars(idxs(i),2)==0)
+            col='k';
+        else
+            col='r';
+        end
+        plot(usedS(idxs(i)).xcom*100,usedS(idxs(i)).ycom*100,'color',col,'linewidth',2);
+    end
+    title(['R=',num2str(angz),'$^\circ$'],'interpreter','latex');
+    %     legend({'Left','Right'},'location','south')
+    
+    xlabel('x (cm)','interpreter','latex');
+    ylabel('y (cm)','interpreter','latex');
+    
+    figText(gcf,18);
 end
