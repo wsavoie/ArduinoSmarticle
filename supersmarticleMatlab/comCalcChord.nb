@@ -1,0 +1,122 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 10.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[      3815,        113]
+NotebookOptionsPosition[      3468,         96]
+NotebookOutlinePosition[      3810,        111]
+CellTagsIndexPosition[      3767,        108]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+Cell[BoxData[""], "Input",
+ CellChangeTimes->{{3.7245895240604267`*^9, 3.7245895514579935`*^9}, {
+   3.724589594161436*^9, 3.724589665578521*^9}, 3.724589828115817*^9}],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"Ri", "=", "192"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Ro", "=", "197"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"chordAng", "=", "252"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"chordAngi", "=", 
+   RowBox[{
+    RowBox[{"-", "180"}], "+", 
+    RowBox[{"chordAng", "/", "2"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"chordAngf", "=", 
+   RowBox[{
+    RowBox[{"-", "180"}], "-", 
+    RowBox[{"chordAng", "/", "2"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Mmed", "=", "60.5"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"MchordTot", "=", "75.8"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"MchordCurve", "=", 
+   RowBox[{"Mmed", "*", 
+    RowBox[{"chordAng", "/", "360"}]}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"MchordBar", "=", 
+   RowBox[{"MchordTot", "-", "MchordCurve"}]}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"chordLoc", "=", 
+    RowBox[{"Ri", "-", "37.5"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  FractionBox[
+   RowBox[{
+    RowBox[{"MchordCurve", "*", 
+     RowBox[{
+      SubsuperscriptBox["\[Integral]", "Ri", "Ro"], 
+      RowBox[{
+       RowBox[{"(", 
+        RowBox[{
+         SubsuperscriptBox["\[Integral]", 
+          RowBox[{"chordAngi", "*", 
+           RowBox[{"\[Pi]", "/", "180"}]}], 
+          RowBox[{"chordAngf", "*", 
+           RowBox[{"\[Pi]", "/", "180"}]}]], 
+         RowBox[{
+          RowBox[{"Sin", "[", "\[Theta]", "]"}], 
+          SuperscriptBox["r", "2"], 
+          RowBox[{"\[DifferentialD]", "\[Theta]"}]}]}], ")"}], 
+       RowBox[{"\[DifferentialD]", "r"}]}]}]}], "+", 
+    RowBox[{"MchordBar", "*", "chordLoc"}]}], 
+   RowBox[{"MchordCurve", "+", "MchordBar"}]], "//", "N"}]}], "Input",
+ CellChangeTimes->{{3.7245896814674296`*^9, 3.7245898177942266`*^9}, {
+   3.7245898482979717`*^9, 3.7245899143137474`*^9}, {3.7245899978665266`*^9, 
+   3.7245900105462513`*^9}, {3.7245901002023797`*^9, 
+   3.7245901022984996`*^9}, {3.724590140130664*^9, 3.724590156042574*^9}, {
+   3.7245903188748875`*^9, 3.724590324043183*^9}, 3.72459040109859*^9, {
+   3.724590435906581*^9, 3.7245904421069355`*^9}, 3.7245904764829016`*^9, {
+   3.7245907532667327`*^9, 3.724590800667444*^9}, 3.7245908846832495`*^9, {
+   3.724590934675109*^9, 3.7245909378432903`*^9}, {3.724591032890726*^9, 
+   3.7245910499957047`*^9}, {3.724591158947936*^9, 3.724591200083289*^9}}],
+
+Cell[BoxData["68.1797493403694`"], "Output",
+ CellChangeTimes->{{3.724590764622382*^9, 3.7245908011994743`*^9}, {
+   3.724591054934987*^9, 3.72459105602205*^9}, 3.724591203798502*^9, 
+   3.7245912461569242`*^9}]
+}, Open  ]]
+},
+WindowSize->{778, 872},
+WindowMargins->{{567, Automatic}, {53, Automatic}},
+FrontEndVersion->"10.0 for Microsoft Windows (64-bit) (July 1, 2014)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[558, 20, 168, 2, 31, "Input"],
+Cell[CellGroupData[{
+Cell[751, 26, 2487, 62, 281, "Input"],
+Cell[3241, 90, 211, 3, 31, "Output"]
+}, Open  ]]
+}
+]
+*)
+
+(* End of internal cache information *)
