@@ -42,7 +42,7 @@ return;
 end
 if(ba>=1)
     
-    out=char(fread(obj,ba)')
+    out=char(fread(obj,ba)');
     if(out=='}')%end of run delimiter
         client = natnet();
         client.ConnectionType = 'Multicast';

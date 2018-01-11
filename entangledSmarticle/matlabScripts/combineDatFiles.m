@@ -1,6 +1,6 @@
 %% combine older files
 clear all
-fold='A:\2DSmartData\entangledData\12-6 multimark w=10\dataAll';
+fold='A:\2DSmartData\entangledData\11-30 multimarker\data files';
 f=dir2(fold,0);
 finalPars=[];
 finalS=struct;
@@ -20,7 +20,7 @@ save(fullfile(fold,'dataOutAll.mat'),'s','allFpars')
 
 %% resaving files
 s0=s; y=allFpars;
-indS0=19;
+indS0=2;
 indS=1;
 s0(indS0)=s(indS); 
 y(indS0,:)=allFpars(indS,:);

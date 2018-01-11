@@ -2,7 +2,8 @@
 % fold=uigetdir('A:\2DSmartData');
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
-fold=uigetdir('A:\2DSmartData\chordRing');
+% fold=uigetdir('A:\2DSmartData\chordRing');
+fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\mediumRing\noExtraMass\');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -49,7 +50,7 @@ for i=1:nMovs
         if RIGIDBODYNAMES
             
             %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
-            [movs(idx).t,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).fps, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,chordFlat);
+            [movs(idx).t,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).fps, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
         end
         movs(idx).fname=f(i).name;
         movs(idx).conv=1;
