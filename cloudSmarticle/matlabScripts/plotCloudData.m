@@ -4,7 +4,9 @@ close all;
 
 % fold=uigetdir('A:\2DSmartData\');
 % f='A:\2DSmartData\singleSmarticleTrack';
-f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+% f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\leftsquare\close packed';
+f='A:\2DSmartData\cloud\cloud 9-30';
+
 fold=uigetdir(f);
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
@@ -21,9 +23,11 @@ pts(fold);
 %* 6. granular temperature for ensemble
 %* 8. vector field plot of positions
 %* 7. phi vs. time
-%* 9. displacement vs time and theta vs time for single smarticle
+%* 9. radial displacement vs time and theta vs time for single smarticle
+%*10. total path length vs time and theta vs time for single smarticle
+%*11. granular temperature v2
 %************************************************************
-showFigs=[9];
+showFigs=[11 ];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -61,26 +65,26 @@ if(showFigs(showFigs==xx))
     
     idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
-
-        for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
-            figure(1000+i);
-            x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
-            y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
-            t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
-            y= usedMovs(idx).rot(:,i);%-usedMovs(idx).y(1,i);
-            subplot(1,2,1);
-            hold on;
-            plot( usedMovs(idx).x(:,i),usedMovs(idx).y(:,i),'linewidth',lw);
-            xlabel('x (m)');
-            ylabel('y (m)');
-            subplot(1,2,2);
-            hold on;
-            plot(usedMovs(idx).t(:,i),usedMovs(idx).rot(:,i)*180/pi,'linewidth',lw);
-            xlabel('t (s)');
-            ylabel('\theta (\circ)');
-            
-            
-        end
+    
+    for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+        figure(1000+i);
+        x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
+        y= usedMovs(idx).rot(:,i);%-usedMovs(idx).y(1,i);
+        subplot(1,2,1);
+        hold on;
+        plot( usedMovs(idx).x(:,i),usedMovs(idx).y(:,i),'linewidth',lw);
+        xlabel('x (m)');
+        ylabel('y (m)');
+        subplot(1,2,2);
+        hold on;
+        plot(usedMovs(idx).t(:,i),usedMovs(idx).rot(:,i)*180/pi,'linewidth',lw);
+        xlabel('t (s)');
+        ylabel('\theta (\circ)');
+        
+        
+    end
     pts('plotted: ',usedMovs(idx).fname);
     %     xlabel('x (m)');
     %     ylabel('y (m)');
@@ -166,14 +170,14 @@ if(showFigs(showFigs==xx))
     %         area(rI(:,1,1),rI(:,2,1));
     [ord,v]=convhull(rI(:,1,1),rI(:,2,1));
     %     plot(rI(:,1,1),rI(:,2,1),'-o');
-%     plot(vF-vI);
+    %     plot(vF-vI);
     cc=mean(vF-vI)
     cerr=std(vF-vI)
-        sigma = [0,   200    ,400   ,  800  ];
-        vChange=[.022 ,0.0244,.0202 ,0.0253 ];
-        vCerr=  [0.0053,0.0045,0.0074,0.008];
-%         plot(sigma,vChange);
-        errorbar(sigma,vChange,vCerr)
+    sigma = [0,   200    ,400   ,  800  ];
+    vChange=[.022 ,0.0244,.0202 ,0.0253 ];
+    vCerr=  [0.0053,0.0045,0.0074,0.008];
+    %         plot(sigma,vChange);
+    errorbar(sigma,vChange,vCerr)
     xlabel('\xi');
     ylabel('Area Change');
     figText(gcf,16);
@@ -181,9 +185,9 @@ end
 %% 5. granular temperature for translation for single run
 xx=5;
 if(showFigs(showFigs==xx))
-
+    
     figure(xx); lw=2;
-%         clf
+    %         clf
     hold on;
     idx=1;
     pts(usedMovs(idx).fname);
@@ -247,13 +251,13 @@ if(showFigs(showFigs==xx))
     xlabel('time');
     ylabel('energy (J)');
     subplot(2,2,2)
-      hold on;
+    hold on;
     plot(xd,TR(:,1));
     xlabel('time (s)');
     ylabel('energy (J)');
     title('rotational');
     subplot(2,2,[3 4])
-      hold on;
+    hold on;
     plot(xd,ktot(:,1));
     title('total kinetic');
     xlabel('time (s)');
@@ -377,11 +381,11 @@ if(showFigs(showFigs==xx))
     ind=2;
     single = 0;
     
-%      figure(123123)
-%      [k,v]=convhull(R(:,1),R(:,2));
-%      A=R(k,:)
-% plot(A(:,1),A(:,2),'o-')
-% axis square
+    %      figure(123123)
+    %      [k,v]=convhull(R(:,1),R(:,2));
+    %      A=R(k,:)
+    % plot(A(:,1),A(:,2),'o-')
+    % axis square
     
     
     for(idx=1:N)
@@ -410,11 +414,11 @@ if(showFigs(showFigs==xx))
         plot((1:length(phi{single}))./usedMovs(single).fps,(A*n)./phi{single});
         id=single;
     else
-        for j=1:length(phi)     
+        for j=1:length(phi)
             plot((1:length(phi{j}))./usedMovs(j).fps,(A*n)./phi{j});
-                meanx = mean(usedMovs(j).x(end,:));
-                meany = mean(usedMovs(j).y(end,:),2);
-%                 allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
+            meanx = mean(usedMovs(j).x(end,:));
+            meany = mean(usedMovs(j).y(end,:),2);
+            %                 allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
         end
         id=j;
     end
@@ -424,7 +428,7 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
     
     %mean distance btween points
-
+    
     ylim([0.1 0.5])
 end
 %% 8. vector field plot of positions
@@ -432,7 +436,7 @@ xx=8;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-
+    
 end
 %% 9 displacement vs time and theta vs time for single smarticle
 xx=9;
@@ -443,52 +447,189 @@ if(showFigs(showFigs==xx))
     
     idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+    
+    for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+       figure(4000+i);
+        x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
+        thet=usedMovs(idx).rot(:,i);
 
-        for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
-            figure(2000+i);
-            x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
-            x=x-x(1);
-            
-            y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
-            y=y-y(1);
-            t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
-%             y= usedMovs(idx).rot(:,i);%-usedMovs(idx).y(1,i);
-            
-            thet=usedMovs(idx).rot(:,i);
-            thet=thet-thet(1);
-            
-            subplot(2,1,1);
-            hold on;
-%             plot( usedMovs(idx).x(:,i),usedMovs(idx).y(:,i),'linewidth',lw);
-            q=sqrt((x*100).^2+(y*100).^2);
-%             plot( x*100,y*100,'linewidth',lw);
-             plot(t,q,'linewidth',lw);
-%             xlabel('x (cm)','interpreter','latex');
-%             ylabel('y (cm)','interpreter','latex');
-            xlabel('time (s)','interpreter','latex');
-            ylabel('displacement (cm)','interpreter','latex');
-            axis([0,120,-6,6])
-            subplot(2,1,2);
-            
-            hold on;
-            plot(t,wrapTo2Pi(thet),'linewidth',lw);
-%             axis([0 120 -pi-.01,pi+.01]);
-            
-            axis([0 120 0 2*pi]);
-            xlabel('time (s)','interpreter','latex');
-            ylabel('$\theta$ (rads)','interpreter','latex');
-%             set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
-%                 'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
-            
-            set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
-                'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
-%             ='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
-%2004 idx 1 for paper fig
-        end
+%         x=smooth(x,20);
+%         y=smooth(y,20);
+
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+        
+        subplot(2,1,1);
+        hold on;
+        
+        dx=diff(x); dy=diff(y);
+        q=sqrt((x*100).^2+(y*100).^2);
+        
+        plot(t,q,'linewidth',lw);
+        xlabel('time (s)','interpreter','latex');
+        ylabel('displacement (cm)','interpreter','latex');
+        
+        xlim([0 120]);
+        figText(gcf,16);
+        subplot(2,1,2);
+        
+        hold on;
+        a=wrapTo2Pi(thet-.16);
+        plot(t,a,'linewidth',lw);
+        %             axis([0 120 -pi-.01,pi+.01]);
+        
+        axis([0 120 0 2*pi]);
+        xlabel('time (s)','interpreter','latex');
+        ylabel('$\theta$ (rads)','interpreter','latex');
+        %             set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
+        %                 'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
+        
+        set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
+            'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
+        %             ='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+        %2004 idx 1 for paper fig
+        figText(gcf,16);
+    end
     pts('plotted: ',usedMovs(idx).fname);
     %     xlabel('x (m)');
     %     ylabel('y (m)');
     figText(gcf,16);
-%     axis equal
+    %     axis equal
 end
 
+% f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+%paper figure plot in at 'Take 2017-10-05 04.03.06 PM.csv'
+% a=wrapTo2Pi(thet-.16); to remove wrapping
+
+% f='A:\2DSmartData\singleSmarticleTrack' for single smarticle non-cloud
+% a=wrapTo2Pi(thet+.05); to remove wrapping
+%% 10. total path length vs time and theta vs time for single smarticle
+xx=10;
+if(showFigs(showFigs==xx))
+    
+    figure(xx); lw=2;
+    hold on;
+    
+    idx=1; %index of movie to look at
+    %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+    
+    for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+        figure(3000);
+        hold on;
+        
+        x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
+        thet=usedMovs(idx).rot(:,i);
+        %             y= usedMovs(idx).rot(:,i);%-usedMovs(idx).y(1,i);
+%         x=smooth(x,20);
+%         y=smooth(y,20);
+       
+        plot(x,y);
+                title('track'); 
+        xlabel('x (m)','interpreter','latex'); 
+        ylabel('y (m)','interpreter','latex');
+     
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+
+        
+        figure(2000+i);
+        subplot(2,1,1);
+        hold on;
+        dx=diff(x); dy=diff(y);
+        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+        plot(t,q,'linewidth',lw);
+        GT(:,i)=q;
+        
+        %         plot(t,q,'linewidth',lw);
+        %             xlabel('x (cm)','interpreter','latex');
+        %             ylabel('y (cm)','interpreter','latex');
+        xlabel('time (s)','interpreter','latex');
+        ylabel('displacement (cm)','interpreter','latex');
+        %             axis([0,120,0,6])
+        xlim([0 120]);
+        figText(gcf,16);
+        subplot(2,1,2);
+        
+        hold on;
+        a=wrapTo2Pi(thet-.16);
+        plot(t,a,'linewidth',lw);
+        %             axis([0 120 -pi-.01,pi+.01]);
+        
+        axis([0 120 0 2*pi]);
+        xlabel('time (s)','interpreter','latex');
+        ylabel('$\theta$ (rads)','interpreter','latex');
+        %             set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
+        %                 'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
+        
+        set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
+            'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
+        %             ='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+        %2004 idx 1 for paper fig
+        figText(gcf,16);
+    end
+    pts('plotted: ',usedMovs(idx).fname);
+    %     xlabel('x (m)');
+    %     ylabel('y (m)');
+    figText(gcf,16);
+    %     axis equal
+end
+
+% f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+%paper figure plot in at 'Take 2017-10-05 04.03.06 PM.csv'
+% a=wrapTo2Pi(thet-.16); to remove wrapping
+
+% f='A:\2DSmartData\singleSmarticleTrack' for single smarticle non-cloud
+% a=wrapTo2Pi(thet+.05); to remove wrapping
+
+%% 11. granular temperature v2
+xx=11;
+if(showFigs(showFigs==xx))
+    
+    figure(xx); lw=2;
+    hold on;
+    
+    idx=1; %index of movie to look at
+    %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+    GTTAll=[];
+for k=1:N
+    GTT=[];
+    for i=1:size(usedMovs(k).x,2) %for the number of smarticles       
+        x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
+        thet=usedMovs(k).rot(1:minT,i);
+        
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+
+        dx=diff(x); dy=diff(y);dr=diff(thet);
+        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+        r=[0; cumsum(sqrt(dr.^2))];
+        GTT(:,i)=q;
+        GTR(:,i)=r;
+    end
+    GTTAll(:,k)=mean(GTT,2); %translational granular temp
+    GTRAll(:,k)=mean(GTR,2); %translational granular temp
+%     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
+    plot(t,GTTAll(:,k));
+    plot(t,GTRAll(:,k),'--');
+end
+    plot(t,mean(GTTAll,2),'k','linewidth',2);
+    plot(t,mean(GTRAll,2),'--k','linewidth',2);
+    xlabel('time (s)','interpreter','latex');
+    ylabel('displacement,rotation (cm,rads)','interpreter','latex');
+end
+ylim([0 180]);
+% f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+%paper figure plot in at 'Take 2017-10-05 04.03.06 PM.csv'
+% a=wrapTo2Pi(thet-.16); to remove wrapping
+
+% f='A:\2DSmartData\singleSmarticleTrack' for single smarticle non-cloud
+% a=wrapTo2Pi(thet+.05); to remove wrapping

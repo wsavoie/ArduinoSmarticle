@@ -6,7 +6,8 @@ close all;
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\metal_singleInactive_1-1_frame_inactive');
 % fold=uigetdir('A:\2DSmartData\');
 % fold=uigetdir('A:\2DSmartData\chordRing');
-fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\superlightRing\extraMassAdded');
+% fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\superlightRing\extraMassAdded');
+fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\metal_allActive\all');
 load(fullfile(fold,'movieInfo.mat'));
 figure(1)
 SPACE_UNITS = 'm';
@@ -46,9 +47,12 @@ fold
 %*29. Rot each track by the rotation of inactive smart and project
 %*30. partial Rot each track by the rotation of inactive smart and project
 %*31. rotate chord trajectory ring about chord
+%*32. plot rotation and euler displacement from center
+%*33. plot rotation and total path length
+%*
 %************************************************************
 % showFigs=[1 23 29];
-showFigs=[1 29];
+showFigs=[1  34];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
 %define curve params [] for all
@@ -56,6 +60,7 @@ spk=[]; smart=[]; gait=[]; rob=[]; v=[];
 
 props={spk smart gait rob v};
 inds=1;
+minT=100000000000;%initalize as a huge number
 for i=1:length(movs)
     
     cond=true;
@@ -73,6 +78,7 @@ for i=1:length(movs)
         ma = ma.addAll(movs(i).data(1));
         usedMovs(inds)=movs(i);
         inds=inds+1;
+        minT=min(length(movs(i).t),minT);
     end
 end
 if(isempty(ma.tracks))
@@ -1608,4 +1614,162 @@ if(showFigs(showFigs==xx))
     clf;
     polarhistogram(theta,10)
     hold on;
+end
+%% 32. plot rotation and euler displacement from center
+xx=32;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    idx=5;
+    for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+        x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
+        thet=usedMovs(idx).rot(:,i);
+        
+%         x=smooth(x,20);
+%         y=smooth(y,20);
+
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+
+        subplot(2,1,1);
+        hold on;
+        %             plot( usedMovs(idx).x(:,i),usedMovs(idx).y(:,i),'linewidth',lw);
+        dx=diff(x); dy=diff(y);
+        q=sqrt((x*100).^2+(y*100).^2);
+        plot(t,q,'linewidth',lw);
+        
+        %             xlabel('x (cm)','interpreter','latex');
+        %             ylabel('y (cm)','interpreter','latex');
+        xlabel('time (s)','interpreter','latex');
+        ylabel('displacement (cm)','interpreter','latex');
+%         axis([0,120,0,6])
+        xlim([0,120]);
+        figText(gcf,16);
+        subplot(2,1,2);
+        
+        hold on;
+     
+        a=wrapToPi(thet);
+        a=a-a(1);
+        plot(t,a,'linewidth',lw);
+        %             axis([0 120 -pi-.01,pi+.01]);
+        
+        axis([0 120 -pi-.01 pi]);
+        xlabel('time (s)','interpreter','latex');
+        ylabel('$\theta$ (rads)','interpreter','latex');
+        %             set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
+        %                 'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
+        
+        set(gca,'YTickLabel',{'$-\pi$','','$0$','','$\pi$'},...
+            'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
+        %             ='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+        %2004 idx 1 for paper fig
+        figText(gcf,16);
+    end
+    pts('plotted: ',usedMovs(idx).fname);
+    %     xlabel('x (m)');
+    %     ylabel('y (m)');
+
+    %     axis equal
+    
+end
+%% 33. plot rotation and total path length
+xx=33;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    idx=5;
+    for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+        x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
+        thet=usedMovs(idx).rot(:,i);
+
+        plot(x,y); 
+        title('track'); 
+        xlabel('x (m)','interpreter','latex'); 
+        ylabel('y (m)','interpreter','latex');
+     
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+        
+        subplot(2,1,1);
+        hold on;
+
+        dx=diff(x); dy=diff(y);
+        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+        plot(t,q,'linewidth',lw);
+        xlabel('time (s)','interpreter','latex');
+        ylabel('displacement (cm)','interpreter','latex');
+        xlim([0,120]);
+        figText(gcf,16);
+        subplot(2,1,2);
+        
+        hold on;
+        a=wrapToPi(thet);
+        a=a-a(1);
+        plot(t,a,'linewidth',lw);
+        %             axis([0 120 -pi-.01,pi+.01]);
+        
+        axis([0 120 -pi pi]);
+        xlabel('time (s)','interpreter','latex');
+        ylabel('$\theta$ (rads)','interpreter','latex');
+        %             set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
+        %                 'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
+        
+        set(gca,'YTickLabel',{'$-\pi$','','$0$','','$\pi$'},...
+            'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
+        %             ='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+        %2004 idx 1 for paper fig
+        figText(gcf,16);
+    end
+    pts('plotted: ',usedMovs(idx).fname);
+    %     xlabel('x (m)');
+    %     ylabel('y (m)');
+
+    %     axis equal
+    
+end
+%% 34. granular temperature v2
+xx=34;
+if(showFigs(showFigs==xx))
+    
+    figure(xx); lw=2;
+    hold on;
+    
+    idx=1; %index of movie to look at
+    %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+    GTTAll=[];
+for k=1:N
+    GTT=[];
+    for i=1:size(usedMovs(k).x,2) %for the number of smarticles       
+        x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
+        thet=usedMovs(k).rot(1:minT,i);
+        
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+
+        dx=diff(x); dy=diff(y);dr=diff(thet);
+        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+        r=[0; cumsum(sqrt(dr.^2))];
+        GTT(:,i)=q;
+        GTR(:,i)=r;
+    end
+    GTTAll(:,k)=mean(GTT,2); %translational granular temp
+    GTRAll(:,k)=mean(GTR,2); %translational granular temp
+%     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
+    plot(t,GTTAll(:,k));
+    plot(t,GTRAll(:,k),'--');
+end
+    plot(t,mean(GTTAll,2),'k','linewidth',2);
+    xlabel('time (s)','interpreter','latex');
+    ylabel('displacement,rotation (cm,rads)','interpreter','latex');
+%     plot(t,mean(GTRAll,2),'--k','linewidth',2);
 end
