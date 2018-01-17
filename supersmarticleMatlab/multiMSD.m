@@ -49,10 +49,10 @@ fold
 %*31. rotate chord trajectory ring about chord
 %*32. plot rotation and euler displacement from center
 %*33. plot rotation and total path length
-%*
+%*34. granular temperature v2
 %************************************************************
 % showFigs=[1 23 29];
-showFigs=[1  34];
+showFigs=[1  33 34];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
 %define curve params [] for all
@@ -1636,6 +1636,7 @@ if(showFigs(showFigs==xx))
 
         subplot(2,1,1);
         hold on;
+        title('$\sqrt{x^2+y^2}$','interpreter','latex')
         %             plot( usedMovs(idx).x(:,i),usedMovs(idx).y(:,i),'linewidth',lw);
         dx=diff(x); dy=diff(y);
         q=sqrt((x*100).^2+(y*100).^2);
@@ -1681,7 +1682,7 @@ xx=33;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    idx=5;
+    idx=3;
     for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
         x= usedMovs(idx).x(:,i);%-usedMovs(idx).x(1,i);
         y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
@@ -1692,12 +1693,18 @@ if(showFigs(showFigs==xx))
         title('track'); 
         xlabel('x (m)','interpreter','latex'); 
         ylabel('y (m)','interpreter','latex');
-     
+        
         x=x-x(1);
         y=y-y(1);
         thet=thet-thet(1);
-        
+%         plot(x,y);
+        [b,a]=butter(6,1/120*2*12,'low');
+        x=filter(b,a,x);  %filtered signal
+        y=filter(b,a,y);  %filtered signal
+        thet=filter(b,a,thet);  %filtered signal
+%         plot(x,y);
         subplot(2,1,1);
+        title('$\int\sqrt{dx^2+dy^2}$','interpreter','latex')
         hold on;
 
         dx=diff(x); dy=diff(y);
@@ -1755,7 +1762,11 @@ for k=1:N
         x=x-x(1);
         y=y-y(1);
         thet=thet-thet(1);
-
+        [b,a]=butter(6,1/120*2*12,'low');
+        x=filter(b,a,x);  %filtered signal
+        y=filter(b,a,y);  %filtered signal
+        thet=filter(b,a,thet);  %filtered signal
+%         
         dx=diff(x); dy=diff(y);dr=diff(thet);
         q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
         r=[0; cumsum(sqrt(dr.^2))];
