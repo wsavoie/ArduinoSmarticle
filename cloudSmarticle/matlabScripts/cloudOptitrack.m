@@ -16,7 +16,7 @@ data = importdata(file);
 
 
 %Get data for the ring specifically (rigid body MUST be named with "ring")
-rigidBodyHeaders = lower(data.textdata{4,1}); %single line of text with csv
+rigidBodyHeaders = lower(data.textdata{3,1}); %single line of text with csv
 ind = strfind(rigidBodyHeaders,rigidBodyName);
 tx=data.textdata{1};
 a=strfind(tx,'Frame Rate,');

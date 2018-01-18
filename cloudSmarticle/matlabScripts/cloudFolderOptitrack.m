@@ -1,16 +1,17 @@
 clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\singleSmarticleTrack');
+fold=uigetdir('A:\2DSmartData\cloud\cloud 9-30');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
 [~,pathFold,~] = fileparts(fold);
 % randAmp=
 a=strfind(pathFold, 'd');
-randAmp=str2double(pathFold(a+1:end));
+% randAmp=str2double(pathFold(a+1:end));
+randAmp=str2double(regexp(pathFold, '\d*','match'));
 % randAmp=0; %eventually read from filename instead
 if RIGIDBODYNAMES
-    numBods = 1;
+    numBods = 7;
     warning(['make sure to correct "numBods" to the number of '...
         'smarticles in the cloud data taken current set at numBods=',num2str(numBods)]);
     %names of bodies will be "something #"
@@ -25,7 +26,7 @@ end
 movs=struct;
 nMovs=length(f);
 movs(nMovs).fname='';
-dec=12; %decimate amount
+dec=1; %decimate amount
 %HANDEDNESS IN QUATERNIONS ISNT CHANGED?
 conv=zeros(nMovs,1);
 
