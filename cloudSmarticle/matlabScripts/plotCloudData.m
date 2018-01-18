@@ -1,5 +1,5 @@
 clear all;
-close all;
+% close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
 % fold=uigetdir('A:\2DSmartData\');
@@ -21,14 +21,15 @@ pts(fold);
 %* 4. polygon initial vs. final
 %* 5. granular temperature for translation for single run
 %* 6. granular temperature for ensemble
-%* 8. vector field plot of positions
 %* 7. phi vs. time
+%* 8. vector field plot of positions
 %* 9. radial displacement vs time and theta vs time for single smarticle
 %*10. total path length vs time and theta vs time for single smarticle
 %*11. granular temperature v2
 %*12. compiled granular temperature data
+%*13. d<s>/dt 
 %************************************************************
-showFigs=[12];
+showFigs=[11];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -684,7 +685,7 @@ for k=1:N
         t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
         thet=usedMovs(k).rot(1:minT,i);
         
-
+        
         
         x=x-x(1);
         y=y-y(1);
@@ -709,6 +710,7 @@ for k=1:N
 end
     plot(t,mean(GTTAll,2),'k','linewidth',2);
     plot(t,mean(GTRAll,2),'--k','linewidth',2);
+
     xlabel('time (s)','interpreter','latex');
     ylabel('displacement,rotation (cm,rads)','interpreter','latex');
 
@@ -724,6 +726,13 @@ mre=std(max(GTRAll,[],2),0,1);
 % f='A:\2DSmartData\singleSmarticleTrack' for single smarticle non-cloud
 % a=wrapTo2Pi(thet+.05); to remove wrapping
 [mt,mte;mr,mre]
+
+    figure(23)
+    hold on;
+    plot(t(1:end-1),diff(mean(GTTAll,2))./diff(t),'linewidth',1);
+    ylabel('d<S>/dt');
+    xlabel('t(s)');
+    
 end
 %% 12. compiled granular temperature data
 xx=12;
@@ -735,16 +744,19 @@ if(showFigs(showFigs==xx))
 x=[0 200 400 800];
 
 %nonfiltered
-yt=[81.8878 94.5277 127.6742 72.6423];
-yte=[26.3643 29.5863 42.6499 20.0665];
-yr=[118.5865 68.6063 151.3340 60.6466];
-yre=[42.2075 26.0797 66.8817 17.5103];
+% yt=[81.8878 94.5277 127.6742 72.6423];
+% yte=[26.3643 29.5863 42.6499 20.0665];
+% yr=[118.5865 68.6063 151.3340 60.6466];
+% yre=[42.2075 26.0797 66.8817 17.5103];
 
 %filtered
-% yt=[41.7259 55.0991 70.9126 24.3348];
-% yte=[13.6990 18.9334 26.0592 7.2252];
+yt=[41.7259 55.0991 70.9126 24.3348];
+yte=[13.6990 18.9334 26.0592 7.2252];
 % yr=[76.3638 53.9141 106.9800 18.9320];
 % yre=[26.8491 19.0759 37.3578 6.5970];
+yr=[53.6353 53.9141 106.9800 18.9320];
+yre=[19.5214 19.0759 37.3578 6.5970];
+
 
 errorbar(x,yt,yte,'linewidth',2);
 errorbar(x,yr,yre,'--','linewidth',2);
@@ -757,4 +769,55 @@ legend(legz,'interpreter','latex','fontsize',12);
 xlim([0,1000])
 end
 
-% yte=[
+%% 13. d<s>/dt 
+xx=13;
+if(showFigs(showFigs==xx))
+    
+    figure(xx); lw=2;
+    hold on;
+    
+    idx=1; %index of movie to look at
+    %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+    GTTAll=[];
+for k=1:N
+    GTT=[];
+    for i=1:size(usedMovs(k).x,2) %for the number of smarticles       
+        x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+        y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+        t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
+        thet=usedMovs(k).rot(1:minT,i);
+        
+        
+        
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+        
+        [b,a]=butter(6,1/120*2,'low');
+        x=filter(b,a,x);  %filtered signal
+        y=filter(b,a,y);  %filtered signal
+        thet=filter(b,a,thet);  %filtered signal
+        
+        dx=diff(x); dy=diff(y);dr=diff(thet);
+        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+        r=[0; cumsum(sqrt(dr.^2))];
+        GTT(:,i)=q;
+        GTR(:,i)=r;
+    end
+    GTTAll(:,k)=mean(GTT,2); %translational granular temp
+    GTRAll(:,k)=mean(GTR,2); %translational granular temp
+%     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
+
+end
+
+    mGTTAll=mean(GTTAll,2);
+    mGTRAll=mean(GTRAll,2);
+    
+    figure(23)
+    hold on;
+    h=plot(t(1:end-1),diff(mGTTAll)./diff(t),'linewidth',1);
+    plot(t(1:end-1),diff(mGTRAll)./diff(t),'--','linewidth',1);
+    ylabel('d<S>/dt');
+    xlabel('t(s)');
+    
+end
