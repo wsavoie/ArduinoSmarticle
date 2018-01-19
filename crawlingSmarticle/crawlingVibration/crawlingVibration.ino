@@ -27,9 +27,13 @@
 #define stressPin A7    // CHANGE BACK TO orig a7 or a3
 #define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
+//
+//#define pr1 A2 // front PR sensor
+//#define pr2 A3 // back PR sensor
+#define pr1 A0 // front PR sensor
+#define pr2 A1 // back PR sensor
 
-#define pr1 A2 // front PR sensor
-#define pr2 A3 // back PR sensor
+#define pr3 A2 // side PR sensor
 
 static int lightLevel1 = 0;
 static int lightLevel2 = 0;

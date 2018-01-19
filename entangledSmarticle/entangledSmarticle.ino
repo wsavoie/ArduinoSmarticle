@@ -31,6 +31,9 @@
 /*Stress related vars*/
 int stressMoveThresh =5;
 uint8_t stressCount = 0;
+
+uint8_t stressThresh=20;
+
 static int curr  = 0;
 bool stress = false;
 uint16_t samps = 8;
@@ -130,11 +133,13 @@ void loop()
   
 //////////STRESS RESPONSE///////////////
   int mcurr=0;
-  for (int i = 0; i < 1<<samps; i++)
+  stressThresh=18;
+  int ss=9;
+  for (int i = 0; i < 1<<ss; i++)
     {
       mcurr  = mcurr+analogRead(stressPin);
     }
-    mcurr >>= samps;
+    mcurr >>= ss;
   bool notStress=currentMove(mcurr);
 ////////////////////////////////////////
 
@@ -151,6 +156,7 @@ void loop()
 int pollCurrent()
 {
   int meanCurr = 0;
+  int ss= 8;
   for (int i = 0; i < 1 << samps; i++)
   {
     curr    = analogRead(stressPin);
@@ -198,7 +204,7 @@ bool currentMove(int sp)
 //    cInertia=cInertia-1;;
 //    return true;
 //  }
-  if(sp<20)
+  if(sp<stressThresh)
   {
     if(p1>smin&& p2<smax)
     {
@@ -216,7 +222,7 @@ bool currentMove(int sp)
     }
     
   }
-  delay(sdel);  
+//  delay(sdel);  
 return true;
 } 
 

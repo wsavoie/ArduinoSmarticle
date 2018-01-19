@@ -29,13 +29,13 @@ void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
   pinMode(led,OUTPUT);
-  deactivateSmarticle();
+  //deactivateSmarticle();
 }
 
 void loop() 
 {
-  //activateSmarticle();
-  deactivateSmarticle();
+  activateSmarticle();
+  //deactivateSmarticle();
    //zShape();
 }
 
@@ -43,8 +43,8 @@ void loop()
 void deactivateSmarticle() {
   S1.writeMicroseconds(p1=1500);
   S2.writeMicroseconds(p2=1500);
-  //S1.writeMicroseconds(p1=minn * 10 + 600);
-  //S2.writeMicroseconds(p2=maxx * 10 + 600);
+//  S1.writeMicroseconds(p1=minn * 10 + 600);
+//  S2.writeMicroseconds(p2=maxx * 10 + 600);
   delay(del);
 }
 

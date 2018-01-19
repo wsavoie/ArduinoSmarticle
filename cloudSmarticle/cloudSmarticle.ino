@@ -1,7 +1,7 @@
 #include <Servo.h>
 
 /* Pin Definitions */
-int randAmp = 200;//units of milliseconds
+int randAmp = 0;//units of milliseconds
 #define SERVOTYPE 0 //red=0, ross=1
 
 #if SERVOTYPE==0 //RED
@@ -47,7 +47,8 @@ void setup() {
 
 void loop()
 {
-  leftDiamond();
+  //leftSquare();
+  activateSmarticle();
   //deactivateSmarticle();
 }
 
