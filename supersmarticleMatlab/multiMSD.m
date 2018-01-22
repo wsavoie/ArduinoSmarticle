@@ -50,9 +50,11 @@ fold
 %*32. plot rotation and euler displacement from center
 %*33. plot rotation and total path length
 %*34. granular temperature v2
+%*35. 31 but linear histogram version
+%*36. 31 but linear histogram with seperate axes
 %************************************************************
 % showFigs=[1 23 29];
-showFigs=[1  33 34];
+showFigs=[1 29 31 36];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
 %define curve params [] for all
@@ -1612,7 +1614,9 @@ if(showFigs(showFigs==xx))
     theta=atan2(nn(:,2),nn(:,1));
     %     plot(nn(:,1),nn(:,2),'o');
     clf;
-    polarhistogram(theta,10)
+    polarhistogram(theta,20);
+    set(gca,'ThetaAxisUnits','radians');
+    
     hold on;
 end
 %% 32. plot rotation and euler displacement from center
@@ -1783,4 +1787,264 @@ end
     xlabel('time (s)','interpreter','latex');
     ylabel('displacement,rotation (cm,rads)','interpreter','latex');
 %     plot(t,mean(GTRAll,2),'--k','linewidth',2);
+end
+%% 35. 31 but linear histogram version
+xx=35;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    L=length(usedMovs);
+
+    minT=1e10;
+    nn=zeros(length(usedMovs),2);
+    for i=1:length(usedMovs)
+        minT=min(length(usedMovs(i).t),minT);
+        % dpos=diff(pos);
+        pos = [usedMovs(i).x, usedMovs(i).y];
+        rpos = bsxfun(@minus, pos, pos(1,:));
+        
+        % Subtract initial position
+        % Inactive particle position
+        iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+        iapos = bsxfun(@minus, iapos, pos(1,:));
+        
+        %get rid of nans in iapos and rpos
+        [nanr,~]=find(isnan(iapos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+            end
+        end
+        [nanr,~]=find(isnan(rpos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+            end
+        end
+        
+        
+        newpos=zeros(size(rpos));
+        for j=2:size(newpos,1)
+            % Get the change in the ring position in the world frame
+            deltaR = rpos(j, :) - rpos(j-1, :);
+            
+            % Get the vec1, tor from the ring COG to the inactive smarticle
+            rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
+            rs = rs./norm(rs);
+            ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
+            %             ns=-ns;%this gets direction of perpendicular movement correct
+            %             deltay = ((rs*deltaR')/norm(rs)^2)*rs;
+            %             deltax = deltaR - deltay;
+            newpos(j, :) =[deltaR*ns',deltaR*rs'];
+            %       newpos(j, :) = [sign((rs./norm(rs))*(deltax'./norm(deltax)))*norm(deltax),...
+            %                           sign((rs./norm(rs))*(deltay'./norm(deltay)))*norm(deltay)];
+            
+        end
+        %         newpos=cumsum(newpos,2);
+        newpos=cumsum(newpos);
+        nn(i,[1,2])=newpos(end,[1:2]);
+        
+    end
+    hold on;
+    
+    theta=atan2(nn(:,2),nn(:,1));
+%     %     plot(nn(:,1),nn(:,2),'o');
+%     clf;
+%     polarhistogram(theta,10)
+%     hold on;
+% histogram(theta)
+top=theta(theta>0);
+bott= theta(theta<=0);
+bins=10;
+edges=linspace(0,1,bins+1);
+
+[NT,~]=histcounts(top,bins);
+[NB,~]=histcounts(-bott,bins);
+ticks=linspace(0,1,5);
+
+set(gca,'xticklabel',{'0','\pi/4','\pi/2','3\pi/2','\pi'},'xtick',ticks)
+xlim([-0.1,1.1])
+% ax1 = gca; % current axes
+% ax1.XColor='k';
+% set(ax1,'XAxisLocation','top');
+% ax2 = axes('Position',ax1_pos,...
+%     'XAxisLocation','bottom',...
+%     'YAxisLocation','right',...
+%     'Color','none');
+% 
+% 
+% 
+% 
+% ax1.XTick=(ticks);
+% ax1.XTickLabel={'0','\pi/4','\pi/2','3\pi/2','\pi'};
+% 
+% 
+% 
+% 
+% ax2.XTick=(ticks);
+% ax2.XTickLabel={'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'};
+% ax2.XColor = 'r';
+% ax2.YColor = 'none';
+% 
+% 
+% hold on;
+% h=bar([1:bins]./bins,NT,'parent',ax1,'facecolor','k');
+% hold on;
+% h2=bar([1:bins]./bins,NB,'parent',ax2,'facecolor','r');
+
+% bar([1:bins],-NB/pi,'parent',ax1);
+wid=.95;%bar width
+h=bar([1:bins]./bins,NT,wid,'facecolor','k');
+h=bar([1:bins]./bins,-NB,wid,'facecolor','r');
+
+end
+
+%% 36. 31 but linear histogram with seperate axes
+xx=36;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    L=length(usedMovs);
+
+    minT=1e10;
+    nn=zeros(length(usedMovs),2);
+    for i=1:length(usedMovs)
+        minT=min(length(usedMovs(i).t),minT);
+        % dpos=diff(pos);
+        pos = [usedMovs(i).x, usedMovs(i).y];
+        rpos = bsxfun(@minus, pos, pos(1,:));
+        
+        % Subtract initial position
+        % Inactive particle position
+        iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+        iapos = bsxfun(@minus, iapos, pos(1,:));
+        
+        %get rid of nans in iapos and rpos
+        [nanr,~]=find(isnan(iapos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+            end
+        end
+        [nanr,~]=find(isnan(rpos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+            end
+        end
+        
+        
+        newpos=zeros(size(rpos));
+        for j=2:size(newpos,1)
+            % Get the change in the ring position in the world frame
+            deltaR = rpos(j, :) - rpos(j-1, :);
+            
+            % Get the vec1, tor from the ring COG to the inactive smarticle
+            rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
+            rs = rs./norm(rs);
+            ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
+            %             ns=-ns;%this gets direction of perpendicular movement correct
+            %             deltay = ((rs*deltaR')/norm(rs)^2)*rs;
+            %             deltax = deltaR - deltay;
+            newpos(j, :) =[deltaR*ns',deltaR*rs'];
+            %       newpos(j, :) = [sign((rs./norm(rs))*(deltax'./norm(deltax)))*norm(deltax),...
+            %                           sign((rs./norm(rs))*(deltay'./norm(deltay)))*norm(deltay)];
+            
+        end
+        %         newpos=cumsum(newpos,2);
+        newpos=cumsum(newpos);
+        nn(i,[1,2])=newpos(end,[1:2]);
+        
+    end
+    hold on;
+    
+    theta=atan2(nn(:,2),nn(:,1));
+%     %     plot(nn(:,1),nn(:,2),'o');
+%     clf;
+%     polarhistogram(theta,10)
+%     hold on;
+% histogram(theta)
+top=theta(theta>0);
+bott= theta(theta<=0);
+bins=10;
+edges=linspace(0,1,bins+1);
+
+[NT,~]=histcounts(top,bins);
+[NB,~]=histcounts(-bott,bins);
+ticks=linspace(0,1,5);
+wid=.95;%bar width
+
+set(gca,'xticklabel',{'0','\pi/4','\pi/2','3\pi/2','\pi'},'xtick',ticks)
+
+
+ax1 = gca; % current axes
+ax1_pos = ax1.Position; % position of first axes
+% [0 0.5 1.0 0.5]
+set(ax1,'OuterPosition',[0 0.5 1.0 0.5],...
+    'XDir','reverse',...
+    'XAxisLocation','bottom',...
+    'XColor','k',...
+    'xlim',[-0.1,1.1],...
+    'box','on');
+
+% ax1.XDir='reverse';
+
+
+% ax1.OuterPosition=[0 0.5 1.0 0.5];
+h1=bar([1:bins]./bins,NT,wid,'facecolor','k','parent',ax1);
+% set();
+
+
+% ,'OuterPosition',[0 0 1.0 0.5],...
+ax2 = axes('Position',[0.1300,0.0550,0.7750 0.4075],...
+    'XAxisLocation','top',...
+    'YAxisLocation','left',...
+    'XDir','reverse',...
+    'xticklabel',{'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'},...
+    'xtick',ticks,...
+    'xlim',[-0.1,1.1],...
+     'box','on');
+hold on;
+% set(ax2,'XAxisLocation','bottom');
+
+
+
+% h1=bar([1:bins]./bins,NT,wid,'facecolor','k','parent',ax1);
+
+% ax1 = gca; % current axes
+% ax1.XColor='k';
+% set(ax1,'XAxisLocation','top');
+% ax2 = axes('Position',ax1_pos,...
+%     'XAxisLocation','bottom',...
+%     'YAxisLocation','right',...
+%     'Color','none');
+% 
+% 
+% 
+% 
+% ax1.XTick=(ticks);
+% ax1.XTickLabel={'0','\pi/4','\pi/2','3\pi/2','\pi'};
+% 
+% 
+% 
+% 
+% ax2.XTick=(ticks);
+% ax2.XTickLabel={'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'};
+% ax2.XColor = 'r';
+% ax2.YColor = 'none';
+% 
+% 
+% hold on;
+% h=bar([1:bins]./bins,NT,'parent',ax1,'facecolor','k');
+% hold on;
+% h2=bar([1:bins]./bins,NB,'parent',ax2,'facecolor','r');
+
+% bar([1:bins],-NB/pi,'parent',ax1);
+
+h=bar([1:bins]./bins,-NB,wid,'facecolor','r','parent',ax2);
+
 end
