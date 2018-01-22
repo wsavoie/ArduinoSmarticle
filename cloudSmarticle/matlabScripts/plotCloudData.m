@@ -29,7 +29,7 @@ pts(fold);
 %*12. compiled granular temperature data
 %*13. d<s>/dt 
 %************************************************************
-showFigs=[11];
+showFigs=[ 13];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -732,7 +732,7 @@ mre=std(max(GTRAll,[],2),0,1);
     plot(t(1:end-1),diff(mean(GTTAll,2))./diff(t),'linewidth',1);
     ylabel('d<S>/dt');
     xlabel('t(s)');
-    
+fps=usedMovs(1).fps;    
 end
 %% 12. compiled granular temperature data
 xx=12;
@@ -741,7 +741,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     
-x=[0 200 400 800];
+x=[0 200 400 600 800 1000];
 
 %nonfiltered
 % yt=[81.8878 94.5277 127.6742 72.6423];
@@ -750,12 +750,12 @@ x=[0 200 400 800];
 % yre=[42.2075 26.0797 66.8817 17.5103];
 
 %filtered
-yt=[41.7259 55.0991 70.9126 24.3348];
-yte=[13.6990 18.9334 26.0592 7.2252];
+yt=[41.7259 55.0991 70.9126 72.2794 67.0875 73.0501];
+yte=[13.6990 18.9334 26.0592 25.1421 18.9005 22.5646];
 % yr=[76.3638 53.9141 106.9800 18.9320];
 % yre=[26.8491 19.0759 37.3578 6.5970];
-yr=[53.6353 53.9141 106.9800 18.9320];
-yre=[19.5214 19.0759 37.3578 6.5970];
+yr=[53.6353 53.9141 64.1974 59.6325 64.2384  66.8990] ;
+yre=[19.5214 19.0759 23.1742 20.7481 19.5432 21.5626];
 
 
 errorbar(x,yt,yte,'linewidth',2);
@@ -815,9 +815,30 @@ end
     
     figure(23)
     hold on;
-    h=plot(t(1:end-1),diff(mGTTAll)./diff(t),'linewidth',1);
-    plot(t(1:end-1),diff(mGTRAll)./diff(t),'--','linewidth',1);
+%     h=plot(t(1:end-1),diff(mGTTAll)./diff(t),'linewidth',1);
+%     plot(t(1:end-1),diff(mGTRAll)./diff(t),'--','linewidth',1);
     ylabel('d<S>/dt');
     xlabel('t(s)');
+   
+    x=t(100:end-1);
+    y=diff(mGTTAll(100:end))./diff(t(100:end));
+    f = fit(x,y,'power2');
+%     yf=f.a*exp(f.b*x);
+    yf=f.a*x.^f.b+f.c;
     
+    figure(99);
+    plot(f,x,y);
+    
+    figure(27);
+    hold on;
+%     plot(x,yf);
+    
+    yi=yf(end);
+    idx=max(find(abs(yf-yi)>=0.66*yi));
+    xv=[0 200 400 600 800 1000];
+%     v=x(idx)
+%     vv=[  55.6667 44.6583 34.2667 71.0333 33.8500 39.8000];
+%     plot(xv,vv);
 end
+
+%% 14. plot fitted time constant vs rand amp
