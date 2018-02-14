@@ -4,10 +4,10 @@ close all;
 
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\superlightring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\metal_singleInactive_1-1_frame_inactive');
-% fold=uigetdir('A:\2DSmartData\');
+fold=uigetdir('A:\2DSmartData\');
 % fold=uigetdir('A:\2DSmartData\chordRing');
 % fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\superlightRing\extraMassAdded');
-fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\metal_allActive\all');
+% fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\metal_allActive\all');
 load(fullfile(fold,'movieInfo.mat'));
 figure(1)
 SPACE_UNITS = 'm';
@@ -26,7 +26,7 @@ fold
 %* 8. 1 2 3 into single plot
 %* 9. for each msd traj get linear fit of log
 %*10. partial msd fit with log
-%*11. for each msd traj get linear fit of log
+%*11. for each msd traj get linear fit of log *most recent pom vs mop*
 %*12. rotate each each track by the rotation of ring
 %*13. polar plot of rotation of ring (used for checking axes)
 %*14. Drift correction using velocity correlation
@@ -52,9 +52,12 @@ fold
 %*34. granular temperature v2
 %*35. 31 but linear histogram version
 %*36. 31 but linear histogram with seperate axes
+%*37. plot from table
 %************************************************************
 % showFigs=[1 23 29];
-showFigs=[1 29 31 36];
+% showFigs=[1 29 31 36];
+showFigs=[1 29 37];
+% showFigs=[1 29 37];
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
 %define curve params [] for all
@@ -164,9 +167,10 @@ if(showFigs(showFigs==xx))
     
     ma = ma.computeMSD;
     hax2=gca;
+    set(gcf,'Renderer','painters'); %this allows fig to be copied as vectored img
     ma.plotMSD(hax2);
-    ma.plotMeanMSD(hax2, 1);
-    
+    ma.plotMeanMSD(hax2, 1,[],.5);
+    %     ha
     [fo, gof]=ma.fitMeanMSD;
     % [a b]=ma.fitMeanMSD;
     D=fo.p1/2/ma.n_dim;
@@ -341,6 +345,8 @@ if(showFigs(showFigs==xx))
     lx=log(x);
     ly=log(y);
     pom=fit(lx,ly,'poly1');
+    
+    
     %mean of powers
     clear x y lx ly
     fs=zeros(length(ma.msd),1);
@@ -350,7 +356,7 @@ if(showFigs(showFigs==xx))
         y=a(:,2);
         y=y(x>1.2&x<15);
         x=x(x>1.2&x<15);
-        [lx]=log(x)
+        [lx]=log(x);
         [ly]=log(y);
         [f,gof]=fit(lx,ly,'poly1');
         fs(i)=f.p1;
@@ -399,12 +405,15 @@ if(showFigs(showFigs==xx))
     figText(gcf,15)
     %     msdanalyzer
 end
-%% 11 for each msd traj get linear fit of log
+%% 11 for each msd traj get linear fit of log most recent pom vs mop
 xx=11;
 if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
     ggg=790;
+    
+    fitT=1; %linear = 0; exp=1;
+    
     if(isempty(ma.msd))
         ma = ma.computeMSD;
     end
@@ -418,7 +427,20 @@ if(showFigs(showFigs==xx))
     x=x(x>1.2&x<15);
     lx=log(x);
     ly=log(y);
-    pom=fit(lx,ly,'poly1');
+    
+    if(fitT) %exp
+        pom=fit(x,y,'exp1');
+        pomR=pom.a;
+    else
+        pom=fit(lx,ly,'poly1');
+        pomR=pom.p1;
+    end
+    
+    %     pom=fit(lx,ly,'poly1');
+    %     plot(pom,lx,ly)
+    
+    %     plot(pom,x,y)
+    
     %mean of powers
     clear x y lx ly
     fs=zeros(length(ma.msd),1);
@@ -429,25 +451,43 @@ if(showFigs(showFigs==xx))
         y=a(:,2);
         y=y(x>1.2&x<15);
         x=x(x>1.2&x<15);
-        [lx]=log(x);
-        [ly]=log(y);
-        [f,gof]=fit(lx,ly,'poly1');
-        fs(i)=f.p1;
+        
+        
+        %%%LINEAR FIT%%%
+        if(fitT) %exp
+            [f,gof]=fit(x,y,'exp1');
+            fs(i)=f.b;
+            %         plot(f,x,y);
+        else
+            [lx]=log(x);
+            [ly]=log(y);
+            [f,gof]=fit(lx,ly,'poly1');
+            fs(i)=f.p1;
+            %         plot(f,lx,ly);
+        end
+        
+        
     end
-    plot(fs);
     
-    msd=ma.getMeanMSD;
-    idx = find(isnan(msd(:,3)), 1, 'first');
+    errorbar(2,mean(fs),std(fs));
     
-    msd = msd(1:idx-1,:);
     
-    msd=msd(msd(:,1)<15&msd(:,1)>0.1,:);
-    [lx]=log(msd(:,1));
-    [ly]=log(msd(:,2));
-    [f2]=polyfit(lx,ly,1);
-    meanPow=f2(1);
+    %     msd=ma.getMeanMSD;
+    %     idx = find(isnan(msd(:,3)), 1, 'first');
+    %
+    %     msd = msd(1:idx-1,:);
+    %
+    %     msd=msd(msd(:,1)<15&msd(:,1)>0.1,:);
+    %     [lx]=log(msd(:,1));
+    %     [ly]=log(msd(:,2));
+    %     [f2]=polyfit(lx,ly,1);
+    % [f,gof]=fit(lx,ly,'poly1');
     
-    pts('(*)mean of powers=',mean(fs),' stdev=', std(fs),'  power of mean=',pom.p1);
+    %     [f,gof]=fit(x,y,'exp1');
+    %     meanPow=f(1);
+    
+    
+    pts('(*)mean of powers=',mean(fs),' stdev=', std(fs),'  power of mean=',pomR);
     % std(fs);
 end
 
@@ -602,10 +642,13 @@ end
 
 xx=16;
 if(showFigs(showFigs==xx))
-    
+    figure(xx);
+    hold on;
     tEnd = 15; % do not consider delays longer than tEnd
-    ma = ma.computeMSD;
-    figure
+    if(isempty(ma.msd))
+        ma = ma.computeMSD;
+    end
+    
     ma.plotMeanMSD(gca, true);
     
     A = ma.getMeanMSD;
@@ -640,7 +683,7 @@ if(showFigs(showFigs==xx))
     fprintf('D = %.3g [ %.3g - %.3g ] %s', ...
         Dfit, Dci(1), Dci(2), [SPACE_UNITS '²/' TIME_UNITS]);
     
-    fprintf('V = %.3g [ %.3g - %.3g ] %s', ...
+    fprintf(' V = %.3g [ %.3g - %.3g ] %s', ...
         Vfit, Vci(1), Vci(2), [SPACE_UNITS '/' TIME_UNITS]);
     
     
@@ -667,6 +710,8 @@ end
 %% 18. 2D Velocity Histogram
 xx=18;
 if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
     vel = [];
     for idx = 1:length(ma.tracks)
         newVel = [diff((ma.tracks{idx}(:,2))) diff((ma.tracks{idx}(:,3)))];
@@ -674,8 +719,9 @@ if(showFigs(showFigs==xx))
     end
     
     
-    hist3(vel, [100 100])
-    colormap(hot) % heat map
+    hist3(vel, [25 25])
+    colormap(fire)
+    set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     
     %     set(get(gca,'child'),'FaceColor','interp','CDataMode','auto');
     xlabel('X Velocity')
@@ -696,9 +742,10 @@ if(showFigs(showFigs==xx))
     axis([-.25 .25 -.25 .25]);
     for i=1:length(ma.tracks)
         hold on;
-        B = ma.tracks{i}(:, 1) < 60;
-        ma.tracks{i} = ma.tracks{i}(B, :, :);
-        plot(ma.tracks{i}(:,2), ma.tracks{i}(:,3),'-');
+        B = ma.tracks{i};
+        B(B(:, 1) < 60);
+        %         ma.tracks{i} = ma.tracks{i}(B, :, :);
+        plot(B(:,2), B(:,3),'-');
         %     pause
     end
     ma.labelPlotTracks
@@ -1099,7 +1146,7 @@ if(showFigs(showFigs==xx))
             ns=[-rs(2) rs(1)];
             newpos(j, 1) = newpos(j-1,1)+dot(deltaR,ns);
             newpos(j, 2) = newpos(j-1,2)+dot(deltaR,rs);
-
+            
         end
         np=sum(newpos);
         if np(2)<0
@@ -1170,7 +1217,7 @@ if(showFigs(showFigs==xx))
         y=a(:,2);
         y=y(x>1.2&x<15);
         x=x(x>1.2&x<15);
-        [lx]=log(x)
+        [lx]=log(x);
         [ly]=log(y);
         plot(lx, ly);
         [f,gof]=fit(lx,ly,'poly1');
@@ -1346,7 +1393,7 @@ if(showFigs(showFigs==xx))
             % Get the vec1, tor from the ring COG to the inactive smarticle
             rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
             if(norm(rs))
-            rs = rs./norm(rs);
+                rs = rs./norm(rs);
             end
             ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
             %             ns=-ns;%this gets direction of perpendicular movement correct
@@ -1363,8 +1410,8 @@ if(showFigs(showFigs==xx))
             correctDir=correctDir+1;
         end
         plot(newpos(:,1),newpos(:,2));
-%                 plot(ones(1,length(newpos(:,2)))*.025*i-length(usedMovs)/2*.025,newpos(:,2));
-                h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
+        %                 plot(ones(1,length(newpos(:,2)))*.025*i-length(usedMovs)/2*.025,newpos(:,2));
+        h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         endPos(i)=newpos(end,2);
         nn(i)=newpos(end,2)./usedMovs(i).t(end);
@@ -1391,6 +1438,7 @@ if(showFigs(showFigs==xx))
     
     
     figure(12524);
+    dataLen=[40, ];
     mm=[-0.00013641 -0.00021787 -.00014566, -0.00012244 0.0001927, 0.000697 0.00098668];
     mmerr=[0.00011918 0.00027257 0.0004223, 0.0006557,  0.0011994, 0.0010046 0.0013029];
     %     mx=[1/6 1/4 1/3 1/2 1 2 3];
@@ -1411,7 +1459,23 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
     xl=xlim;
     plot(xl,[0,0],'k');
-    %     x=usedMovs(1).x;y=usedMovs(1).y;ix=usedMovs(1).Ix;iy=usedMovs(1).Iy;x0=x(1);y0=y(1);
+    
+    
+    %%%%
+        load('ssData');
+        trialName='shortv3';
+        mi=34;
+        mr=29.5;
+        mRat=mi/mr;
+        trialsAmt=length(usedMovs);
+        datMean=mean(nn);
+        datStd=std(nn);
+        datVar=datStd.^2;
+        datErr=datStd/sqrt(trialsAmt);
+        towardsInactive=correctDir/L;
+        ssData2=table(mi,mr,mRat,trialsAmt,datMean,datStd,datVar,datErr,towardsInactive,'RowNames',{trialName});
+        ssData=[ssData;ssData2];
+        save('ssData3','ssData');
 end
 %% 30. partial Rot each track by the rotation of inactive smart and project
 xx=30;
@@ -1631,13 +1695,13 @@ if(showFigs(showFigs==xx))
         t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
         thet=usedMovs(idx).rot(:,i);
         
-%         x=smooth(x,20);
-%         y=smooth(y,20);
-
+        %         x=smooth(x,20);
+        %         y=smooth(y,20);
+        
         x=x-x(1);
         y=y-y(1);
         thet=thet-thet(1);
-
+        
         subplot(2,1,1);
         hold on;
         title('$\sqrt{x^2+y^2}$','interpreter','latex')
@@ -1650,13 +1714,13 @@ if(showFigs(showFigs==xx))
         %             ylabel('y (cm)','interpreter','latex');
         xlabel('time (s)','interpreter','latex');
         ylabel('displacement (cm)','interpreter','latex');
-%         axis([0,120,0,6])
+        %         axis([0,120,0,6])
         xlim([0,120]);
         figText(gcf,16);
         subplot(2,1,2);
         
         hold on;
-     
+        
         a=wrapToPi(thet);
         a=a-a(1);
         plot(t,a,'linewidth',lw);
@@ -1677,7 +1741,7 @@ if(showFigs(showFigs==xx))
     pts('plotted: ',usedMovs(idx).fname);
     %     xlabel('x (m)');
     %     ylabel('y (m)');
-
+    
     %     axis equal
     
 end
@@ -1692,25 +1756,25 @@ if(showFigs(showFigs==xx))
         y= usedMovs(idx).y(:,i);%-usedMovs(idx).y(1,i);
         t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
         thet=usedMovs(idx).rot(:,i);
-
-        plot(x,y); 
-        title('track'); 
-        xlabel('x (m)','interpreter','latex'); 
+        
+        plot(x,y);
+        title('track');
+        xlabel('x (m)','interpreter','latex');
         ylabel('y (m)','interpreter','latex');
         
         x=x-x(1);
         y=y-y(1);
         thet=thet-thet(1);
-%         plot(x,y);
+        %         plot(x,y);
         [b,a]=butter(6,1/120*2*12,'low');
         x=filter(b,a,x);  %filtered signal
         y=filter(b,a,y);  %filtered signal
         thet=filter(b,a,thet);  %filtered signal
-%         plot(x,y);
+        %         plot(x,y);
         subplot(2,1,1);
         title('$\int\sqrt{dx^2+dy^2}$','interpreter','latex')
         hold on;
-
+        
         dx=diff(x); dy=diff(y);
         q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
         plot(t,q,'linewidth',lw);
@@ -1741,7 +1805,7 @@ if(showFigs(showFigs==xx))
     pts('plotted: ',usedMovs(idx).fname);
     %     xlabel('x (m)');
     %     ylabel('y (m)');
-
+    
     %     axis equal
     
 end
@@ -1755,38 +1819,38 @@ if(showFigs(showFigs==xx))
     idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     GTTAll=[];
-for k=1:N
-    GTT=[];
-    for i=1:size(usedMovs(k).x,2) %for the number of smarticles       
-        x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
-        y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
-        t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
-        thet=usedMovs(k).rot(1:minT,i);
-        
-        x=x-x(1);
-        y=y-y(1);
-        thet=thet-thet(1);
-        [b,a]=butter(6,1/120*2*12,'low');
-        x=filter(b,a,x);  %filtered signal
-        y=filter(b,a,y);  %filtered signal
-        thet=filter(b,a,thet);  %filtered signal
-%         
-        dx=diff(x); dy=diff(y);dr=diff(thet);
-        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
-        r=[0; cumsum(sqrt(dr.^2))];
-        GTT(:,i)=q;
-        GTR(:,i)=r;
+    for k=1:N
+        GTT=[];
+        for i=1:size(usedMovs(k).x,2) %for the number of smarticles
+            x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+            y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+            t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
+            thet=usedMovs(k).rot(1:minT,i);
+            
+            x=x-x(1);
+            y=y-y(1);
+            thet=thet-thet(1);
+            [b,a]=butter(6,1/120*2*12,'low');
+            x=filter(b,a,x);  %filtered signal
+            y=filter(b,a,y);  %filtered signal
+            thet=filter(b,a,thet);  %filtered signal
+            %
+            dx=diff(x); dy=diff(y);dr=diff(thet);
+            q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+            r=[0; cumsum(sqrt(dr.^2))];
+            GTT(:,i)=q;
+            GTR(:,i)=r;
+        end
+        GTTAll(:,k)=mean(GTT,2); %translational granular temp
+        GTRAll(:,k)=mean(GTR,2); %translational granular temp
+        %     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
+        plot(t,GTTAll(:,k));
+        plot(t,GTRAll(:,k),'--');
     end
-    GTTAll(:,k)=mean(GTT,2); %translational granular temp
-    GTRAll(:,k)=mean(GTR,2); %translational granular temp
-%     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
-    plot(t,GTTAll(:,k));
-    plot(t,GTRAll(:,k),'--');
-end
     plot(t,mean(GTTAll,2),'k','linewidth',2);
     xlabel('time (s)','interpreter','latex');
     ylabel('displacement,rotation (cm,rads)','interpreter','latex');
-%     plot(t,mean(GTRAll,2),'--k','linewidth',2);
+    %     plot(t,mean(GTRAll,2),'--k','linewidth',2);
 end
 %% 35. 31 but linear histogram version
 xx=35;
@@ -1794,7 +1858,7 @@ if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
     L=length(usedMovs);
-
+    
     minT=1e10;
     nn=zeros(length(usedMovs),2);
     for i=1:length(usedMovs)
@@ -1850,55 +1914,55 @@ if(showFigs(showFigs==xx))
     hold on;
     
     theta=atan2(nn(:,2),nn(:,1));
-%     %     plot(nn(:,1),nn(:,2),'o');
-%     clf;
-%     polarhistogram(theta,10)
-%     hold on;
-% histogram(theta)
-top=theta(theta>0);
-bott= theta(theta<=0);
-bins=10;
-edges=linspace(0,1,bins+1);
-
-[NT,~]=histcounts(top,bins);
-[NB,~]=histcounts(-bott,bins);
-ticks=linspace(0,1,5);
-
-set(gca,'xticklabel',{'0','\pi/4','\pi/2','3\pi/2','\pi'},'xtick',ticks)
-xlim([-0.1,1.1])
-% ax1 = gca; % current axes
-% ax1.XColor='k';
-% set(ax1,'XAxisLocation','top');
-% ax2 = axes('Position',ax1_pos,...
-%     'XAxisLocation','bottom',...
-%     'YAxisLocation','right',...
-%     'Color','none');
-% 
-% 
-% 
-% 
-% ax1.XTick=(ticks);
-% ax1.XTickLabel={'0','\pi/4','\pi/2','3\pi/2','\pi'};
-% 
-% 
-% 
-% 
-% ax2.XTick=(ticks);
-% ax2.XTickLabel={'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'};
-% ax2.XColor = 'r';
-% ax2.YColor = 'none';
-% 
-% 
-% hold on;
-% h=bar([1:bins]./bins,NT,'parent',ax1,'facecolor','k');
-% hold on;
-% h2=bar([1:bins]./bins,NB,'parent',ax2,'facecolor','r');
-
-% bar([1:bins],-NB/pi,'parent',ax1);
-wid=.95;%bar width
-h=bar([1:bins]./bins,NT,wid,'facecolor','k');
-h=bar([1:bins]./bins,-NB,wid,'facecolor','r');
-
+    %     %     plot(nn(:,1),nn(:,2),'o');
+    %     clf;
+    %     polarhistogram(theta,10)
+    %     hold on;
+    % histogram(theta)
+    top=theta(theta>0);
+    bott= theta(theta<=0);
+    bins=10;
+    edges=linspace(0,1,bins+1);
+    
+    [NT,~]=histcounts(top,bins);
+    [NB,~]=histcounts(-bott,bins);
+    ticks=linspace(0,1,5);
+    
+    set(gca,'xticklabel',{'0','\pi/4','\pi/2','3\pi/2','\pi'},'xtick',ticks)
+    xlim([-0.1,1.1])
+    % ax1 = gca; % current axes
+    % ax1.XColor='k';
+    % set(ax1,'XAxisLocation','top');
+    % ax2 = axes('Position',ax1_pos,...
+    %     'XAxisLocation','bottom',...
+    %     'YAxisLocation','right',...
+    %     'Color','none');
+    %
+    %
+    %
+    %
+    % ax1.XTick=(ticks);
+    % ax1.XTickLabel={'0','\pi/4','\pi/2','3\pi/2','\pi'};
+    %
+    %
+    %
+    %
+    % ax2.XTick=(ticks);
+    % ax2.XTickLabel={'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'};
+    % ax2.XColor = 'r';
+    % ax2.YColor = 'none';
+    %
+    %
+    % hold on;
+    % h=bar([1:bins]./bins,NT,'parent',ax1,'facecolor','k');
+    % hold on;
+    % h2=bar([1:bins]./bins,NB,'parent',ax2,'facecolor','r');
+    
+    % bar([1:bins],-NB/pi,'parent',ax1);
+    wid=.95;%bar width
+    h=bar([1:bins]./bins,NT,wid,'facecolor','k');
+    h=bar([1:bins]./bins,-NB,wid,'facecolor','r');
+    
 end
 
 %% 36. 31 but linear histogram with seperate axes
@@ -1907,7 +1971,7 @@ if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
     L=length(usedMovs);
-
+    
     minT=1e10;
     nn=zeros(length(usedMovs),2);
     for i=1:length(usedMovs)
@@ -1963,88 +2027,123 @@ if(showFigs(showFigs==xx))
     hold on;
     
     theta=atan2(nn(:,2),nn(:,1));
-%     %     plot(nn(:,1),nn(:,2),'o');
-%     clf;
-%     polarhistogram(theta,10)
-%     hold on;
-% histogram(theta)
-top=theta(theta>0);
-bott= theta(theta<=0);
-bins=10;
-edges=linspace(0,1,bins+1);
-
-[NT,~]=histcounts(top,bins);
-[NB,~]=histcounts(-bott,bins);
-ticks=linspace(0,1,5);
-wid=.95;%bar width
-
-set(gca,'xticklabel',{'0','\pi/4','\pi/2','3\pi/2','\pi'},'xtick',ticks)
-
-
-ax1 = gca; % current axes
-ax1_pos = ax1.Position; % position of first axes
-% [0 0.5 1.0 0.5]
-set(ax1,'OuterPosition',[0 0.5 1.0 0.5],...
-    'XDir','reverse',...
-    'XAxisLocation','bottom',...
-    'XColor','k',...
-    'xlim',[-0.1,1.1],...
-    'box','on');
-
-% ax1.XDir='reverse';
-
-
-% ax1.OuterPosition=[0 0.5 1.0 0.5];
-h1=bar([1:bins]./bins,NT,wid,'facecolor','k','parent',ax1);
-% set();
-
-
-% ,'OuterPosition',[0 0 1.0 0.5],...
-ax2 = axes('Position',[0.1300,0.0550,0.7750 0.4075],...
-    'XAxisLocation','top',...
-    'YAxisLocation','left',...
-    'XDir','reverse',...
-    'xticklabel',{'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'},...
-    'xtick',ticks,...
-    'xlim',[-0.1,1.1],...
-     'box','on');
-hold on;
-% set(ax2,'XAxisLocation','bottom');
-
-
-
-% h1=bar([1:bins]./bins,NT,wid,'facecolor','k','parent',ax1);
-
-% ax1 = gca; % current axes
-% ax1.XColor='k';
-% set(ax1,'XAxisLocation','top');
-% ax2 = axes('Position',ax1_pos,...
-%     'XAxisLocation','bottom',...
-%     'YAxisLocation','right',...
-%     'Color','none');
-% 
-% 
-% 
-% 
-% ax1.XTick=(ticks);
-% ax1.XTickLabel={'0','\pi/4','\pi/2','3\pi/2','\pi'};
-% 
-% 
-% 
-% 
-% ax2.XTick=(ticks);
-% ax2.XTickLabel={'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'};
-% ax2.XColor = 'r';
-% ax2.YColor = 'none';
-% 
-% 
-% hold on;
-% h=bar([1:bins]./bins,NT,'parent',ax1,'facecolor','k');
-% hold on;
-% h2=bar([1:bins]./bins,NB,'parent',ax2,'facecolor','r');
-
-% bar([1:bins],-NB/pi,'parent',ax1);
-
-h=bar([1:bins]./bins,-NB,wid,'facecolor','r','parent',ax2);
-
+    %     %     plot(nn(:,1),nn(:,2),'o');
+    %     clf;
+    %     polarhistogram(theta,10)
+    %     hold on;
+    % histogram(theta)
+    top=theta(theta>0);
+    bott= theta(theta<=0);
+    bins=10;
+    edges=linspace(0,1,bins+1);
+    
+    [NT,~]=histcounts(top,bins);
+    [NB,~]=histcounts(-bott,bins);
+    ticks=linspace(0,1,5);
+    wid=.95;%bar width
+    
+    set(gca,'xticklabel',{'0','\pi/4','\pi/2','3\pi/2','\pi'},'xtick',ticks)
+    
+    
+    ax1 = gca; % current axes
+    ax1_pos = ax1.Position; % position of first axes
+    % [0 0.5 1.0 0.5]
+    set(ax1,'OuterPosition',[0 0.5 1.0 0.5],...
+        'XDir','reverse',...
+        'XAxisLocation','bottom',...
+        'XColor','k',...
+        'xlim',[-0.1,1.1],...
+        'box','on');
+    
+    % ax1.XDir='reverse';
+    
+    
+    % ax1.OuterPosition=[0 0.5 1.0 0.5];
+    h1=bar([1:bins]./bins,NT,wid,'facecolor','k','parent',ax1);
+    % set();
+    
+    
+    % ,'OuterPosition',[0 0 1.0 0.5],...
+    ax2 = axes('Position',[0.1300,0.0550,0.7750 0.4075],...
+        'XAxisLocation','top',...
+        'YAxisLocation','left',...
+        'XDir','reverse',...
+        'xticklabel',{'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'},...
+        'xtick',ticks,...
+        'xlim',[-0.1,1.1],...
+        'box','on');
+    hold on;
+    % set(ax2,'XAxisLocation','bottom');
+    
+    
+    
+    % h1=bar([1:bins]./bins,NT,wid,'facecolor','k','parent',ax1);
+    
+    % ax1 = gca; % current axes
+    % ax1.XColor='k';
+    % set(ax1,'XAxisLocation','top');
+    % ax2 = axes('Position',ax1_pos,...
+    %     'XAxisLocation','bottom',...
+    %     'YAxisLocation','right',...
+    %     'Color','none');
+    %
+    %
+    %
+    %
+    % ax1.XTick=(ticks);
+    % ax1.XTickLabel={'0','\pi/4','\pi/2','3\pi/2','\pi'};
+    %
+    %
+    %
+    %
+    % ax2.XTick=(ticks);
+    % ax2.XTickLabel={'0','-\pi/4','-\pi/2','-3\pi/2','-\pi'};
+    % ax2.XColor = 'r';
+    % ax2.YColor = 'none';
+    %
+    %
+    % hold on;
+    % h=bar([1:bins]./bins,NT,'parent',ax1,'facecolor','k');
+    % hold on;
+    % h2=bar([1:bins]./bins,NB,'parent',ax2,'facecolor','r');
+    
+    % bar([1:bins],-NB/pi,'parent',ax1);
+    
+    h=bar([1:bins]./bins,-NB,wid,'facecolor','r','parent',ax2);
+    
+end
+%% 37. plot from table
+xx=37;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    xmax=3.5;     xlim([0,xmax]);
+    H=plot(xlim,[0,0],'k');
+    load('ssDataComb.mat');
+    H.Annotation.LegendInformation.IconDisplayStyle='off';    
+    errorbar(ssData.mRat,ssData.datMean,ssData.datVar);
+    errorbar(ssData.mRat,ssData.datMean,ssData.datStd);
+    errorbar(ssData.mRat,ssData.datMean,ssData.datErr);
+    legend({'var','std','err'});
+    xlabel('m_{inactive}/m_{ring}');
+    ylabel('velocity ');
+    figText(gcf,16);
+    
+    figure(38)
+    hold on;
+    subplot(1,2,1);
+    plot(ssData.datStd,ssData.mRat,'o-');
+    xlabel('std(velocity)')
+    ylabel('m_{inactive}/m_{ring}');
+     subplot(1,2,2);
+    plot(ssData.mRat,ssData.datStd,'o-');
+    xlabel('m_{inactive}/m_{ring}')
+    ylabel('std(velocity)');
+    
+    figure(39)
+    hold on;
+    plot(ssData.mRat,ssData.towardsInactive*100,'o-');
+    plot([0,xmax],[50 50],'r');
+    xlabel('m_{inactive}/m_{ring}')
+    ylabel('Towards Inactive (%)');
 end
