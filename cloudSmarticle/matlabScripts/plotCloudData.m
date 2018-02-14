@@ -4,9 +4,9 @@ clear all;
 
 % fold=uigetdir('A:\2DSmartData\');
 % f='A:\2DSmartData\singleSmarticleTrack';
-% f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\leftsquare\close packed';
+f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\';
 % f='A:\2DSmartData\cloud\cloud 9-30';
-f='A:\2DSmartData\cloud\cloud 9-30\'
+% f='A:\2DSmartData\cloud\cloud 9-30\'
 fold=uigetdir(f);
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
@@ -27,9 +27,11 @@ pts(fold);
 %*10. total path length vs time and theta vs time for single smarticle
 %*11. granular temperature v2
 %*12. compiled granular temperature data
-%*13. d<s>/dt 
+%*13. d<s>/dt
+%*14. rand amp vs. contact cycles
+%*15. plot phi final
 %************************************************************
-showFigs=[ 13];
+showFigs=[ 7 15];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -417,7 +419,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ind=2;
-    single = 0;
+    single = 0; % plotting out a single run
     
     %      figure(123123)
     %      [k,v]=convhull(R(:,1),R(:,2));
@@ -838,7 +840,112 @@ end
     xv=[0 200 400 600 800 1000];
 %     v=x(idx)
 %     vv=[  55.6667 44.6583 34.2667 71.0333 33.8500 39.8000];
-%     plot(xv,vv);
+% plot(xv,vv);
 end
 
-%% 14. plot fitted time constant vs rand amp
+%% 14. plot contact time vs rand amp 
+xx=14;
+if(showFigs(showFigs==xx))
+    
+    figure(xx); lw=2;
+    hold on;
+    
+cyc0= [9 7 4 3 4 2 4 3 25 30 7 6 2 3 2 1 3 1 2 2 7 24 2]; % 0 rand del
+cyc200=[0];
+cyc400=[3 7 11 5 8 7 11 21 8 19 4 8 5 10 5 20 4 24]; % 400 rand del
+cyc600=[0];
+cyc800=[0];
+cyc1000=[0];
+
+cyc={cyc0,cyc200,cyc400,cyc600,cyc800,cyc1000};
+mCyc=cellfun(@mean,cyc);
+eCyc=cellfun(@std,cyc);
+errCyc=eCyc./sqrt(cellfun(@length,cyc));
+del=[0 200 400 600 800 1000];
+
+errorbar(del,mCyc,eCyc);
+
+
+end
+
+%% 15 plot final phi
+xx=15;
+if(showFigs(showFigs==xx))
+    
+    figure(xx); lw=2;
+    hold on;
+
+
+    single = 0; % plotting out a single run
+    
+    finalPhi=zeros(N,1);
+    for(idx=1:N)
+        
+        %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
+        %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
+        V=zeros(1,length(usedMovs(idx).x));
+        for i=1:length(usedMovs(idx).x)
+            R=[usedMovs(idx).x(i,:)',usedMovs(idx).y(i,:)'];
+            [~,V(i)]=convhull(R(:,1),R(:,2));
+            
+        end
+        %         %last point is first point
+        %         rI(end,:,idx)=[usedMovs(idx).x(1,1)',usedMovs(idx).y(1,1)'];
+        %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
+        phi{idx}=V;
+    end
+    A=.051*.021; %area (l*w) of smarticle in m
+    n=size(usedMovs(idx).x,2);%number of particles
+    s=0.1428;%straight leg length of smarticle
+    otherAngs=(180-(1-2/n)*180)/2*pi/180;
+    sig=s*cos(otherAngs);%optitrack straight length of regular polygon
+    maxAreaOpti=1/4*n*sig^2*cot(pi/n); %max optitrack convex hull area
+    
+    if(single)
+        
+        warning('cutting off runs at 2 mins or 1440 frames for 30fps');
+%         finalPhi=[finalPhi,phival(end)];  
+        finalPhi=[finalPhi,phival(1440)];
+        
+        plot((1:length(phi{single}))./usedMovs(single).fps,phival);
+        id=single;
+    else
+        for j=1:length(phi)
+            phival=(A*n)./phi{j};
+            warning('cutting off runs at 2 mins or 1440 frames for 30fps');
+            finalPhi(j)=phival(1440);
+%             plot((1:length(phi{j}))./usedMovs(j).fps,phival);
+            meanx = mean(usedMovs(j).x(end,:));
+            meany = mean(usedMovs(j).y(end,:),2);
+            %                 allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
+        end
+        id=j;
+    end
+%     plot([0,usedMovs(id).t(end)],[n*A/maxAreaOpti,n*A/maxAreaOpti],'r--');
+    xlabel('gait type');
+    ylabel('\phi_f');
+    figText(gcf,16);
+    
+    LDcp=[0.2704 0.1936 0.1781 0.2119 0.2089];
+    LDlp=[0.1816 0.2332 0.2202 0.2178 0.1877 0.1926];
+    
+    LScp=[0.2480 0.1673 0.2000 0.1710 0.1809 0.1861];
+    LSlp=[0.1611 0.1985 0.3008 0.2783 0.2386 0.1588];
+    
+    RScp=[0.1756 0.2216 0.1501 0.1959 0.1948 0.1404 0.2919];
+   
+
+
+    
+    %mean distance btween points
+    finalPhi
+    mean(finalPhi)
+    xlim([0 6])
+    x=[1 2 3 4 5];
+    y=[mean(LDcp) mean(LDlp) mean(LScp) mean(LSlp) mean(RScp)];
+    yerr=[std(LDcp) std(LDlp) std(LScp) std(LSlp) std(RScp)];
+    set(gca,'xtick',[1 2 3 4 5],'xticklabel',{'LDcp','LDlp','LScp','LSlp','RScp'},'colororderindex',3);
+    bar(x,y);
+    errorbar(x,y,yerr,'.');
+
+    end
