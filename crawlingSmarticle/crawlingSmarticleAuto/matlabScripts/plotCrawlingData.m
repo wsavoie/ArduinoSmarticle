@@ -16,8 +16,9 @@ fold
 %* 4. plot only left or right
 %* 5. plot gait radius pic
 %* 6. plotting out x vs t for dan and phase shifting
+%* 7. fft of gait
 %************************************************************
-showFigs=[2];
+showFigs=[1 7];
 
 %params we wish to plot
 DIR=[]; RAD=[]; V=[];
@@ -73,8 +74,11 @@ if(showFigs(showFigs==xx))
     end
     hax1=gca;
     ind=1;
-    plot(usedMovs(D1(ind)).t,usedMovs(D1(ind)).x,'r','linewidth',lw);
-    plot(usedMovs(D2(ind)).t,usedMovs(D2(ind)).x,'k','linewidth',lw);
+    h1=plot(usedMovs(D1(ind)).t,usedMovs(D1(ind)).x,'r','linewidth',lw);
+    h2=plot(usedMovs(D2(ind)).t,usedMovs(D2(ind)).x,'k','linewidth',lw);
+    [x1]=MagnetGInput(h1,2);
+    [x2]=MagnetGInput(h2,2);
+    [diff(x1), diff(x2)]
     xlabel('time (s)');
     ylabel('displacement(m)');
     
@@ -123,9 +127,9 @@ if(showFigs(showFigs==xx))
     legend({'Exp (CCW)', 'Exp (CW)'});
     axis([10 90 0 30])
     figText(gcf,16);
-%     clearvars -except x1 x2 x3 y1 y2 y3
-%     d=get(gca,'children'); x2=d.XData; y2=d.YData;
-% plot(x1,-y1,'o-','linewidth',lw,'markerfacecolor','w')
+    %     clearvars -except x1 x2 x3 y1 y2 y3
+    %     d=get(gca,'children'); x2=d.XData; y2=d.YData;
+    % plot(x1,-y1,'o-','linewidth',lw,'markerfacecolor','w')
 end
 %% 3 get position and time of all gait high&low points for
 xx=3;
@@ -335,7 +339,7 @@ xx=6;
 if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
-    
+
     plot(usedMovs(100).t,usedMovs(100).x,'o');
     plot(usedMovs(101).t,-(usedMovs(101).x-usedMovs(100).x(1)),'o');
     
@@ -359,4 +363,46 @@ if(showFigs(showFigs==xx))
     %finding which peaks are better (more square/diamond)
     x=(9.55-8.1)/2+8.1; %these are particular peak locations in time
     
+end
+%% 7. fft of gait
+xx=7;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
+    ind=1;
+    
+    for i = 1:2
+        if(i==1)
+            dat=usedMovs(D1(ind));
+        else
+            dat=usedMovs(D2(ind));
+        end
+        Fs = 1/dat.t(2)            % Sampling frequency
+        t = dat.t;        % Time vector
+        L = length(t);             % Length of signal        
+        T = 1/Fs;             % Sampling period
+        
+        X=dat.x;
+%         X=sin(2*pi*1.5*t)+2*t;
+        k=(X(end)-X(1))/(t(end)-t(1));
+        X2=X-k.*t;
+        Y=fft(X2);
+        
+        P2 = abs(Y/L);
+        P1 = P2(1:L/2+1);
+        P1(2:end-1) = 2*P1(2:end-1);
+        f = Fs*(0:(L/2))/L;
+        plot(f,P1);
+        title('Single-Sided Amplitude Spectrum of X(t)')
+        xlabel('f (Hz)')
+        ylabel('|P1(f)|')
+
+        
+    end
+    %
+    %
+    %     plot(usedMovs(D1(ind)).t,usedMovs(D1(ind)).x,'r','linewidth',lw);
+    %     plot(usedMovs(D2(ind)).t,usedMovs(D2(ind)).x,'k','linewidth',lw);
+    %     xlabel('time (s)');
+    %     ylabel('displacement(m)');
 end

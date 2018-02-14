@@ -33,8 +33,8 @@ clear all;
 
 % fold=uigetdir('A:\2DSmartData\entangledData');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
-fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)\stretchAll 11-20 paperTrials\type4only';
-% fold='A:\2DSmartData\entangledData\12-6 multimark w=10';
+% fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)\stretchAll 11-20 paperTrials\type4only';
+fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
 freq=1000; %hz rate for polling F/T sensor
 fractD=0;%flag for fractData
 if (~exist(fullfile(fold,'dataOut.mat'),'file') && ~exist(fullfile(fold,'fractData.mat'),'file'))
@@ -67,7 +67,8 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 % strains=[65]/1000;
-types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
+% types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
+types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
 %%%%%%%%%%%%%%%%%%%%%%%%
 props={types strains Hs dels spds its vs};
 if ~isempty([props{:}])
@@ -101,8 +102,9 @@ for i=1:uN
 end
 [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
 end
-showFigs=[9 10]
-tpt=[1 1];
+% showFigs=[9 10]
+showFigs=[17 13]
+tpt=[2 2];
 %% 1. single force vs time with strain overlay
 xx=1;
 if(showFigs(showFigs==xx))
