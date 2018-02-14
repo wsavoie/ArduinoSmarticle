@@ -80,25 +80,33 @@ if ~isempty(ind) || data.textdata{r,6}=='W' %has ring rigid body
     ang=ang(1:dec:end,:);
     % pts('rigid body sys');
     
-
-    
-    nanIndsx=find(isnan(x));
-    while(nanIndsx)
-        x(nanIndsx)=x(nanIndsx-1);
-        nanIndsx=find(isnan(x));
+    allDat=[x,y,ang];
+    aa=find(isnan([x,y,ang]));%find if any nans
+    while(aa)
+    for(qq=1:size(allDat,2))
+        nanidx=find(isnan(allDat(:,qq)));
+        allDat(nanidx,qq)=allDat(nanidx-1,qq);
     end
-    
-    nanIndsy=find(isnan(y));
-    while(nanIndsy)
-        y(nanIndsy)=y(nanIndsy-1);
-        nanIndsy=find(isnan(y));
+    aa=find(isnan(allDat));
     end
-    
-    nanIndsrot=find(isnan(ang));
-    while(nanIndsrot)
-        ang(nanIndsrot)=ang(nanIndsrot-1);
-        nanIndsrot=find(isnan(ang));
-    end
+    [x,y,ang]=separateVec(allDat,1);
+%     nanIndsx=find(isnan(x));
+%     while(nanIndsx)
+%         x(nanIndsx)=x(nanIndsx-1);
+%         nanIndsx=find(isnan(x));
+%     end
+%     
+%     nanIndsy=find(isnan(y));
+%     while(nanIndsy)
+%         y(nanIndsy)=y(nanIndsy-1);
+%         nanIndsy=find(isnan(y));
+%     end
+%     
+%     nanIndsrot=find(isnan(ang));
+%     while(nanIndsrot)
+%         ang(nanIndsrot)=ang(nanIndsrot-1);
+%         nanIndsrot=find(isnan(ang));
+%     end
     
     comx=x;
     comy=y;
@@ -118,13 +126,25 @@ else
     z=z(1:dec:end,:);
     
     
-    nanIndsx=find(isnan(x));
-    nanIndsy=find(isnan(y));
-    nanIndsrot=find(isnan(ang));
-    
-    x(nanIndsx)=x(nanIndsx-1);
-    y(nanIndsy)=y(nanIndsy-1);
-    ang(nanIndsrot)=ang(nanIndsrot-1);
+%     nanIndsx=find(isnan(x));
+%     nanIndsy=find(isnan(y));
+%     nanIndsrot=find(isnan(ang));
+%     
+%     x(nanIndsx)=x(nanIndsx-1);
+%     y(nanIndsy)=y(nanIndsy-1);
+%     ang(nanIndsrot)=ang(nanIndsrot-1);
+
+    allDat=[x,y,ang];
+    aa=find(isnan([x,y,ang]));%find if any nans
+    while(aa)
+    for(qq=1:size(allDat,2))
+        nanidx=find(isnan(allDat(:,qq)));
+        allDat(nanidx,qq)=allDat(nanidx-1,qq);
+    end
+    aa=find(isnan(allDat));
+    end
+    [x,y,ang]=separateVec(allDat,1);
+
     comx=mean(x,2);
     comy=mean(y,2);
 end

@@ -15,6 +15,8 @@ if RIGIDBODYNAMES
     activeName= ' active';
     inactiveName=' inactive';
     
+    otherName=inactiveName;
+    
 else
     rigidBodyName = 'rigid body 1';
 end
@@ -37,7 +39,7 @@ steps = nMovs;
 idx=1;
 badIdx=0;
 failedAttempts=struct;
-warning('may want to change last argument in RIGIDBODYNAMES if statement (inactive, chord, etc.)')
+warning(['may want to change last argument in RIGIDBODYNAMES current name is ',otherName])
 for i=1:nMovs
     
     % for i =1:length(f)
@@ -48,9 +50,8 @@ for i=1:nMovs
     try
         [movs(idx).t,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).fps, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
         if RIGIDBODYNAMES
-            
             %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
-            [movs(idx).t,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).fps, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
+            [movs(idx).t,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).fps, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,otherName);
         end
         movs(idx).fname=f(i).name;
         movs(idx).conv=1;
