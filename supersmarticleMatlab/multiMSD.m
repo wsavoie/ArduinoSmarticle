@@ -2149,10 +2149,12 @@ if(showFigs(showFigs==xx))
 
     figure(40)
     hold on;
+    load('zachdat.mat');
     h=plot(topErr(:,1),topErr(:,2),'--');
     plot(bottErr(:,1),bottErr(:,2),'--','color',h.Color);
     plot(simData(:,1),simData(:,2),'-r','linewidth',2);
     plot(xlim,[0 0],'k');
+    errorbar(ssData.mRat,ssData.datMean,ssData.datStd);
     xlabel('mass ratio (m_i/m_{ring})');
     ylabel('Drift Velocity m/s');
 end
