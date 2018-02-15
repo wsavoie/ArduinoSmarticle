@@ -44,7 +44,7 @@ fold
 %*26. rotate each each track by the rotation of inactive smarticle OLDER
 %*27. for each msd traj get linear fit of log
 %*28. plot inactive particle position rotate by its rotation
-%*29. Rot each track by the rotation of inactive smart and project
+%*29. Rot each track by the rotation of inactive smart %%plot rotated%%
 %*30. partial Rot each track by the rotation of inactive smart and project
 %*31. rotate chord trajectory ring about chord
 %*32. plot rotation and euler displacement from center
@@ -53,6 +53,7 @@ fold
 %*35. 31 but linear histogram version
 %*36. 31 but linear histogram with seperate axes
 %*37-40. plot from table and zach data
+%*41. plot ring and smarticle trajectory together
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
@@ -1340,17 +1341,10 @@ if(showFigs(showFigs==xx))
     deltax=get(gca,'xlim');
     c=max(abs(deltax)); xlim([-c,c]);
     c=max(abs(y)); ylim([-c,c]);
-    axis equal
-    
-    axis([-.3 .3 -.3 .3]);
     deltax=xlim; y=ylim;
     %set(gca,'xtick',[-.5:.25:.5],'ytick',[-.5:.25:.5]);
     set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]); %same as 1
-    y=get(gca,'ylim'); deltax=get(gca,'xlim');
-    h=plot(deltax,[0,0],'r');
-    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-    h=plot([0,0],y,'r');
-    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+   
     %     for i=9
     %     xp = 0;
     %     yp = 0;
@@ -1433,8 +1427,13 @@ if(showFigs(showFigs==xx))
     ylabel('Along Axis of Inactive Smarticle (m)')
     title('Projected displacement');
     figText(gcf,14);
-    axis tight
-    
+    %     axis tight
+    axis equal
+    axis([-.35 .35 -.35 .35]);
+    h=plot(xlim,[0,0],'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    h=plot([0,0],ylim,'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
     
     
     figure(12524);
@@ -2146,13 +2145,81 @@ if(showFigs(showFigs==xx))
     plot([0,xmax],[50 50],'r');
     xlabel('m_{inactive}/m_{ring}')
     ylabel('Towards Inactive (%)');
-end
 
-figure(40)
-hold on;
-h=plot(topErr(:,1),topErr(:,2),'--');
-plot(bottErr(:,1),bottErr(:,2),'--','color',h.Color);
-plot(simData(:,1),simData(:,2),'-r','linewidth',2);
-plot(xlim,[0 0],'k');
-xlabel('mass ratio (m_i/m_{ring})');
-ylabel('Drift Velocity m/s');
+
+    figure(40)
+    hold on;
+    h=plot(topErr(:,1),topErr(:,2),'--');
+    plot(bottErr(:,1),bottErr(:,2),'--','color',h.Color);
+    plot(simData(:,1),simData(:,2),'-r','linewidth',2);
+    plot(xlim,[0 0],'k');
+    xlabel('mass ratio (m_i/m_{ring})');
+    ylabel('Drift Velocity m/s');
+end
+%% 41. plot ring and smarticle trajectory together
+xx=41;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    idx=3; %index of movie to look at
+    %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+    for k=idx
+        GTT=[];
+        for i=1:size(usedMovs(k).x,2) %for the number of smarticles
+            x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+            y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+            t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
+            thet=usedMovs(k).rot(1:minT,i);
+            ix= usedMovs(k).Ix(1:minT,i);%-usedMovs(idx).x(1,i);
+            iy= usedMovs(k).Iy(1:minT,i);%-usedMovs(idx).y(1,i);
+            irot=usedMovs(k).Irot(1:minT,i);%-usedMovs(idx).y(1,i);
+            
+            x=x-ix(1);
+            y=y-iy(1);
+            thet=thet-irot(1);
+            
+            ix=ix-ix(1);
+            iy=iy-iy(1);
+            irot=irot-irot(1);
+            
+            [b,a]=butter(6,1/120*2*12,'low');
+%             x=filter(b,a,x);  %filtered signal
+%             y=filter(b,a,y);  %filtered signal
+%             thet=filter(b,a,thet);  %filtered signal
+%             
+%             ix=filter(b,a,ix);  %filtered signal
+%             iy=filter(b,a,iy);  %filtered signal
+%             irot=filter(b,a,irot);  %filtered signal
+            
+            %
+            
+           
+
+  
+            
+            
+            %plot ring trajectory
+            plot(x,y);
+            plot(x(1),y(1),'o','markerfacecolor','k','markeredgecolor','none');
+            plot(x(end),y(end),'o','markerfacecolor','r','markeredgecolor','none');
+            
+            %plot active particle trajectory
+            set(gca,'colororderindex',5);
+            plot(ix,iy);
+            plot(ix(end),iy(end),'o','markerfacecolor','r','markeredgecolor','none');
+            
+            %plot starting point and initial ring placement
+            ringRad=.1905/2;
+            plot(0,0,'o','markerfacecolor','k','markeredgecolor','none');
+            h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+%             set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+         
+        end
+    end
+    xlabel('X(m)');
+    ylabel('Y(m)');
+    
+    axis equal
+    axis([-0.2 0.2 -0.2 0.2])
+    %     plot(t,mean(GTRAll,2),'--k','linewidth',2);
+end
