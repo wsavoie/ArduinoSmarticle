@@ -1,4 +1,4 @@
-vidOn=0;
+vidOn=1;
 t=120; %seconds
 client = natnet();
 

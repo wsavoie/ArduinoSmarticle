@@ -4,9 +4,9 @@ clear all;
 
 % fold=uigetdir('A:\2DSmartData\');
 % f='A:\2DSmartData\singleSmarticleTrack';
-f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\';
+% f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\';
 % f='A:\2DSmartData\cloud\cloud 9-30';
-% f='A:\2DSmartData\cloud\cloud 9-30\'
+f='A:\2DSmartData\cloud\cloud 9-30\'
 fold=uigetdir(f);
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
@@ -31,7 +31,7 @@ pts(fold);
 %*14. rand amp vs. contact cycles
 %*15. plot phi final
 %************************************************************
-showFigs=[ 7 15];
+showFigs=[ 7 11 13];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -839,8 +839,8 @@ end
     idx=max(find(abs(yf-yi)>=0.66*yi));
     xv=[0 200 400 600 800 1000];
 %     v=x(idx)
-%     vv=[  55.6667 44.6583 34.2667 71.0333 33.8500 39.8000];
-% plot(xv,vv);
+    vv=[  55.6667 44.6583 34.2667 71.0333 33.8500 39.8000];
+plot(xv,vv);
 end
 
 %% 14. plot contact time vs rand amp 
@@ -879,6 +879,7 @@ if(showFigs(showFigs==xx))
     single = 0; % plotting out a single run
     
     finalPhi=zeros(N,1);
+    iPhi=zeros(N,1);
     for(idx=1:N)
         
         %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
@@ -900,20 +901,20 @@ if(showFigs(showFigs==xx))
     otherAngs=(180-(1-2/n)*180)/2*pi/180;
     sig=s*cos(otherAngs);%optitrack straight length of regular polygon
     maxAreaOpti=1/4*n*sig^2*cot(pi/n); %max optitrack convex hull area
-    
+%      warning('cutting off runs at 2 mins or 1440 frames for 30fps');
     if(single)
         
-        warning('cutting off runs at 2 mins or 1440 frames for 30fps');
+       
 %         finalPhi=[finalPhi,phival(end)];  
-        finalPhi=[finalPhi,phival(1440)];
+        finalPhi=[finalPhi,phival(end)];
         
         plot((1:length(phi{single}))./usedMovs(single).fps,phival);
         id=single;
     else
         for j=1:length(phi)
             phival=(A*n)./phi{j};
-            warning('cutting off runs at 2 mins or 1440 frames for 30fps');
-            finalPhi(j)=phival(1440);
+            finalPhi(j)=phival(end);
+            iPhi(j)=phival(1);
 %             plot((1:length(phi{j}))./usedMovs(j).fps,phival);
             meanx = mean(usedMovs(j).x(end,:));
             meany = mean(usedMovs(j).y(end,:),2);
@@ -938,8 +939,9 @@ if(showFigs(showFigs==xx))
 
     
     %mean distance btween points
-    finalPhi
-    mean(finalPhi)
+%     finalPhi
+    pts(mean(finalPhi),'+-',std(finalPhi));
+    pts(mean(iPhi-finalPhi),'+-',std(iPhi-finalPhi));
     xlim([0 6])
     x=[1 2 3 4 5];
     y=[mean(LDcp) mean(LDlp) mean(LScp) mean(LSlp) mean(RScp)];
