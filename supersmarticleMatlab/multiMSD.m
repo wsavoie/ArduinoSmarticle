@@ -52,7 +52,7 @@ fold
 %*34. granular temperature v2
 %*35. 31 but linear histogram version
 %*36. 31 but linear histogram with seperate axes
-%*37. plot from table
+%*37-40. plot from table and zach data
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
@@ -2147,3 +2147,12 @@ if(showFigs(showFigs==xx))
     xlabel('m_{inactive}/m_{ring}')
     ylabel('Towards Inactive (%)');
 end
+
+figure(40)
+hold on;
+h=plot(topErr(:,1),topErr(:,2),'--');
+plot(bottErr(:,1),bottErr(:,2),'--','color',h.Color);
+plot(simData(:,1),simData(:,2),'-r','linewidth',2);
+plot(xlim,[0 0],'k');
+xlabel('mass ratio (m_i/m_{ring})');
+ylabel('Drift Velocity m/s');
