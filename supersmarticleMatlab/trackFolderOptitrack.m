@@ -15,7 +15,7 @@ if RIGIDBODYNAMES
     activeName= ' active';
     inactiveName=' inactive';
     
-    otherName=inactiveName;
+    otherName=activeName;
     
 else
     rigidBodyName = 'rigid body 1';

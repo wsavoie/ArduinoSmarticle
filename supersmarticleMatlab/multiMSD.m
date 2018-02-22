@@ -4,12 +4,15 @@ close all;
 
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\superlightring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\metal_singleInactive_1-1_frame_inactive');
-fold=uigetdir('A:\2DSmartData\');
-% fold=uigetdir('A:\2DSmartData\chordRing');
+
+
 % fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\superlightRing\extraMassAdded');
 % fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\metal_allActive\all');
+
+% fold=uigetdir('A:\2DSmartData\');
+fold=uigetdir('A:\2DSmartData\superheavyRing\redSmarts');
 load(fullfile(fold,'movieInfo.mat'));
-figure(1)
+% figure(1)
 SPACE_UNITS = 'm';
 TIME_UNITS = 's';
 fold
@@ -54,19 +57,30 @@ fold
 %*36. 31 but linear histogram with seperate axes
 %*37-40. plot from table and zach data
 %*41. plot ring and smarticle trajectory together
+%*42. polar histogram for all active systems
+%*43. msd for rotated trajectories
+%*44. new MSD analysis for non-directed
+%*45-46. plot mean vcorr in non-rotated and rotated frame
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
-showFigs=[1 29 37];
+showFigs=[45];
 % showFigs=[1 29 37];
-ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 
+maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
+ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
+ma2 = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 %define curve params [] for all
 spk=[]; smart=[]; gait=[]; rob=[]; v=[];
 
 props={spk smart gait rob v};
 inds=1;
 minT=100000000000;%initalize as a huge number
+
+% [fb,fa]=butter(4,1/120*2*12,'low');
+
+samp=10;
+[fb,fa]=butter(6,2/(10/2),'low');
 for i=1:length(movs)
     
     cond=true;
@@ -85,6 +99,11 @@ for i=1:length(movs)
         usedMovs(inds)=movs(i);
         inds=inds+1;
         minT=min(length(movs(i).t),minT);
+        
+        fpos=movs(i).data(1);
+        fpos{1}(:,2)=filter(fb,fa,fpos{1}(:,2));  %filtered signal
+        fpos{1}(:,3)=filter(fb,fa,fpos{1}(:,3));  %filtered signal
+        maf=maf.addAll(fpos);
     end
 end
 if(isempty(ma.tracks))
@@ -158,7 +177,8 @@ if(showFigs(showFigs==xx))
     %     h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
     %     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
     figText(gcf,14)
-    
+    ringRad=.1905/2;
+    h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
 end
 %% 2 plot MSD
 xx=2;
@@ -413,7 +433,7 @@ if(showFigs(showFigs==xx))
     hold on;
     ggg=790;
     
-    fitT=1; %linear = 0; exp=1;
+    fitT=0; %linear = 0; exp=1;
     
     if(isempty(ma.msd))
         ma = ma.computeMSD;
@@ -1233,6 +1253,16 @@ if(showFigs(showFigs==xx))
     %     plot(lx, 2*(lx)-10)
     pts('(*)mean of powers=', mean(fs),' stdev=', std(fs),'  power of mean=',pom.p1);
     % std(fs);
+    
+    
+    ma = ma.fitMSD;
+    good_enough_fit = ma.lfit.r2fit > 0.8;
+    Dmean = mean( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+    Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+    fprintf('Found D = %.3e ± %.3e (mean ± std, N = %d)\n', ...
+        Dmean, Dstd, sum(good_enough_fit));
+    
+    
 end
 %% 28 plot inactive particle position rotate by its rotation
 xx=28;
@@ -1344,7 +1374,7 @@ if(showFigs(showFigs==xx))
     deltax=xlim; y=ylim;
     %set(gca,'xtick',[-.5:.25:.5],'ytick',[-.5:.25:.5]);
     set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]); %same as 1
-   
+    
     %     for i=9
     %     xp = 0;
     %     yp = 0;
@@ -1461,20 +1491,20 @@ if(showFigs(showFigs==xx))
     
     
     %%%%
-        load('ssData');
-        trialName='shortv3';
-        mi=34;
-        mr=29.5;
-        mRat=mi/mr;
-        trialsAmt=length(usedMovs);
-        datMean=mean(nn);
-        datStd=std(nn);
-        datVar=datStd.^2;
-        datErr=datStd/sqrt(trialsAmt);
-        towardsInactive=correctDir/L;
-        ssData2=table(mi,mr,mRat,trialsAmt,datMean,datStd,datVar,datErr,towardsInactive,'RowNames',{trialName});
-        ssData=[ssData;ssData2];
-        save('ssData3','ssData');
+    load('ssData');
+    trialName='shortv3';
+    mi=34;
+    mr=29.5;
+    mRat=mi/mr;
+    trialsAmt=length(usedMovs);
+    datMean=mean(nn);
+    datStd=std(nn);
+    datVar=datStd.^2;
+    datErr=datStd/sqrt(trialsAmt);
+    towardsInactive=correctDir/L;
+    ssData2=table(mi,mr,mRat,trialsAmt,datMean,datStd,datVar,datErr,towardsInactive,'RowNames',{trialName});
+    ssData=[ssData;ssData2];
+    save('ssData3','ssData');
 end
 %% 30. partial Rot each track by the rotation of inactive smart and project
 xx=30;
@@ -1765,10 +1795,10 @@ if(showFigs(showFigs==xx))
         y=y-y(1);
         thet=thet-thet(1);
         %         plot(x,y);
-        [b,a]=butter(6,1/120*2*12,'low');
-        x=filter(b,a,x);  %filtered signal
-        y=filter(b,a,y);  %filtered signal
-        thet=filter(b,a,thet);  %filtered signal
+%         [fb,fa]=butter(6,1/120*2*12,'low');
+        x=filter(fb,fa,x);  %filtered signal
+        y=filter(fb,fa,y);  %filtered signal
+        thet=filter(fb,fa,thet);  %filtered signal
         %         plot(x,y);
         subplot(2,1,1);
         title('$\int\sqrt{dx^2+dy^2}$','interpreter','latex')
@@ -1829,10 +1859,10 @@ if(showFigs(showFigs==xx))
             x=x-x(1);
             y=y-y(1);
             thet=thet-thet(1);
-            [b,a]=butter(6,1/120*2*12,'low');
-            x=filter(b,a,x);  %filtered signal
-            y=filter(b,a,y);  %filtered signal
-            thet=filter(b,a,thet);  %filtered signal
+%             [fb,fa]=butter(6,1/120*2*12,'low');
+            x=filter(fb,fa,x);  %filtered signal
+            y=filter(fb,fa,y);  %filtered signal
+            thet=filter(fb,fa,thet);  %filtered signal
             %
             dx=diff(x); dy=diff(y);dr=diff(thet);
             q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
@@ -2119,7 +2149,7 @@ if(showFigs(showFigs==xx))
     xmax=3.5;     xlim([0,xmax]);
     H=plot(xlim,[0,0],'k');
     load('ssDataComb.mat');
-    H.Annotation.LegendInformation.IconDisplayStyle='off';    
+    H.Annotation.LegendInformation.IconDisplayStyle='off';
     errorbar(ssData.mRat,ssData.datMean,ssData.datVar);
     errorbar(ssData.mRat,ssData.datMean,ssData.datStd);
     errorbar(ssData.mRat,ssData.datMean,ssData.datErr);
@@ -2134,7 +2164,7 @@ if(showFigs(showFigs==xx))
     plot(ssData.datStd,ssData.mRat,'o-');
     xlabel('std(velocity)')
     ylabel('m_{inactive}/m_{ring}');
-     subplot(1,2,2);
+    subplot(1,2,2);
     plot(ssData.mRat,ssData.datStd,'o-');
     xlabel('m_{inactive}/m_{ring}')
     ylabel('std(velocity)');
@@ -2145,8 +2175,8 @@ if(showFigs(showFigs==xx))
     plot([0,xmax],[50 50],'r');
     xlabel('m_{inactive}/m_{ring}')
     ylabel('Towards Inactive (%)');
-
-
+    
+    
     figure(40)
     hold on;
     load('zachdat.mat');
@@ -2163,41 +2193,42 @@ xx=41;
 if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
-    idx=3; %index of movie to look at
+    idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     for k=idx
         GTT=[];
         for i=1:size(usedMovs(k).x,2) %for the number of smarticles
-            x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
-            y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+            xo= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+            yo= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
             t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
-            thet=usedMovs(k).rot(1:minT,i);
-            ix= usedMovs(k).Ix(1:minT,i);%-usedMovs(idx).x(1,i);
-            iy= usedMovs(k).Iy(1:minT,i);%-usedMovs(idx).y(1,i);
-            irot=usedMovs(k).Irot(1:minT,i);%-usedMovs(idx).y(1,i);
+            theto=usedMovs(k).rot(1:minT,i);
+            ixo= usedMovs(k).Ix(1:minT,i);%-usedMovs(idx).x(1,i);
+            iyo= usedMovs(k).Iy(1:minT,i);%-usedMovs(idx).y(1,i);
+            iroto=usedMovs(k).Irot(1:minT,i);%-usedMovs(idx).y(1,i);
             
-            x=x-ix(1);
-            y=y-iy(1);
-            thet=thet-irot(1);
             
-            ix=ix-ix(1);
-            iy=iy-iy(1);
-            irot=irot-irot(1);
+            x=xo-xo(1);
+            y=yo-yo(1);
+            thet=theto-theto(1);
             
-            [b,a]=butter(6,1/120*2*12,'low');
-%             x=filter(b,a,x);  %filtered signal
-%             y=filter(b,a,y);  %filtered signal
-%             thet=filter(b,a,thet);  %filtered signal
-%             
-%             ix=filter(b,a,ix);  %filtered signal
-%             iy=filter(b,a,iy);  %filtered signal
-%             irot=filter(b,a,irot);  %filtered signal
+            ix=ixo-xo(1);
+            iy=iyo-yo(1);
+            irot=iroto-theto(1);
+            
+%             [fb,fa]=butter(6,1/120*2*12,'low');
+            x=filter(fb,fa,x);  %filtered signal
+            y=filter(fb,fa,y);  %filtered signal
+            thet=filter(fb,fa,thet);  %filtered signal
+
+            ix=filter(fb,fa,ix);  %filtered signal
+            iy=filter(fb,fa,iy);  %filtered signal
+            irot=filter(fb,fa,irot);  %filtered signal
             
             %
             
-           
-
-  
+            
+            
+            
             
             
             %plot ring trajectory
@@ -2214,8 +2245,8 @@ if(showFigs(showFigs==xx))
             ringRad=.1905/2;
             plot(0,0,'o','markerfacecolor','k','markeredgecolor','none');
             h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
-%             set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-         
+            %             set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+            
         end
     end
     xlabel('X(m)');
@@ -2224,4 +2255,379 @@ if(showFigs(showFigs==xx))
     axis equal
     axis([-0.2 0.2 -0.2 0.2])
     %     plot(t,mean(GTRAll,2),'--k','linewidth',2);
+end
+%% 42. polar histogram for all active systems
+xx=42;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    hax1=gca;
+    %     ma.plotTracks
+    ma.labelPlotTracks
+    %     text(0,0+.01,'start')
+    %     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
+    y=get(gca,'ylim');
+    deltax=get(gca,'xlim');
+    c=max(abs(deltax)); xlim([-c,c]);
+    c=max(abs(y)); ylim([-c,c]);
+    axis equal
+    
+    axis([-.3 .3 -.3 .3]);
+    deltax=xlim; y=ylim;
+    %set(gca,'xtick',[-.5:.25:.5],'ytick',[-.5:.25:.5]);
+    set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]); %same as 1
+    y=get(gca,'ylim'); deltax=get(gca,'xlim');
+    h=plot(deltax,[0,0],'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    h=plot([0,0],y,'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    %     for i=9
+    %     xp = 0;
+    %     yp = 0;
+    L=length(usedMovs);
+    correctDir=0;
+    minT=1e10;
+    nn=zeros(length(usedMovs),2);
+    for i=1:length(usedMovs)
+        minT=min(length(usedMovs(i).t),minT);
+        % dpos=diff(pos);
+        pos = [usedMovs(i).x, usedMovs(i).y];
+        rpos = bsxfun(@minus, pos, pos(1,:));
+        
+        % Subtract initial position
+        % Inactive particle position
+        iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+        iapos = bsxfun(@minus, iapos, pos(1,:));
+        
+        %get rid of nans in iapos and rpos
+        [nanr,~]=find(isnan(iapos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+            end
+        end
+        [nanr,~]=find(isnan(rpos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+            end
+        end
+        
+        
+        nn(i,[1,2])=rpos(end,[1:2]);
+        
+    end
+    hold on;
+    theta=atan2(nn(:,2),nn(:,1));
+    %     plot(nn(:,1),nn(:,2),'o');
+    clf;
+    polarhistogram(theta,20);
+    set(gca,'ThetaAxisUnits','radians');
+    
+    hold on;
+end
+%% 43. msd for rotated trajectories
+xx=43;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    ma2 = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
+    fitT=0; %linear = 1; parab=0;
+    filtz=0; %0=no filtering, 1= filtering
+    
+    if(isempty(ma.msd))
+        ma = ma.computeMSD;
+    end
+    %     p=ma2.getMeanMSD;
+    %     idx = find(isnan(p(:,3)), 1, 'first');
+    %     p = p(1:idx-1,:);
+    
+    
+    %rotate data into frame of inactive
+    for i=1:length(usedMovs)
+        minT=min(length(usedMovs(i).t),minT);
+        % dpos=diff(pos);
+        pos = [usedMovs(i).x, usedMovs(i).y];
+        rpos = bsxfun(@minus, pos, pos(1,:));
+        
+        % Subtract initial position
+        % Inactive particle position
+        iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+        iapos = bsxfun(@minus, iapos, pos(1,:));
+        
+        %get rid of nans in iapos and rpos
+        [nanr,~]=find(isnan(iapos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+            end
+        end
+        [nanr,~]=find(isnan(rpos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+            end
+        end
+        
+        
+        newpos=zeros(size(rpos));
+        for j=2:size(newpos,1)
+            % Get the change in the ring position in the world frame
+            deltaR = rpos(j, :) - rpos(j-1, :);
+            
+            % Get the vec1, tor from the ring COG to the inactive smarticle
+            rs = iapos(j-1, :) - rpos(j-1, :);
+            if(norm(rs))
+                rs = rs./norm(rs);
+            end
+            ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
+            newpos(j, :) =[deltaR*ns',deltaR*rs'];
+        end
+        newpos=cumsum(newpos);
+        newposFilt=newpos;
+%         [fb,fa]=butter(4,1/120*2*12,'low');
+        newposFilt(:,1)=filter(fb,fa,newpos(:,1));  %filtered signal
+        newposFilt(:,2)=filter(fb,fa,newpos(:,2));  %filtered signal
+        
+        if filtz
+            dat={[usedMovs(i).t,newposFilt]};
+        else
+            dat={[usedMovs(i).t,newpos]};
+        end
+        
+        ma2=ma2.addAll(dat);
+    end
+    
+    ma2 = ma2.computeMSD;
+    p=ma2.getMeanMSD;
+    
+    if(fitT)
+        ma2.plotMeanMSD(gca, true);
+        [fo, gof] = ma2.fitMeanMSD;
+        plot(fo)
+        
+        ma2 = ma2.fitMSD;
+        good_enough_fit = ma2.lfit.r2fit > 0.8;
+        Dmean = mean( ma2.lfit.a(good_enough_fit) ) / 2 / ma2.n_dim;
+        Dstd  =  std( ma2.lfit.a(good_enough_fit) ) / 2 / ma2.n_dim;
+        
+        fprintf('Estimation of the diffusion coefficient from linear fit of the MSD curves:\n')
+        fprintf('D = %.3g ± %.3g (mean ± std, N = %d)\n', ...
+            Dmean, Dstd, sum(good_enough_fit));
+    else
+        ma2.plotMeanMSD(gca, true)
+        A = ma2.getMeanMSD;
+        t = A(:, 1); % delay vector
+        msd = A(:,2); % msd
+        std_msd = A(:,3); % we will use inverse of the std as weights for the fit
+        std_msd(1) = std_msd(2); % avoid infinity weight
+        
+        ft = fittype('a*x + c*x^2');
+        [fo, gof] = fit(t, msd, ft, 'Weights', 1./std_msd, 'StartPoint', [0 0]);
+        
+        hold on
+        plot(fo)
+        legend off
+        ma2.labelPlotMSD
+        
+        Dfit = fo.a / 4;
+        Vfit = sqrt(fo.c);
+        
+        ci = confint(fo);
+        Dci = ci(:,1) / 4;
+        Vci = sqrt(ci(:,2));
+        
+        fprintf('Parabolic fit of the rotated average MSD curve with 95%% confidence interval:\n')
+        
+        fprintf('D = %.3g [ %.3g - %.3g ] %s\n', ...
+            Dfit, Dci(1), Dci(2), [SPACE_UNITS '²/' TIME_UNITS]);
+        
+        fprintf('V = %.3g [ %.3g - %.3g ] %s\n', ...
+            Vfit, Vci(1), Vci(2), [SPACE_UNITS '/' TIME_UNITS]);
+    end
+    
+    
+    ma=ma.fitLogLogMSD;
+    ma2=ma2.fitLogLogMSD;
+    
+    pts('loglog fit NON-ROTATED: ',round(mean(ma.loglogfit.alpha),3),'+-',round(std(ma.loglogfit.alpha),3),' r2=',round(mean(ma.loglogfit.r2fit),3),...
+        newline,'loglog fit ROTATED:     ',round(mean(ma2.loglogfit.alpha),3),'+-',round(std(ma2.loglogfit.alpha),3),' r2=',round(mean(ma2.loglogfit.r2fit),3));
+end
+
+%% 44. new MSD analysis for non-directed
+xx=44;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    fitT=0; %linear = 1; parab=0;
+    
+    
+    if(isempty(ma.msd))
+        ma = ma.computeMSD;
+    end
+    
+    if(fitT)
+        ma.plotMeanMSD(gca, true)
+        [fo, gof] = ma.fitMeanMSD;
+        plot(fo)
+        
+        ma = ma.fitMSD;
+        good_enough_fit = ma.lfit.r2fit > 0.8;
+        Dmean = mean( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+        Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+        
+        fprintf('Estimation of the diffusion coefficient from linear fit of the MSD curves:\n')
+        fprintf('D = %.3g ± %.3g (mean ± std, N = %d)\n', ...
+            Dmean, Dstd, sum(good_enough_fit));
+    else
+        ma.plotMeanMSD(gca, true)
+        A = ma.getMeanMSD;
+        t = A(:, 1); % delay vector
+        msd = A(:,2); % msd
+        std_msd = A(:,3); % we will use inverse of the std as weights for the fit
+        std_msd(1) = std_msd(2); % avoid infinity weight
+        
+        ft = fittype('a*x + c*x^2');
+        [fo, gof] = fit(t, msd, ft, 'Weights', 1./std_msd, 'StartPoint', [0 0]);
+        
+        hold on
+        plot(fo)
+        legend off
+        ma.labelPlotMSD
+        
+        Dfit = fo.a / 4;
+        Vfit = sqrt(fo.c);
+        
+        ci = confint(fo);
+        Dci = ci(:,1) / 4;
+        Vci = sqrt(ci(:,2));
+        
+        fprintf('Parabolic fit of the average MSD curve with 95%% confidence interval:\n')
+        
+        fprintf('D = %.3g [ %.3g - %.3g ] %s\n', ...
+            Dfit, Dci(1), Dci(2), [SPACE_UNITS '²/' TIME_UNITS]);
+        
+        fprintf('V = %.3g [ %.3g - %.3g ] %s\n', ...
+            Vfit, Vci(1), Vci(2), [SPACE_UNITS '/' TIME_UNITS]);
+    end
+    
+end
+
+%% 45-46. plot mean vcorr in non-rotated and rotated frame
+xx=45;
+if(showFigs(showFigs==xx))
+    figure(45)
+    hold on;
+    
+    warning('filtering happens after the data is rotated perhaps we should do it before');
+    filtz=1; %0=no filtering, 1= filtering
+    
+    if(filtz)
+        if(isempty(maf.vcorr))
+            maf = maf.computeVCorr;
+        end
+        maVcorr=maf.getMeanVCorr;
+        maf.plotMeanVCorr(gca);
+        maf.labelPlotVCorr(gca);
+        
+    else
+        if(isempty(ma.vcorr))
+            ma = ma.computeVCorr;
+        end
+        maVcorr=ma.getMeanVCorr;
+        ma.plotMeanVCorr(gca);
+        ma.labelPlotVCorr(gca);
+    end
+    
+    
+    plot(xlim,mean(maVcorr(maVcorr(:,1)>1.5,2)).*[1,1],'r','linewidth',2);
+    figText(gcf,17);
+    
+    
+    figure(46);
+    hold on;
+    %rotate data into frame of inactive
+    if(isempty(ma2.vcorr))
+        for i=1:length(usedMovs)
+            minT=min(length(usedMovs(i).t),minT);
+            % dpos=diff(pos);
+            pos = [usedMovs(i).x, usedMovs(i).y];
+            rpos = bsxfun(@minus, pos, pos(1,:));
+            
+            % Subtract initial position
+            % Inactive particle position
+            iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+            iapos = bsxfun(@minus, iapos, pos(1,:));
+            
+            %get rid of nans in iapos and rpos
+            [nanr,~]=find(isnan(iapos));
+            
+            %%%%%%%%%%%%%%%%%%%
+            if(filtz)
+                pos=filter(fb,fa,pos);  %filtered signal
+                rpos=filter(fb,fa,rpos);
+                iapos=filter(fb,fa,iapos);
+            end
+            %%%%%%%%%%%%%%%%%%%
+  
+            
+            
+            while ~isempty(nanr)
+                for qq=1:length(nanr)
+                    iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+                end
+                [nanr,~]=find(isnan(iapos));
+            end
+            
+            [nanr,~]=find(isnan(rpos));
+            while ~isempty(nanr)
+                for qq=1:length(nanr)
+                    rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+                end
+            [nanr,~]=find(isnan(rpos));
+            end
+            
+            
+            newpos=zeros(size(rpos));
+            for j=2:size(newpos,1)
+                % Get the change in the ring position in the world frame
+                deltaR = rpos(j, :) - rpos(j-1, :);
+                
+                % Get the vec1, tor from the ring COG to the inactive smarticle
+                rs = iapos(j-1, :) - rpos(j-1, :);
+                if(norm(rs))
+                    rs = rs./norm(rs);
+                end
+                ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs 
+                newpos(j, :) =[deltaR*ns',deltaR*rs'];
+            end
+            newpos=cumsum(newpos);
+            newposFilt=newpos;
+
+            newposFilt(:,1)=filter(fb,fa,newpos(:,1));  %filtered signal
+            newposFilt(:,2)=filter(fb,fa,newpos(:,2));  %filtered signal
+%             if filtz
+%                 dat={[usedMovs(i).t,newposFilt]};
+%             else
+                dat={[usedMovs(i).t,newpos]};
+%             end
+            ma2=ma2.addAll(dat);
+        end
+    end
+    
+    if(isempty(ma2.vcorr))
+        ma2=ma2.computeVCorr;
+    end
+    
+    
+    ma2Vcorr= ma2.getMeanVCorr;
+    ma2.plotMeanVCorr(gca);
+    ma2.labelPlotVCorr(gca);
+    plot(xlim,mean(ma2Vcorr(ma2Vcorr(:,1)>1.5,2)).*[1,1],'r','linewidth',2);
+    figText(gcf,17);
+    pts('filt=',filtz,newline,'unrot:',mean(maVcorr(maVcorr(:,1)>1.5,2)),newline,'rot:',mean(ma2Vcorr(ma2Vcorr(:,1)>1.5,2)));
 end
