@@ -31,7 +31,7 @@ pts(fold);
 %*14. rand amp vs. contact cycles
 %*15. plot phi final
 %************************************************************
-showFigs=[ 7 11 13];
+showFigs=[11 13];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -94,13 +94,13 @@ if(showFigs(showFigs==xx))
         hold on;
         plot(t,rot*180/pi,'linewidth',lw);
         plot(t,rotF*180/pi,'linewidth',lw);
-%         pts('i=',i,' maxrot=',max(abs(rot*180/pi)));
+        %         pts('i=',i,' maxrot=',max(abs(rot*180/pi)));
         xlabel('t (s)');
         ylabel('\theta (\circ)');
         axis auto
         figText(gcf,16);
-                
-
+        
+        
         
         
         
@@ -175,7 +175,7 @@ if(showFigs(showFigs==xx))
     vI=zeros(1,N);
     vF=zeros(1,N);
     A=.051*.021; %area (l*w) of smarticle in m
-
+    
     for(idx=1:N)
         n=size(usedMovs(idx).x,2);%number of particles
         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
@@ -184,9 +184,9 @@ if(showFigs(showFigs==xx))
         [~, vI(idx)]=convhull(rI(:,1,idx),rI(:,2,idx));
         [~, vF(idx)]=convhull(rF(:,1,idx),rF(:,2,idx));
         %         %last point is first point
-                rI(end,:,idx)=[usedMovs(idx).x(1,1)',usedMovs(idx).y(1,1)'];
-                rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
-                
+        rI(end,:,idx)=[usedMovs(idx).x(1,1)',usedMovs(idx).y(1,1)'];
+        rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
+        
     end
     
     %         area(rI(:,1,1),rI(:,2,1));
@@ -213,14 +213,14 @@ if(showFigs(showFigs==xx))
     xlabel('$\xi (ms)$','interpreter','latex');
     ylabel('Area Change $(m^2)$','interpreter','latex');
     figText(gcf,16);
-%     
-%     %plot out in change of area fraction instead
-%     figure(50);
-%     hold on;
-%     errorbar(sigma,phiChange,phiErr)
-%     xlabel('$\xi (ms)$','interpreter','latex');
-%     ylabel('$\Delta\phi$','interpreter','latex');
-%     figText(gcf,16);
+    %
+    %     %plot out in change of area fraction instead
+    %     figure(50);
+    %     hold on;
+    %     errorbar(sigma,phiChange,phiErr)
+    %     xlabel('$\xi (ms)$','interpreter','latex');
+    %     ylabel('$\Delta\phi$','interpreter','latex');
+    %     figText(gcf,16);
 end
 %% 5. granular temperature for translation for single run
 xx=5;
@@ -497,14 +497,14 @@ if(showFigs(showFigs==xx))
         thet=usedMovs(idx).rot(:,i);
         
         plot(x,y);
-        title('track'); 
-        xlabel('x (m)','interpreter','latex'); 
+        title('track');
+        xlabel('x (m)','interpreter','latex');
         ylabel('y (m)','interpreter','latex');
         
         figure(4000+i);
-%         x=smooth(x,20);
-%         y=smooth(y,20);
-
+        %         x=smooth(x,20);
+        %         y=smooth(y,20);
+        
         x=x-x(1);
         y=y-y(1);
         thet=thet-thet(1);
@@ -574,10 +574,10 @@ if(showFigs(showFigs==xx))
         t= usedMovs(idx).t(:,i);%-usedMovs(idx).y(1,i);
         thet=usedMovs(idx).rot(:,i);
         %             y= usedMovs(idx).rot(:,i);%-usedMovs(idx).y(1,i);
-%         x=smooth(x,20);
-%         y=smooth(y,20);
+        %         x=smooth(x,20);
+        %         y=smooth(y,20);
         
-
+        
         
         x=x-x(1);
         y=y-y(1);
@@ -613,33 +613,33 @@ if(showFigs(showFigs==xx))
             'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
         axis([0 120 -pi pi])
         
-%         a=wrapTo2Pi(thet);
-%         set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
-%             'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
-%         axis([0 120 0 2*pi])
+        %         a=wrapTo2Pi(thet);
+        %         set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
+        %             'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
+        %         axis([0 120 0 2*pi])
         
         a=a-a(1);
         plot(t,a,'linewidth',lw);
         %             axis([0 120 -pi-.01,pi+.01]);
         
-%         axis([0 120 0 2*pi]);
+        %         axis([0 120 0 2*pi]);
         xlabel('time (s)','interpreter','latex');
         ylabel('$\theta$ (rads)','interpreter','latex');
-
         
         
-       
         
-%         set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
-%             'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
-%         axis([0 120 0 2*pi])
+        
+        
+        %         set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
+        %             'ytick',[0,pi/2,pi,3*pi/2,2*pi],'ticklabelinterpreter','latex');
+        %         axis([0 120 0 2*pi])
         %             ='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
         %2004 idx 1 for paper fig
         figText(gcf,16);
         
         
         figure(xx);
-   
+        
         subplot(2,1,1);
         hold on;
         title('$\int\sqrt{dx^2+dy^2}$','interpreter','latex')
@@ -679,62 +679,62 @@ if(showFigs(showFigs==xx))
     idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     GTTAll=[];
-for k=1:N
-    GTT=[];
-    for i=1:size(usedMovs(k).x,2) %for the number of smarticles       
-        x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
-        y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
-        t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
-        thet=usedMovs(k).rot(1:minT,i);
-        
-        
-        
-        x=x-x(1);
-        y=y-y(1);
-        thet=thet-thet(1);
-        
-        [b,a]=butter(6,1/120*2,'low');
-        x=filter(b,a,x);  %filtered signal
-        y=filter(b,a,y);  %filtered signal
-        thet=filter(b,a,thet);  %filtered signal
-        
-        dx=diff(x); dy=diff(y);dr=diff(thet);
-        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
-        r=[0; cumsum(sqrt(dr.^2))];
-        GTT(:,i)=q;
-        GTR(:,i)=r;
+    for k=1:N
+        GTT=[];
+        for i=1:size(usedMovs(k).x,2) %for the number of smarticles
+            x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+            y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+            t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
+            thet=usedMovs(k).rot(1:minT,i);
+            
+            
+            
+            x=x-x(1);
+            y=y-y(1);
+            thet=thet-thet(1);
+            
+            [b,a]=butter(6,1/120*2,'low');
+            x=filter(b,a,x);  %filtered signal
+            y=filter(b,a,y);  %filtered signal
+            thet=filter(b,a,thet);  %filtered signal
+            
+            dx=diff(x); dy=diff(y);dr=diff(thet);
+            q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+            r=[0; cumsum(sqrt(dr.^2))];
+            GTT(:,i)=q;
+            GTR(:,i)=r;
+        end
+        GTTAll(:,k)=mean(GTT,2); %translational granular temp
+        GTRAll(:,k)=mean(GTR,2); %translational granular temp
+        %     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
+        plot(t,GTTAll(:,k));
+        plot(t,GTRAll(:,k),'--');
     end
-    GTTAll(:,k)=mean(GTT,2); %translational granular temp
-    GTRAll(:,k)=mean(GTR,2); %translational granular temp
-%     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
-    plot(t,GTTAll(:,k));
-    plot(t,GTRAll(:,k),'--');
-end
     plot(t,mean(GTTAll,2),'k','linewidth',2);
     plot(t,mean(GTRAll,2),'--k','linewidth',2);
-
+    
     xlabel('time (s)','interpreter','latex');
     ylabel('displacement,rotation (cm,rads)','interpreter','latex');
-
-ylim([0 180]);
-mt=[max(mean(GTTAll,2))];
-mte=std(max(GTTAll,[],2),0,1);
-mr=[max(mean(GTRAll,2))];
-mre=std(max(GTRAll,[],2),0,1);
-% f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
-%paper figure plot in at 'Take 2017-10-05 04.03.06 PM.csv'
-% a=wrapTo2Pi(thet-.16); to remove wrapping
-
-% f='A:\2DSmartData\singleSmarticleTrack' for single smarticle non-cloud
-% a=wrapTo2Pi(thet+.05); to remove wrapping
-[mt,mte;mr,mre]
-
-    figure(23)
+    
+    ylim([0 180]);
+    mt=[max(mean(GTTAll,2))];
+    mte=std(max(GTTAll,[],2),0,1);
+    mr=[max(mean(GTRAll,2))];
+    mre=std(max(GTRAll,[],2),0,1);
+    % f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\rightsquare\close packed';
+    %paper figure plot in at 'Take 2017-10-05 04.03.06 PM.csv'
+    % a=wrapTo2Pi(thet-.16); to remove wrapping
+    
+    % f='A:\2DSmartData\singleSmarticleTrack' for single smarticle non-cloud
+    % a=wrapTo2Pi(thet+.05); to remove wrapping
+    [mt,mte;mr,mre]
+    
+    figure(444)
     hold on;
     plot(t(1:end-1),diff(mean(GTTAll,2))./diff(t),'linewidth',1);
     ylabel('d<S>/dt');
     xlabel('t(s)');
-fps=usedMovs(1).fps;    
+    fps=usedMovs(1).fps;
 end
 %% 12. compiled granular temperature data
 xx=12;
@@ -743,129 +743,162 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     
-x=[0 200 400 600 800 1000];
-
-%nonfiltered
-% yt=[81.8878 94.5277 127.6742 72.6423];
-% yte=[26.3643 29.5863 42.6499 20.0665];
-% yr=[118.5865 68.6063 151.3340 60.6466];
-% yre=[42.2075 26.0797 66.8817 17.5103];
-
-%filtered
-yt=[41.7259 55.0991 70.9126 72.2794 67.0875 73.0501];
-yte=[13.6990 18.9334 26.0592 25.1421 18.9005 22.5646];
-% yr=[76.3638 53.9141 106.9800 18.9320];
-% yre=[26.8491 19.0759 37.3578 6.5970];
-yr=[53.6353 53.9141 64.1974 59.6325 64.2384  66.8990] ;
-yre=[19.5214 19.0759 23.1742 20.7481 19.5432 21.5626];
-
-
-errorbar(x,yt,yte,'linewidth',2);
-errorbar(x,yr,yre,'--','linewidth',2);
-legz={'$G_t$','$G_r$'};
-
-xlabel('Random Amplitude $\xi$ (ms)','interpreter','latex');
-ylabel('$G_t$ (cm); $G_r$ (rads)','interpreter','latex');
-figText(gcf,16);
-legend(legz,'interpreter','latex','fontsize',12);
-xlim([0,1000])
+    x=[0 200 400 600 800 1000];
+    
+    %nonfiltered
+    % % yt=[81.8878 94.5277 127.6742 72.6423];
+    % % yte=[26.3643 29.5863 42.6499 20.0665];
+    % % yr=[118.5865 68.6063 151.3340 60.6466];
+    % % yre=[42.2075 26.0797 66.8817 17.5103];
+    
+    %filtered
+    yt=[41.7259 55.0991 70.9126 72.2794 67.0875 73.0501];
+    yte=[13.6990 18.9334 26.0592 25.1421 18.9005 22.5646];
+    % yr=[76.3638 53.9141 106.9800 18.9320];
+    % yre=[26.8491 19.0759 37.3578 6.5970];
+    yr=[53.6353 53.9141 64.1974 59.6325 64.2384  66.8990] ;
+    yre=[19.5214 19.0759 23.1742 20.7481 19.5432 21.5626];
+    
+    
+    errorbar(x,yt,yte,'linewidth',2);
+    errorbar(x,yr,yre,'--','linewidth',2);
+    legz={'$G_t$','$G_r$'};
+    
+    xlabel('Random Amplitude $\xi$ (ms)','interpreter','latex');
+    ylabel('$G_t$ (cm); $G_r$ (rads)','interpreter','latex');
+    figText(gcf,16);
+    legend(legz,'interpreter','latex','fontsize',12);
+    xlim([0,1000])
 end
 
-%% 13. d<s>/dt 
+%% 13. d<s>/dt
 xx=13;
 if(showFigs(showFigs==xx))
     
     figure(xx); lw=2;
     hold on;
-    
+    ti=100; %initial t
+    filtz=1; %0 if no filter 1=filter
+    expfit=2;
     idx=1; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     GTTAll=[];
-for k=1:N
-    GTT=[];
-    for i=1:size(usedMovs(k).x,2) %for the number of smarticles       
-        x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
-        y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
-        t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
-        thet=usedMovs(k).rot(1:minT,i);
+    for k=1:N
+        GTT=[];
+        for i=1:size(usedMovs(k).x,2) %for the number of smarticles
+            x= usedMovs(k).x(1:minT,i);%-usedMovs(idx).x(1,i);
+            y= usedMovs(k).y(1:minT,i);%-usedMovs(idx).y(1,i);
+            t= usedMovs(k).t(1:minT,i);%-usedMovs(idx).y(1,i);
+            thet=usedMovs(k).rot(1:minT,i);
+            
+            
+            
+            x=x-x(1);
+            y=y-y(1);
+            thet=thet-thet(1);
+            
+            [b,a]=butter(6,1/120*2,'low');
+            if(filtz)
+                x=filter(b,a,x);  %filtered signal
+                y=filter(b,a,y);  %filtered signal
+                thet=filter(b,a,thet);  %filtered signal
+            end
+            dx=diff(x); dy=diff(y);dr=diff(thet);
+            q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
+            r=[0; cumsum(sqrt(dr.^2))];
+            GTT(:,i)=q;
+            GTR(:,i)=r;
+        end
+        GTTAll(:,k)=mean(GTT,2); %translational granular temp
+        GTRAll(:,k)=mean(GTR,2); %translational granular temp
+        %     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
         
-        
-        
-        x=x-x(1);
-        y=y-y(1);
-        thet=thet-thet(1);
-        
-        [b,a]=butter(6,1/120*2,'low');
-        x=filter(b,a,x);  %filtered signal
-        y=filter(b,a,y);  %filtered signal
-        thet=filter(b,a,thet);  %filtered signal
-        
-        dx=diff(x); dy=diff(y);dr=diff(thet);
-        q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
-        r=[0; cumsum(sqrt(dr.^2))];
-        GTT(:,i)=q;
-        GTR(:,i)=r;
     end
-    GTTAll(:,k)=mean(GTT,2); %translational granular temp
-    GTRAll(:,k)=mean(GTR,2); %translational granular temp
-%     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
-
-end
-
+    
     mGTTAll=mean(GTTAll,2);
     mGTRAll=mean(GTRAll,2);
     
     figure(23)
     hold on;
-%     h=plot(t(1:end-1),diff(mGTTAll)./diff(t),'linewidth',1);
-%     plot(t(1:end-1),diff(mGTRAll)./diff(t),'--','linewidth',1);
+    %     h=plot(t(1:end-1),diff(mGTTAll)./diff(t),'linewidth',1);
+    %     plot(t(1:end-1),diff(mGTRAll)./diff(t),'--','linewidth',1);
+    
     ylabel('d<S>/dt');
     xlabel('t(s)');
-   
-    x=t(100:end-1);
-    y=diff(mGTTAll(100:end))./diff(t(100:end));
-    f = fit(x,y,'power2');
-%     yf=f.a*exp(f.b*x);
-    yf=f.a*x.^f.b+f.c;
     
-    figure(99);
-    plot(f,x,y);
     
-    figure(27);
-    hold on;
-%     plot(x,yf);
+    x=t(ti:end-1);
+    y=diff(mGTTAll(ti:end))./diff(t(ti:end));
     
-    yi=yf(end);
-    idx=max(find(abs(yf-yi)>=0.66*yi));
-    xv=[0 200 400 600 800 1000];
-%     v=x(idx)
-    vv=[  55.6667 44.6583 34.2667 71.0333 33.8500 39.8000];
-plot(xv,vv);
+
+    
+    if(expfit==1)
+        f=fit(x,y,'exp1');
+        text(.1, 0.25,['ae^{bx}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized')
+        yf=f.a*exp(f.b*x);
+    elseif (expfit==2) %stretched exp
+        y=y/max(y);
+        fo = fitoptions('Method','NonlinearLeastSquares',...
+            'Lower',[0,0],...
+            'Upper',[Inf,max(y)],...
+            'StartPoint',[1 1]);
+        ft = fittype('exp(-(x./a).^b)','options',fo);
+        f=fit(x,y,ft);
+        %         text(.1, 0.25,['ax^{b}+c',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f'),newline,'c=',num2str(f.c,'%.3f')],'fontsize',16,'units','normalized')
+        %         yf=f.a*x.^f.b+f.c;
+        %         text(.1, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
+        yf=exp(-(x./f.a).^(f.b));
+%         expz=[f.a,f.b];
+%                 load('expz.mat');
+%                 expz=[expz;f.a,f.b];
+%                 save('expz.mat','expz');
+    else
+        f=fit(x,y,'power1');
+        %         text(.1, 0.25,['ax^{b}+c',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f'),newline,'c=',num2str(f.c,'%.3f')],'fontsize',16,'units','normalized')
+        %         yf=f.a*x.^f.b+f.c;
+        text(.1, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
+        yf=f.a*x.^f.b;    
+    end
+    plot(x,yf,'-r');
+    plot(x,y,'linewidth',1);
+    %     figure(99);
+    %     plot(f,x,y,'.');
+    %
+    %     figure(27);
+    %     hold on;
+    % %     plot(x,yf);
+    %
+    %     yi=yf(end);
+    %     idx=max(find(abs(yf-yi)>=0.66*yi));
+    %     xv=[0 200 400 600 800 1000];
+    % %     v=x(idx)
+    %     vv=[  55.6667 44.6583 34.2667 71.0333 33.8500 39.8000];
+    % plot(xv,vv);
 end
 
-%% 14. plot contact time vs rand amp 
+%% 14. plot contact time vs rand amp
 xx=14;
 if(showFigs(showFigs==xx))
     
     figure(xx); lw=2;
     hold on;
     
-cyc0= [9 7 4 3 4 2 4 3 25 30 7 6 2 3 2 1 3 1 2 2 7 24 2]; % 0 rand del
-cyc200=[0];
-cyc400=[3 7 11 5 8 7 11 21 8 19 4 8 5 10 5 20 4 24]; % 400 rand del
-cyc600=[0];
-cyc800=[0];
-cyc1000=[0];
-
-cyc={cyc0,cyc200,cyc400,cyc600,cyc800,cyc1000};
-mCyc=cellfun(@mean,cyc);
-eCyc=cellfun(@std,cyc);
-errCyc=eCyc./sqrt(cellfun(@length,cyc));
-del=[0 200 400 600 800 1000];
-
-errorbar(del,mCyc,eCyc);
-
-
+    cyc0= [9 7 4 3 4 2 4 3 25 30 7 6 2 3 2 1 3 1 2 2 7 24 2]; % 0 rand del
+    cyc200=[0];
+    cyc400=[3 7 11 5 8 7 11 21 8 19 4 8 5 10 5 20 4 24]; % 400 rand del
+    cyc600=[0];
+    cyc800=[0];
+    cyc1000=[0];
+    
+    cyc={cyc0,cyc200,cyc400,cyc600,cyc800,cyc1000};
+    mCyc=cellfun(@mean,cyc);
+    eCyc=cellfun(@std,cyc);
+    errCyc=eCyc./sqrt(cellfun(@length,cyc));
+    del=[0 200 400 600 800 1000];
+    
+    errorbar(del,mCyc,eCyc);
+    
+    
 end
 
 %% 15 plot final phi
@@ -874,8 +907,8 @@ if(showFigs(showFigs==xx))
     
     figure(xx); lw=2;
     hold on;
-
-
+    
+    
     single = 0; % plotting out a single run
     
     finalPhi=zeros(N,1);
@@ -901,11 +934,11 @@ if(showFigs(showFigs==xx))
     otherAngs=(180-(1-2/n)*180)/2*pi/180;
     sig=s*cos(otherAngs);%optitrack straight length of regular polygon
     maxAreaOpti=1/4*n*sig^2*cot(pi/n); %max optitrack convex hull area
-%      warning('cutting off runs at 2 mins or 1440 frames for 30fps');
+    %      warning('cutting off runs at 2 mins or 1440 frames for 30fps');
     if(single)
         
-       
-%         finalPhi=[finalPhi,phival(end)];  
+        
+        %         finalPhi=[finalPhi,phival(end)];
         finalPhi=[finalPhi,phival(end)];
         
         plot((1:length(phi{single}))./usedMovs(single).fps,phival);
@@ -915,14 +948,14 @@ if(showFigs(showFigs==xx))
             phival=(A*n)./phi{j};
             finalPhi(j)=phival(end);
             iPhi(j)=phival(1);
-%             plot((1:length(phi{j}))./usedMovs(j).fps,phival);
+            %             plot((1:length(phi{j}))./usedMovs(j).fps,phival);
             meanx = mean(usedMovs(j).x(end,:));
             meany = mean(usedMovs(j).y(end,:),2);
             %                 allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
         end
         id=j;
     end
-%     plot([0,usedMovs(id).t(end)],[n*A/maxAreaOpti,n*A/maxAreaOpti],'r--');
+    %     plot([0,usedMovs(id).t(end)],[n*A/maxAreaOpti,n*A/maxAreaOpti],'r--');
     xlabel('gait type');
     ylabel('\phi_f');
     figText(gcf,16);
@@ -934,12 +967,12 @@ if(showFigs(showFigs==xx))
     LSlp=[0.1611 0.1985 0.3008 0.2783 0.2386 0.1588];
     
     RScp=[0.1756 0.2216 0.1501 0.1959 0.1948 0.1404 0.2919];
-   
-
-
+    
+    
+    
     
     %mean distance btween points
-%     finalPhi
+    %     finalPhi
     pts(mean(finalPhi),'+-',std(finalPhi));
     pts(mean(iPhi-finalPhi),'+-',std(iPhi-finalPhi));
     xlim([0 6])
@@ -949,5 +982,5 @@ if(showFigs(showFigs==xx))
     set(gca,'xtick',[1 2 3 4 5],'xticklabel',{'LDcp','LDlp','LScp','LSlp','RScp'},'colororderindex',3);
     bar(x,y);
     errorbar(x,y,yerr,'.');
-
-    end
+    
+end
