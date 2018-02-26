@@ -30,12 +30,20 @@ pts(fold);
 %*13. d<s>/dt
 %*14. rand amp vs. contact cycles
 %*15. plot phi final
+%*16. plot stretched exponential data for different delays
+%*17. plot out phi for different delays
+%*18. plot out all gran temp data for different delays
 %************************************************************
-showFigs=[11 13];
+showFigs=[18];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
-
+% cutoff/(sample/2)
+cutoff=2;
+sampRate=120;
+filtOrder=6;
+[fb,fa]=butter(filtOrder,cutoff/(sampRate/2),'low');
+%  [b,a]=butter(6,1/120*2,'low');
 % props={};
 inds=1;
 for i=1:length(movs)
@@ -78,10 +86,10 @@ if(showFigs(showFigs==xx))
         rot= usedMovs(idx).rot(:,i);
         x=x-x(1);   y=y-y(1);  rot=rot-rot(1);
         
-        [b,a]=butter(3,1/120*2,'low');
-        xF=filter(b,a,x);  %filtered signal
-        yF=filter(b,a,y);  %filtered signal
-        rotF=filter(b,a,rot);  %filtered signal
+        %         [b,a]=butter(3,1/120*2,'low');
+        xF=filter(fb,fa,x);  %filtered signal
+        yF=filter(fb,fa,y);  %filtered signal
+        rotF=filter(fb,fa,rot);  %filtered signal
         
         subplot(1,2,1);
         hold on;
@@ -455,6 +463,7 @@ if(showFigs(showFigs==xx))
         id=single;
     else
         for j=1:length(phi)
+            aphi{j}=(A*n)./phi{j};
             plot((1:length(phi{j}))./usedMovs(j).fps,(A*n)./phi{j});
             meanx = mean(usedMovs(j).x(end,:));
             meany = mean(usedMovs(j).y(end,:),2);
@@ -469,7 +478,27 @@ if(showFigs(showFigs==xx))
     
     %mean distance btween points
     
-    ylim([0.1 0.5])
+    minT= min(cellfun(@length,aphi));
+    phimat=zeros(minT,length(aphi));
+    for(i=1:length(aphi))
+        phimat(:,i)=aphi{i}(1:minT);
+    end
+    
+    mphi=mean(phimat,2);
+    ephi=std(phimat,0,2);
+    shadedErrorBar([1:length(mphi)]./usedMovs(1).fps,mphi,ephi,{},0.5);
+    
+    mphi(end)
+    %     finalPhi=mphi(end);
+    %     allmPhi={mphi};
+    %     allePhi={ephi};
+    
+    %     load('phi.mat');
+    %     finalPhi=[finalPhi;mphi(end)];
+    %     allmPhi=[allmPhi,{mphi}];
+    %     allePhi=[allePhi,{ephi}];
+    %     save('phi.mat','allmPhi','allePhi','finalPhi');
+    %     ylim([0.1 0.5])
 end
 %% 8. vector field plot of positions
 xx=8;
@@ -582,10 +611,10 @@ if(showFigs(showFigs==xx))
         x=x-x(1);
         y=y-y(1);
         thet=thet-thet(1);
-        [b,a]=butter(6,1/120*2,'low');
-        x=filter(b,a,x);  %filtered signal
-        y=filter(b,a,y);  %filtered signal
-        thet=filter(b,a,thet);  %filtered signal
+        %         [b,a]=butter(6,1/120*2,'low');
+        x=filter(fb,fa,x);  %filtered signal
+        y=filter(fb,fa,y);  %filtered signal
+        thet=filter(fb,fa,thet);  %filtered signal
         
         figure(2000+i);
         subplot(2,1,1);
@@ -693,10 +722,10 @@ if(showFigs(showFigs==xx))
             y=y-y(1);
             thet=thet-thet(1);
             
-            [b,a]=butter(6,1/120*2,'low');
-            x=filter(b,a,x);  %filtered signal
-            y=filter(b,a,y);  %filtered signal
-            thet=filter(b,a,thet);  %filtered signal
+            %             [b,a]=butter(6,1/120*2,'low');
+            x=filter(fb,fa,x);  %filtered signal
+            y=filter(fb,fa,y);  %filtered signal
+            thet=filter(fb,fa,thet);  %filtered signal
             
             dx=diff(x); dy=diff(y);dr=diff(thet);
             q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
@@ -729,11 +758,24 @@ if(showFigs(showFigs==xx))
     % a=wrapTo2Pi(thet+.05); to remove wrapping
     [mt,mte;mr,mre]
     
-    figure(444)
-    hold on;
-    plot(t(1:end-1),diff(mean(GTTAll,2))./diff(t),'linewidth',1);
-    ylabel('d<S>/dt');
-    xlabel('t(s)');
+    %     gtR={mean(GTRAll,2)};
+    %     gtT={mean(GTTAll,2)};
+    %     fps=usedMovs(1).fps;
+    %     t={[1:length(mean(GTRAll,2))]./fps};
+    %
+    %     load('GT.mat');
+    %     gtR=[gtR,{mean(GTRAll,2)}];
+    %     gtT=[gtT,{mean(GTTAll,2)}];
+    %     t=[t,{[1:length(mean(GTRAll,2))]./usedMovs(1).fps}];
+    %     fps=[fps,usedMovs(1).fps];
+    %     xi=[0:200:1000];
+    %     save('GT.mat','gtR','gtT','fps','t','cutoff','sampRate','filtOrder','xi');
+    
+    %     figure(444)
+    %     hold on;
+    %     plot(t(1:end-1),diff(mean(GTTAll,2))./diff(t),'linewidth',1);
+    %     ylabel('d<S>/dt');
+    %     xlabel('t(s)');
     fps=usedMovs(1).fps;
 end
 %% 12. compiled granular temperature data
@@ -746,10 +788,10 @@ if(showFigs(showFigs==xx))
     x=[0 200 400 600 800 1000];
     
     %nonfiltered
-    % % yt=[81.8878 94.5277 127.6742 72.6423];
-    % % yte=[26.3643 29.5863 42.6499 20.0665];
-    % % yr=[118.5865 68.6063 151.3340 60.6466];
-    % % yre=[42.2075 26.0797 66.8817 17.5103];
+    % yt=[81.8878 94.5277 127.6742 72.6423];
+    % yte=[26.3643 29.5863 42.6499 20.0665];
+    % yr=[118.5865 68.6063 151.3340 60.6466];
+    % yre=[42.2075 26.0797 66.8817 17.5103];
     
     %filtered
     yt=[41.7259 55.0991 70.9126 72.2794 67.0875 73.0501];
@@ -797,11 +839,11 @@ if(showFigs(showFigs==xx))
             y=y-y(1);
             thet=thet-thet(1);
             
-            [b,a]=butter(6,1/120*2,'low');
+            
             if(filtz)
-                x=filter(b,a,x);  %filtered signal
-                y=filter(b,a,y);  %filtered signal
-                thet=filter(b,a,thet);  %filtered signal
+                x=filter(fb,fa,x);  %filtered signal
+                y=filter(fb,fa,y);  %filtered signal
+                thet=filter(fb,fa,thet);  %filtered signal
             end
             dx=diff(x); dy=diff(y);dr=diff(thet);
             q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
@@ -830,7 +872,7 @@ if(showFigs(showFigs==xx))
     x=t(ti:end-1);
     y=diff(mGTTAll(ti:end))./diff(t(ti:end));
     
-
+    
     
     if(expfit==1)
         f=fit(x,y,'exp1');
@@ -848,16 +890,16 @@ if(showFigs(showFigs==xx))
         %         yf=f.a*x.^f.b+f.c;
         %         text(.1, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
         yf=exp(-(x./f.a).^(f.b));
-%         expz=[f.a,f.b];
-%                 load('expz.mat');
-%                 expz=[expz;f.a,f.b];
-%                 save('expz.mat','expz');
+        %         expz=[f.a,f.b];
+        %                 load('expz.mat');
+        %                 expz=[expz;f.a,f.b];
+        %                 save('expz.mat','expz');
     else
         f=fit(x,y,'power1');
         %         text(.1, 0.25,['ax^{b}+c',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f'),newline,'c=',num2str(f.c,'%.3f')],'fontsize',16,'units','normalized')
         %         yf=f.a*x.^f.b+f.c;
         text(.1, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
-        yf=f.a*x.^f.b;    
+        yf=f.a*x.^f.b;
     end
     plot(x,yf,'-r');
     plot(x,y,'linewidth',1);
@@ -983,4 +1025,130 @@ if(showFigs(showFigs==xx))
     bar(x,y);
     errorbar(x,y,yerr,'.');
     
+end
+
+%% 16 plot stretched exponential data for different delays
+xx=16;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on
+    load('expzn.mat');
+    %     yf=exp(-(x./f.a).^(f.b));
+    %   [xi,tau,beta]
+    [xi,tau,beta]=separateVec(expzn,1);
+    xi(1)=1;
+    t0=max(tau);
+    b0=max(beta);
+    plot(xi,tau);
+    plot(xi,beta);
+    plot(1./xi,log(beta));
+    hold on;
+    xlabel('\xi');
+    ylabel('fit pars \tau[1/s], \beta');
+    legend({'\tau','\beta','log(\tau/t0)'})
+    title('stretch exp fits exp(-(t/{\tau})^{\beta})')
+    
+end
+
+%% 17 plot out phi for different delays
+xx=17;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on
+    load('phi.mat');
+    
+    
+    [ftau,fbeta]=deal(zeros(length(allmPhi),1));
+    for(i=1:length(allmPhi))
+        tt=[1:length(allmPhi{i})]'./fps(i);
+        y=allmPhi{i};
+        %         plot(tt,allmPhi{i});
+        
+        fo = fitoptions('Method','NonlinearLeastSquares',...
+            'Lower',[0,0],...
+            'Upper',[Inf,max(y)],...
+            'StartPoint',[1 1]);
+        ft = fittype('exp(-(x./a).^b)','options',fo);
+        f=fit(tt,y,'power1');
+        ftau(i)=f.a; fbeta(i)=f.b;
+        plot(f,tt,y);
+        pause(1);
+    end
+    xlabel('t(s)');
+    ylabel('\phi');
+    
+    figure(18);
+    plot(xi,finalPhi);
+    xlabel('\xi(s)');
+    ylabel('\phi_f');
+    
+    figure(19);
+    hold on;
+    xlabel('\xi(s)');
+    ylabel('\tau,\beta');
+    plot(xi,ftau);
+    plot(xi,fbeta);
+end
+
+%% 18 plot out all gran temp data for different delays
+xx=18;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on
+    load('GT.mat');
+    %     yf=exp(-(x./f.a).^(f.b));
+    %   [xi,tau,beta]
+    hold on;
+    expfit=0;
+    
+    its=length(gtT);
+    [coef,pow]=deal(zeros(its,1));
+    
+    for i=1:its
+        x=t{i}';
+        y=gtT{i};
+        
+        if(expfit==1)
+            f=fit(x,y,'exp1');
+            text(.1, 0.25,['ae^{bx}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized')
+            yf=f.a*exp(f.b*x);
+        elseif (expfit==2) %stretched exp
+            y=y/max(y);
+            fo = fitoptions('Method','NonlinearLeastSquares',...
+                'Lower',[0,0],...
+                'Upper',[Inf,max(y)],...
+                'StartPoint',[1 1]);
+            ft = fittype('exp(-(x./a).^b)','options',fo);
+            f=fit(x,y,ft);
+            %         text(.1, 0.25,['ax^{b}+c',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f'),newline,'c=',num2str(f.c,'%.3f')],'fontsize',16,'units','normalized')
+            %         yf=f.a*x.^f.b+f.c;
+            %         text(.1, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
+            yf=exp(-(x./f.a).^(f.b));
+            %         expz=[f.a,f.b];
+            %                 load('expz.mat');
+            %                 expz=[expz;f.a,f.b];
+            %                 save('expz.mat','expz');
+        else
+            f=fit(x,y,'power1');
+            %         text(.1, 0.25,['ax^{b}+c',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f'),newline,'c=',num2str(f.c,'%.3f')],'fontsize',16,'units','normalized')
+            %         yf=f.a*x.^f.b+f.c;
+%             text((i-1)/its, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
+%             text(.1, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
+            yf=f.a*x.^f.b;
+        end
+        
+        plot(x,y,'linewidth',2);
+        plot(x,yf,'r--')
+        coef(i)=f.a; pow(i)=f.b;
+        pause(1);
+        
+    end
+    figure(23);
+    hold on;
+    plot(xi,coef);
+    plot(xi,pow);
+    xlabel('\xi');
+    ylabel('fit pars');
+    legend({'coefficient','power'})
+    title('fitting gran temperature to ax^b')
 end
