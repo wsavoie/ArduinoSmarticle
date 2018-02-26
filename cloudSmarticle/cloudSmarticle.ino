@@ -1,7 +1,7 @@
 #include <Servo.h>
 
 /* Pin Definitions */
-int randAmp = 0;//units of milliseconds
+
 #define SERVOTYPE 0 //red=0, ross=1
 
 #if SERVOTYPE==0 //RED
@@ -14,7 +14,7 @@ int randAmp = 0;//units of milliseconds
 
 #define led 13
 
-
+int randAmp = 400;//units of milliseconds
 int maxRand = 1000;
 int del = 400;
 /* Instance Data & Declarations */
@@ -64,21 +64,23 @@ void deactivateSmarticle() {
 void activateSmarticle() {
   //+1 for max argument for random because it goes from min to max-1
   int periodDel = (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0; //units of milliseconds
-
+  //if I do full size random and divide it by 4 and use it 4 times
+  //it has same std as a single large random
+  //it is different though if I add up 4 smaller randoms
 
   S1.writeMicroseconds(p1 = maxx * 10 + 600);
   S2.writeMicroseconds(p2 = minn * 10 + 600);
-//  delay(del + periodDel);
-  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
+  delay(del + periodDel);
+//  delay(del);
   S1.writeMicroseconds(p1 = maxx * 10 + 600);
   S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
+  delay(del + periodDel);
   S1.writeMicroseconds(p1 = minn * 10 + 600);
   S2.writeMicroseconds(p2 = maxx * 10 + 600);
-  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
+  delay(del + periodDel);
   S1.writeMicroseconds(p1 = minn * 10 + 600);
   S2.writeMicroseconds(p2 = minn * 10 + 600);
-  delay(del + (maxRand + random(-1 * randAmp, randAmp + 1)) / 4.0);
+  delay(del + periodDel);
 }
 
 void uShape() {
