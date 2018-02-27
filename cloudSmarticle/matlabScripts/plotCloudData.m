@@ -36,6 +36,7 @@ pts(fold);
 %************************************************************
 showFigs=[18];
 
+
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
 % cutoff/(sample/2)
@@ -46,6 +47,8 @@ filtOrder=6;
 %  [b,a]=butter(6,1/120*2,'low');
 % props={};
 inds=1;
+maxT=0;
+minT=1e28;
 for i=1:length(movs)
     
     %     cond=true;
@@ -61,6 +64,8 @@ for i=1:length(movs)
     %     end
     %     if(cond)
     usedMovs(inds)=movs(i);
+    maxT=max(maxT,usedMovs(inds).t(end));
+    minT=min(minT,usedMovs(inds).t(end));
     inds=inds+1;
     %     end
 end
@@ -549,7 +554,7 @@ if(showFigs(showFigs==xx))
         xlabel('time (s)','interpreter','latex');
         ylabel('displacement (cm)','interpreter','latex');
         
-        xlim([0 120]);
+        xlim([0 maxT]);
         figText(gcf,16);
         subplot(2,1,2);
         
@@ -558,7 +563,7 @@ if(showFigs(showFigs==xx))
         plot(t,a,'linewidth',lw);
         %             axis([0 120 -pi-.01,pi+.01]);
         
-        axis([0 120 0 2*pi]);
+        axis([0 maxT 0 2*pi]);
         xlabel('time (s)','interpreter','latex');
         ylabel('$\theta$ (rads)','interpreter','latex');
         %             set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
@@ -631,7 +636,7 @@ if(showFigs(showFigs==xx))
         xlabel('time (s)','interpreter','latex');
         ylabel('displacement (cm)','interpreter','latex');
         %             axis([0,120,0,6])
-        xlim([0 120]);
+        xlim([0 maxT]);
         figText(gcf,16);
         subplot(2,1,2);
         
@@ -640,7 +645,7 @@ if(showFigs(showFigs==xx))
         a=wrapToPi(thet);
         set(gca,'YTickLabel',{'$-\pi$','','0','','$\pi$'},...
             'ytick',[-pi,-pi/2,0,pi/2,pi],'ticklabelinterpreter','latex');
-        axis([0 120 -pi pi])
+        axis([0 maxT -pi pi])
         
         %         a=wrapTo2Pi(thet);
         %         set(gca,'YTickLabel',{'0','','$\pi$','','$2\pi$'},...
@@ -745,7 +750,7 @@ if(showFigs(showFigs==xx))
     xlabel('time (s)','interpreter','latex');
     ylabel('displacement,rotation (cm,rads)','interpreter','latex');
     
-    ylim([0 180]);
+    ylim([0 maxT]);
     mt=[max(mean(GTTAll,2))];
     mte=std(max(GTTAll,[],2),0,1);
     mr=[max(mean(GTRAll,2))];
