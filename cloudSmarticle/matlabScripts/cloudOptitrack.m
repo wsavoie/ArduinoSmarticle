@@ -73,13 +73,25 @@ if ~isempty(ind) || data.textdata{r,6}=='W' %has ring rigid body
     nanIndsrot=find(isnan(ang));
     
     for(i=1:length(nanIndsx))
-        x(nanIndsx(i))=x(nanIndsx(i)-1);
+        if(nanIndsx(i)==1)
+            x(i)=x(find(~isnan(x),1));
+        else
+            x(nanIndsx(i))=x(nanIndsx(i)-1);
+        end
     end
     for(i=1:length(nanIndsy))
-        y(nanIndsy(i))=y(nanIndsy(i)-1);
+        if(nanIndsy(i)==1)
+            y(i)=y(find(~isnan(y),1));
+        else
+            y(nanIndsy(i))=y(nanIndsy(i)-1);
+        end
     end
     for(i=1:length(nanIndsrot))
-        ang(nanIndsrot(i))=ang(nanIndsrot(i)-1);
+        if(nanIndsrot(i)==1)
+            ang(i)=ang(find(~isnan(ang),1));
+        else
+            ang(nanIndsrot(i))=ang(nanIndsrot(i)-1);
+        end
     end
     ang=unwrap(ang);
     for(i=1:size(x,1))
@@ -88,26 +100,26 @@ if ~isempty(ind) || data.textdata{r,6}=='W' %has ring rigid body
     end
     
     
-%     %getting rid of translational jumps
-%     trans=[x,y];
-%     
-%     distx=abs(diff(x)); %check for major jumps
-%     [longDistsx]=find(distx>.04);
-%     disty=abs(diff(y)); %check for major jumps
-%     [longDistsy]=find(disty>.04);
-%     %eliminate long jumps
-%     while(longDistsx)
-%         x(longDistsx(1)+1)=x(longDistsx(1));
-%         distx=abs(diff(x)); %check for major jumps
-%         [longDistsx]=find(distx>.04);
-%     end
-%     while(longDistsy)
-%         trans(longDistsy(1)+1)=trans(longDistsy(1));
-%         disty=abs(diff(x)); %check for major jumps
-%         [longDistsy]=find(disty>.04);
-%     end
-%     x=trans(:,1);
-%     y=trans(:,2);
+    %     %getting rid of translational jumps
+    %     trans=[x,y];
+    %
+    %     distx=abs(diff(x)); %check for major jumps
+    %     [longDistsx]=find(distx>.04);
+    %     disty=abs(diff(y)); %check for major jumps
+    %     [longDistsy]=find(disty>.04);
+    %     %eliminate long jumps
+    %     while(longDistsx)
+    %         x(longDistsx(1)+1)=x(longDistsx(1));
+    %         distx=abs(diff(x)); %check for major jumps
+    %         [longDistsx]=find(distx>.04);
+    %     end
+    %     while(longDistsy)
+    %         trans(longDistsy(1)+1)=trans(longDistsy(1));
+    %         disty=abs(diff(x)); %check for major jumps
+    %         [longDistsy]=find(disty>.04);
+    %     end
+    %     x=trans(:,1);
+    %     y=trans(:,2);
     %
     %     %eliminate ang jumps
     %     maxAngJump=5*pi/180;

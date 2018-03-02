@@ -1,6 +1,7 @@
 clear all
 % fold=uigetdir('A:\2DSmartData');
-fold=uigetdir('A:\2DSmartData\cloud\cloud 9-30');
+
+fold=uigetdir('A:\2DSmartData\cloud\cloud 2-27');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -87,7 +88,8 @@ for i=1:nMovs
     movs(idx).fname=f(i).name;
     movs(idx).xdot=bsxfun(@rdivide,diff(movs(idx).x),diff(movs(idx).t));
     movs(idx).ydot=bsxfun(@rdivide,diff(movs(idx).x),diff(movs(idx).t));
-    
+    [~, delName, ~]=fileparts(fold);
+    movs(idx).rAmp=str2double(cell2mat(regexp(delName,'\d+','match')));
     
     
     movs(idx).fps=fps/dec;
