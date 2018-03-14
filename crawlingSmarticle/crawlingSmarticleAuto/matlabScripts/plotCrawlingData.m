@@ -18,7 +18,7 @@ fold
 %* 6. plotting out x vs t for dan and phase shifting
 %* 7. fft of gait
 %************************************************************
-showFigs=[1 7];
+showFigs=[2];
 
 %params we wish to plot
 DIR=[]; RAD=[]; V=[];

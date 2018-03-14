@@ -33,9 +33,10 @@ pts(fold);
 %*16. plot stretched exponential data for different delays
 %*17-19. plot out phi for different delays
 %*20. plot out all gran temp data for different delays
-%*21 final gran temp R and T for all delays 
+%*21 final gran temp R and T for all delays
+%*22/23 histogram of phi changes
 %************************************************************
-showFigs=[21];
+showFigs=[22];
 
 
 %params we wish to plot
@@ -744,10 +745,10 @@ if(showFigs(showFigs==xx))
             y=y-y(1);
             thet=thet-thet(1);
             if(filtz)
-            %             [b,a]=butter(6,1/120*2,'low');
-            x=filter(fb,fa,x);  %filtered signal
-            y=filter(fb,fa,y);  %filtered signal
-            thet=filter(fb,fa,thet);  %filtered signal
+                %             [b,a]=butter(6,1/120*2,'low');
+                x=filter(fb,fa,x);  %filtered signal
+                y=filter(fb,fa,y);  %filtered signal
+                thet=filter(fb,fa,thet);  %filtered signal
             end
             dx=diff(x); dy=diff(y);dr=diff(thet);
             q=[0; cumsum(sqrt(dx.^2+dy.^2))]*100;
@@ -780,7 +781,7 @@ if(showFigs(showFigs==xx))
     % a=wrapTo2Pi(thet+.05); to remove wrapping
     [mt,mte;mr,mre]
     
-
+    
     if(saveOut)
         if(exist('GT.mat','file')==2) %if first run has been saved
             load('GT.mat');
@@ -910,7 +911,7 @@ if(showFigs(showFigs==xx))
     x=t(ti:end-1);
     y=diff(mGTTAll(ti:end))./diff(t(ti:end));
     
-     saveOut=0;
+    saveOut=0;
     
     if(expfit==1)
         f=fit(x,y,'exp1');
@@ -929,7 +930,7 @@ if(showFigs(showFigs==xx))
         %         text(.1, 0.25,['ax^{b}',newline,'a=',num2str(f.a,'%.3f'),newline,'b=',num2str(f.b,'%.3f')],'fontsize',16,'units','normalized');
         yf=exp(-(x./f.a).^(f.b));
         
-       
+        
         if(saveOut)
             if(exist('expz.mat','file')==2) %if first run has been saved
                 load('expz.mat');
@@ -1091,7 +1092,7 @@ xx=16;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on
-%     load('expzn.mat');
+    %     load('expzn.mat');
     load('expz.mat');
     %     yf=exp(-(x./f.a).^(f.b));
     %   [xi,tau,beta]
@@ -1132,7 +1133,7 @@ if(showFigs(showFigs==xx))
         f=fit(tt,y,'power1');
         ftau(i)=f.a; fbeta(i)=f.b;
         plot(f,tt,y);
-%         pause(1);
+        %         pause(1);
     end
     xlabel('t(s)');
     ylabel('\phi');
@@ -1218,12 +1219,12 @@ if(showFigs(showFigs==xx))
     legend({'coefficient','power'})
     title('fitting gran temperature to ax^b')
 end
-%% 21 final gran temp R and T for all delays 
+%% 21 final gran temp R and T for all delays
 xx=21;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on
-    load('GTfilt.mat');
+    load('GT.mat');
     
     for i=1:length(egtR)
         errR(i)=egtR{i}(end);
@@ -1241,4 +1242,77 @@ if(showFigs(showFigs==xx))
     xlim([-20,1020]);
     figText(gcf,16);
     legend(legz,'interpreter','latex','fontsize',12);
+end
+%% 22 histogram of phi changes
+xx=22;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+%     ind=9;
+    single = 6; % plotting out a single run
+    ts=1;
+    %      figure(123123)
+    %      [k,v]=convhull(R(:,1),R(:,2));
+    %      A=R(k,:)
+    % plot(A(:,1),A(:,2),'o-')
+    % axis square
+    
+    
+    for(idx=1:N)
+        
+        %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
+        %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
+        V=zeros(1,length(usedMovs(idx).x));
+        for i=1:length(usedMovs(idx).x)
+            R=[usedMovs(idx).x(i,:)',usedMovs(idx).y(i,:)'];
+            [~,V(i)]=convhull(R(:,1),R(:,2));
+            
+        end
+        %         %last point is first point
+        %         rI(end,:,idx)=[usedMovs(idx).x(1,1)',usedMovs(idx).y(1,1)'];
+        %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
+        phi{idx}=V;
+    end
+    A=.051*.021; %area (l*w) of smarticle in m
+    n=size(usedMovs(idx).x,2);%number of particles
+    s=0.1428;%straight leg length of smarticle
+    otherAngs=(180-(1-2/n)*180)/2*pi/180;
+    sig=s*cos(otherAngs);%optitrack straight length of regular polygon
+    maxAreaOpti=1/4*n*sig^2*cot(pi/n); %max optitrack convex hull area
+    minT=min(cellfun(@length,phi));
+    if(single)
+        id=single;
+%         plot((1:length(phi{single}))./usedMovs(id).fps,(A*n)./phi{id});
+        aphi=(A*n)./phi{id}(1:minT)';
+        figure(23);
+        plot((1:length(phi{id}))./usedMovs(id).fps,(A*n)./phi{id});
+        xlabel('time (s)');
+        ylabel('\phi');
+        figText(gcf,16);
+        figure(22);
+        hold on;
+    else
+        
+        for j=1:length(phi)
+            aphi(:,j)=(A*n)./phi{j}(1:minT);
+%             plot((1:length(phi{j}))./usedMovs(j).fps,(A*n)./phi{j});
+            %                 allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
+        end
+        id=j;
+    end
+     aphi=aphi(1:ts:end,:);
+     
+%     plot([0,usedMovs(id).t(end)],[n*A/maxAreaOpti,n*A/maxAreaOpti],'r--');
+    daphi=diff(aphi,1,1)/((1/usedMovs(1).fps*ts));
+    
+    sk=skewness(daphi)'
+    mean(mean(sk))
+%     daphi=daphi(:);
+    d2=filter(fb,fa,daphi);  %filtered signal
+    histogram(daphi);
+% sk=skewness(d2)'
+    xlabel(['\phi(t_n-t_{n-',num2str(ts),'})']);
+    ylabel('counts');
+    figText(gcf,16);
+   
 end

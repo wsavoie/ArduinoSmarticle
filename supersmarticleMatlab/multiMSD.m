@@ -64,7 +64,7 @@ fold
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
-showFigs=[45];
+showFigs=[29];
 % showFigs=[1 29 37];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);

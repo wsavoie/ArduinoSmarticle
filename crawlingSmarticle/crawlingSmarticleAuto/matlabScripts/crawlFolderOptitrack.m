@@ -1,16 +1,18 @@
 % function [ output_args ] = crawlFolderOptitrack( input_args )
 %CRAWLFOLDEROPTITRACK Summary of this function goes here
 %   Detailed explanation goes here
-fold=uigetdir('A:\2DSmartData\crawl');
+% fold=uigetdir('A:\2DSmartData\crawl');
+fold=uigetdir('A:\Dropbox\Smarticles\Shengkai''s Summaries\gaitTestData');
 f=dir2(fullfile(fold,'*.csv'));
 
-RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
+RIGIDBODYNAMES = false; %make true if tracking multiple things (i.e. inactive smarticles)
 clearvars walkerName
 if RIGIDBODYNAMES
     walkerName{1} = ' walker';
     walkerName{2} = ' crawler';
 else
     walkerName{1} = 'rigid body 1';
+    rigidBodyName=walkerName{1};
 end
 
 % r=.9525;
@@ -54,8 +56,8 @@ for i=1:nMovs
             continue;
         end
     else
-        error('no rotation');
-        %         [movs(i).t,movs(i).x,movs(i).y,movs(i).data]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
+%         error('no rotation');
+                 [movs(i).t,movs(i).x,movs(i).y,movs(i).data]= trackOptitrack(fullfile(fold,f(i).name),dec,rigidBodyName);
     end
     
 end
