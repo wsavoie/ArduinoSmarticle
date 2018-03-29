@@ -35,8 +35,9 @@ pts(fold);
 %*20. plot out all gran temp data for different delays
 %*21 final gran temp R and T for all delays
 %*22/23 histogram of phi changes
+%*24 phi changes at all D
 %************************************************************
-showFigs=[22];
+showFigs=[7 22];
 
 
 %params we wish to plot
@@ -1248,7 +1249,7 @@ xx=22;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-%     ind=9;
+    %     ind=9;
     single = 6; % plotting out a single run
     ts=1;
     %      figure(123123)
@@ -1282,7 +1283,7 @@ if(showFigs(showFigs==xx))
     minT=min(cellfun(@length,phi));
     if(single)
         id=single;
-%         plot((1:length(phi{single}))./usedMovs(id).fps,(A*n)./phi{id});
+        %         plot((1:length(phi{single}))./usedMovs(id).fps,(A*n)./phi{id});
         aphi=(A*n)./phi{id}(1:minT)';
         figure(23);
         plot((1:length(phi{id}))./usedMovs(id).fps,(A*n)./phi{id});
@@ -1295,24 +1296,72 @@ if(showFigs(showFigs==xx))
         
         for j=1:length(phi)
             aphi(:,j)=(A*n)./phi{j}(1:minT);
-%             plot((1:length(phi{j}))./usedMovs(j).fps,(A*n)./phi{j});
+            %             plot((1:length(phi{j}))./usedMovs(j).fps,(A*n)./phi{j});
             %                 allDistances = sqrt((usedMovs(j).x(end,:)-meanx).^2+(usedMovs(j).y-meany).^2);
         end
         id=j;
     end
-     aphi=aphi(1:ts:end,:);
-     
-%     plot([0,usedMovs(id).t(end)],[n*A/maxAreaOpti,n*A/maxAreaOpti],'r--');
+    aphi=aphi(1:ts:end,:);
+    
+    %     plot([0,usedMovs(id).t(end)],[n*A/maxAreaOpti,n*A/maxAreaOpti],'r--');
     daphi=diff(aphi,1,1)/((1/usedMovs(1).fps*ts));
     
     sk=skewness(daphi)'
     mean(mean(sk))
-%     daphi=daphi(:);
+    %     daphi=daphi(:);
     d2=filter(fb,fa,daphi);  %filtered signal
     histogram(daphi);
-% sk=skewness(d2)'
+    % sk=skewness(d2)'
     xlabel(['\phi(t_n-t_{n-',num2str(ts),'})']);
     ylabel('counts');
     figText(gcf,16);
-   
+    
+end
+%% 24 phi changes at all D
+xx=24;
+if(showFigs(showFigs==xx))
+    figure(55); lw=2;
+    hold on;
+    single = 9; % plotting out a single run
+    
+    
+    frames=size(usedMovs(single).x,1);
+    robs=7;
+    P=zeros(robs,robs,frames);
+    outlen=(robs^2-robs)/2;
+    pv=zeros(outlen,frames);
+    for i=1:frames
+        [X1,X2]=meshgrid(usedMovs(single).x(i,:));
+        [Y1,Y2]=meshgrid(usedMovs(single).y(i,:));
+        
+        % Z1=cat(3,triu(X1),triu(Y1));
+        % Z2=cat(3,triu(X2),triu(Y2));
+        % P(:,:,i)=sqrt(sum((Z1-Z2).^2,3));
+        
+        Z1=cat(3,triu(X1),triu(Y1));
+        Z2=cat(3,triu(X2),triu(Y2));
+        
+        %     Z1=Z1(triu(Z1)>0);
+        %     Z2=Z2(triu(Z2)>0);
+        p=sqrt(sum((Z1-Z2).^2,3));
+        pv(:,i)=p(triu(p)>0);
+        P(:,:,i)=sqrt(sum((Z1-Z2).^2,3));
+    end
+    dpv=diff(pv,1,2);
+    dpvr=reshape(dpv,[numel(dpv),1]);    
+    pvr=reshape(pv(:,1:end-1),[numel(pv(:,1:end-1)),1]);
+    [Y,E]=discretize(pvr,300);
+    Z=E(Y);
+    scatter(Z,dpvr,'k.');
+%     scatter(pvr,dpvr,'k.');
+%     for(i=1:outlen)
+%         scatter(pv(i,1:end-1),dpv(i,:),'k.');
+%     end
+    ylabel('Dist out');
+    ylabel('Dist in');
+    figure(123);
+    histogram(dpvr);
+
+    figText(gcf,16);
+    
 end
