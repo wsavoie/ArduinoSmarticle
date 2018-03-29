@@ -494,7 +494,7 @@ if(showFigs(showFigs==xx))
     
     mphi=mean(phimat,2);
     ephi=std(phimat,0,2);
-    shadedErrorBar([1:length(mphi)]./usedMovs(1).fps,mphi,ephi,{},0.5);
+    shadedErrorBar([1:100:length(mphi)]./(usedMovs(1).fps),mphi(1:100:end),ephi(1:100:end),{},0.5);
     
     mphi(end)
     
