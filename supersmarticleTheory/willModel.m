@@ -27,31 +27,30 @@ XB=0.00718;
 l1=0.76;
 l2=1-l1;
 
-R1=phi/pi;
-R2=(pi/2-phi)/pi;
-R3=1/2;
+X1=phi/pi;
+X2=(pi/2-phi)/pi;
+X3=1/2;
 
-P1=phi/(2*pi);
-P2=(pi-phi)/(2*pi);
-P3=(pi-phi)/(2*pi);
-P4=phi/(2*pi);
-
-
-r1=sin(phi)/pi;
-r2=(1-sin(phi))/pi;
-r3=-1/pi;
-
-p1=(1-cos(phi))/(phi);
-p2=(1+cos(phi))/(pi-phi);
-p3=(-1-cos(phi))/(pi-phi);
-p4=(-1+cos(phi))/(phi);
+x1=sin(phi)/phi;
+x2=(1-sin(phi))/(pi/2-phi);
+x3=-2/pi;
 
 
-R=[R1 R2 R3];
-r=[r1 r2 r3];
-P=[P1 P2 P3 P4];
-p=[p1 p2 p3 p4];
+Y1=phi/(2*pi);
+Y2=(pi-phi)/(2*pi);
+Y3=(pi-phi)/(2*pi);
+Y4=phi/(2*pi);
 
+y1=(1-cos(phi))/(phi);
+y2=(1+cos(phi))/(pi-phi);
+y3=(-1-cos(phi))/(pi-phi);
+y4=(-1+cos(phi))/(phi);
+
+
+X=[X1 X2 X3];
+x=[x1 x2 x3];
+Y=[Y1 Y2 Y3 Y4];
+y=[y1 y2 y3 y4];
 
 
 
@@ -64,7 +63,7 @@ d0=[0,XA,XA];
 D1=[YB YB YB YB];
 D0=[0 YA YA 0];
 
-[avg,stdz]=getAvg(R,r,P,p,D1,D0,d1,d0,f,l1);
+[avg,stdz]=getAvg(X,x,Y,y,D1,D0,d1,d0,f,l1);
 
 subplot(1,2,1);
 hold on;

@@ -1,4 +1,4 @@
-function [X,Y]=zackModelPars(its,A0,omega,m,gama,m1,m2,g,mu,f,phi,l1)
+function [XX,YY]=zackModelPars(its,A0,omega,m,gama,m1,m2,g,mu,f,phi,l1)
 %zackModelPars
 %X= [m_s/m_r,xavg,xstd,xvar]
 %Y= [m_s/m_r,yavg,ystd,yvar]
@@ -38,39 +38,35 @@ for i=0:its
 end
 
 
-R1=phi/pi;
-R2=(pi/2-phi)/pi;
-R3=1/2;
+X1=phi/pi;
+X2=(pi/2-phi)/pi;
+X3=1/2;
+
+x1=sin(phi)/phi;
+x2=(1-sin(phi))/(pi/2-phi);
+x3=-2/pi;
 
 
+Y1=phi/(2*pi);
+Y2=(pi-phi)/(2*pi);
+Y3=(pi-phi)/(2*pi);
+Y4=phi/(2*pi);
+
+y1=(1-cos(phi))/(phi);
+y2=(1+cos(phi))/(pi-phi);
+y3=(-1-cos(phi))/(pi-phi);
+y4=(-1+cos(phi))/(phi);
 
 
-
-r1=sin(phi)/phi;
-r2=(1-sin(phi))/(pi/2-phi);
-r3=-2/pi;
-
-
-P1=phi/(2*pi);
-P2=(pi-phi)/(2*pi);
-P3=(pi-phi)/(2*pi);
-P4=phi/(2*pi);
-
-p1=(1-cos(phi))/(phi);
-p2=(1+cos(phi))/(pi-phi);
-p3=(-1-cos(phi))/(pi-phi);
-p4=(-1+cos(phi))/(phi);
-
-
-R=[R1 R2 R3];
-r=[r1 r2 r3];
-P=[P1 P2 P3 P4];
-p=[p1 p2 p3 p4];
+X=[X1 X2 X3];
+x=[x1 x2 x3];
+Y=[Y1 Y2 Y3 Y4];
+y=[y1 y2 y3 y4];
     
 
 %this might have to be zero to length of ai when comparing to mathematica
 %code
-[xx,yy,X,Y]=deal(zeros(its+1,4));
+[xx,yy,XX,YY]=deal(zeros(its+1,4));
 for i=0:its
     XA=Ai(i+1);
     XB=Bi(i+1);
@@ -81,14 +77,14 @@ for i=0:its
     d0=[0,XA,XA];
     D1=[YB YB YB YB];
     D0=[0 YA YA 0];
-    [avg,stdz]=getAvg(R,r,P,p,D1,D0,d1,d0,f,l1);
+    [avg,stdz]=getAvg(X,x,Y,y,D1,D0,d1,d0,f,l1);
     
     xx(i+1,:)=[.25*m+.01*i*m,avg(1),stdz(1),stdz(1)^2];
     yy(i+1,:)=[.25*m+.01*i*m,avg(2),stdz(2),stdz(2)^2];
     
-    X(i+1,:)=[1/(.25+i*.01),avg(1),stdz(1),stdz(1)^2];
+    XX(i+1,:)=[1/(.25+i*.01),avg(1),stdz(1),stdz(1)^2];
     
-    Y(i+1,:)=[1/(.25+i*.01),avg(2),stdz(2),stdz(2)^2];
+    YY(i+1,:)=[1/(.25+i*.01),avg(2),stdz(2),stdz(2)^2];
     
 end
 

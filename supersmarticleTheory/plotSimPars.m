@@ -35,10 +35,10 @@ pars(:,varIdx)=linspace(pi,10*pi,runs);
 figure(23);
 hold on;
 for i=1:runs  
-[X,Y]=zackModelPars(its,pars(i,1),pars(i,2),pars(i,3),pars(i,4),pars(i,5),pars(i,6),...
+[XX,YY]=zackModelPars(its,pars(i,1),pars(i,2),pars(i,3),pars(i,4),pars(i,5),pars(i,6),...
     pars(i,7),pars(i,8),pars(i,9),pars(i,10),pars(i,11));
-h(i)=plot(X(:,1),X(:,3),'--');
-plot(X(:,1),X(:,2),'-','linewidth',2,'color',h(i).Color);
+h(i)=plot(XX(:,1),XX(:,3),'--');
+plot(XX(:,1),XX(:,2),'-','linewidth',2,'color',h(i).Color);
 % plot(X(:,1),-X(:,3),'color',h.Color);   
 
 legz(i)={[names{varIdx},'=',num2str(pars(i,varIdx),2)]};
