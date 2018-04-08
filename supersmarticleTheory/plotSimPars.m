@@ -9,9 +9,10 @@ m1= (3*m)/34; %proportional mass of arm
 m2= (28*m)/34; % proportional mass of mid section
 g=9.81;
 mu=.37;
-f=3.5;
-phi=pi/5;
-l1=.76;
+f=5;
+% phi=pi/5;
+phi=pi/3.8;
+l1=.86;
 
 
 %%%Seperate area to revalue params%%%%
