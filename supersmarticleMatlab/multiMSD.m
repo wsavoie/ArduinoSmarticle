@@ -63,11 +63,11 @@ fold
 %*45-46. plot mean vcorr in non-rotated and rotated frame
 %*47-48 plot r for a single trajectory and x,y
 %*49. get x and y variance
-%* 50. view variance dependence on exp time length 
+%*50. view variance dependence on exp time length 
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
-showFigs=[29];
+showFigs=[50];
 % showFigs=[1 29 37];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -2744,22 +2744,23 @@ end
 xx=50;
 if(showFigs(showFigs==xx))
     valz=[];
+    meanz=[];
     numz=20;
     for kkk=1:numz
-    figure(xx)
-    hold on;
-    hax1=gca;
+%     figure(xx)
+%     hold on;
+%     hax1=gca;
     %     ma.plotTracks
-    ma.labelPlotTracks
+%     ma.labelPlotTracks
     %     text(0,0+.01,'start')
     %     plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
-    y=get(gca,'ylim');
-    deltax=get(gca,'xlim');
-    c=max(abs(deltax)); xlim([-c,c]);
-    c=max(abs(y)); ylim([-c,c]);
-    deltax=xlim; y=ylim;
+%     y=get(gca,'ylim');
+%     deltax=get(gca,'xlim');
+%     c=max(abs(deltax)); xlim([-c,c]);
+%     c=max(abs(y)); ylim([-c,c]);
+%     deltax=xlim; y=ylim;
     %set(gca,'xtick',[-.5:.25:.5],'ytick',[-.5:.25:.5]);
-    set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]); %same as 1
+%     set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]); %same as 1
     
     %     for i=9
     %     xp = 0;
@@ -2830,45 +2831,45 @@ if(showFigs(showFigs==xx))
         if newpos(end,2)>0
             correctDir=correctDir+1;
         end
-        plot(newpos(:,1),newpos(:,2));
+%         plot(newpos(:,1),newpos(:,2));
         %                 plot(ones(1,length(newpos(:,2)))*.025*i-length(usedMovs)/2*.025,newpos(:,2));
-        h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
-        set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%         h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
+%         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         endPos(i)=newpos(end,2);
-        nn(i)=newpos(end,2)./usedMovs(i).t(end);
+        nn(i)=newpos(end,2)./usedMovs(i).t(newL);
     end
     pts('mean((final y positions)/time)', mean(nn),' +-',std(nn));
     pts('var=',std(nn).^2);
-    
+    meanz=[meanz,mean(nn)];
     valz=[valz,std(nn).^2];
-    close all
+%     close all
     %     pts('avg projected v=',mean(endPos)/(minT/usedMovs(1).fps));
     %     xpercent = xp/length(ma.tracks);
     %     ypercent = yp/length(ma.tracks);
     %     text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
     %     text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
     
-    text(.1,.9,{['towards inactive: ',num2str(correctDir,2),...
-        '/',num2str(L),'=',num2str(correctDir/L,2)]},'units','normalized','Interpreter','latex');
+%     text(.1,.9,{['towards inactive: ',num2str(correctDir,2),...
+%         '/',num2str(L),'=',num2str(correctDir/L,2)]},'units','normalized','Interpreter','latex');
     
     ringRad=.1905/2;
-    h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
-    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-    xlabel('Perpendicular to Inactive Smarticle (m)')
-    ylabel('Along Axis of Inactive Smarticle (m)')
-    title('Projected displacement');
-    figText(gcf,14);
+%     h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+%     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%     xlabel('Perpendicular to Inactive Smarticle (m)')
+%     ylabel('Along Axis of Inactive Smarticle (m)')
+%     title('Projected displacement');
+% %     figText(gcf,14);
     %     axis tight
-    axis equal
-    axis([-.35 .35 -.35 .35]);
-    h=plot(xlim,[0,0],'r');
-    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-    h=plot([0,0],ylim,'r');
-    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%     axis equal
+%     axis([-.35 .35 -.35 .35]);
+%     h=plot(xlim,[0,0],'r');
+%     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+%     h=plot([0,0],ylim,'r');
+%     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
     
     
-    figure(12524);
-    dataLen=[40, ];
+%     figure(12524);
+    dataLen=[40,];
     mm=[-0.00013641 -0.00021787 -.00014566, -0.00012244 0.0001927, 0.000697 0.00098668];
     mmerr=[0.00011918 0.00027257 0.0004223, 0.0006557,  0.0011994, 0.0010046 0.0013029];
     %     mx=[1/6 1/4 1/3 1/2 1 2 3];
@@ -2881,35 +2882,29 @@ if(showFigs(showFigs==xx))
     %     mm=[-0.00013641 -0.00021787 -.00014566, -0.00012244 0.0001927, 0.000697 0.000548];
     %     mmerr=[0.00011918 0.00027257 0.0004223, 0.0006557,  0.0011994, 0.0010046 0.00073104];
     %     mx=[1/6 1/4 1/3 1/2 1 2 3];
-    errorbar(mx,mm,mmerr);
-    xlabel('M_{inactive}/M_{ring}');
-    ylabel('\langle final drift speed\rangle');
-    hold on;
-    errorbar([0.5],[-0.00017361],[0.00021024])
-    figText(gcf,16);
+%     errorbar(mx,mm,mmerr);
+%     xlabel('M_{inactive}/M_{ring}');
+%     ylabel('\langle final drift speed\rangle');
+%     hold on;
+% %     errorbar([0.5],[-0.00017361],[0.00021024])
+%     figText(gcf,16);
     xl=xlim;
-    plot(xl,[0,0],'k');
+%     plot(xl,[0,0],'k');
     
-    saveDat=0;
-    if saveDat
-        %%%%
-        load('ssData');
-        trialName='shortv3';
-        mi=34;
-        mr=29.5;
-        mRat=mi/mr;
-        trialsAmt=length(usedMovs);
-        datMean=mean(nn);
-        datStd=std(nn);
-        datVar=datStd.^2;
-        datErr=datStd/sqrt(trialsAmt);
-        towardsInactive=correctDir/L;
-        ssData2=table(mi,mr,mRat,trialsAmt,datMean,datStd,datVar,datErr,towardsInactive,'RowNames',{trialName});
-        ssData=[ssData;ssData2];
-        save('ssData3','ssData');
-    end
-    
+  
     
 
     end
+    figure(xx);
+    hold on;
+    l1=log((1:numz)./numz);l2=log(valz);scatter(l1,l2);
+    ylabel('log(var(v_y))')
+    xlabel('log(time)')
+    
+    figure(12412);
+    hold on;
+   	plot(meanz);
+    axis([0,20,-5e-4,0]);
+    ylabel('mean(v_y)')
+    xlabel('')
 end
