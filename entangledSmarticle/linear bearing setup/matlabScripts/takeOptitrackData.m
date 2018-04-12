@@ -3,7 +3,7 @@ vidOn=0;
 %specifiesTime
 ba=obj.bytesavailable;
 if(ba>15)
-    
+    x = evalin('base',vars{var_index(1)});
     tt=fread(obj,ba);
     char(tt')
 %     matchStr=regexp(char(tt'),'\w*|','match');

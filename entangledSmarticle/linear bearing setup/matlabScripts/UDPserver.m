@@ -1,44 +1,70 @@
+function UDPserver
 myip='130.207.141.229';
 roboip='130.207.140.133';
 
-% s=server('hi',1500,3);
-% a=clientTCP('localhost',1508);
-% s=server('hi',1500,3);
-% fclose(instrfindall);
-% if(exist('t'))
-%     fclose(t);
-%     delete(t);
-% end
-% t=tcpip(roboip);
-% t.localport=1520;
-% t.localhost='localhost';
-% t.remotehost=roboip;
-% t.remoteport=1520;
-% t = tcpip('0.0.0.0',55000,'NetworkRole','Server');
-% t=udp(roboip,1510);
-% t.localhost='localhost';
-% t.localport=1510;
-% 
-% t.terminator='';
-% % t.localhost='localhost';
-% % t.localport=55000;
-% t.name='MAT';
-if(exist('udpServ'))
-fclose(udpServ);
-delete(udpServ);
-clear udpServ;
+% global client
 fclose(instrfindall);
-
-client.disconnect();
+if(exist('udpServ'))
+delete(udpServ);
 end
 
 client = natnet();
 client.connect();
 udpServ = udp('', 'LocalHost', '', 'LocalPort', 1520);
-udpServ.BytesAvailableFcn=@takeOptitrackData;
+udpServ.BytesAvailableFcn=@takeOpti;
 udpServ.BytesAvailableFcnCount=1;
 udpServ.BytesAvailableFcnMode='byte';
 fopen(udpServ);
 
+function tt=takeOpti(obj,event)
+vidOn=0;
+%specifiesTime
+ba=obj.bytesavailable;
+if(ba>4)
+    tt=fread(obj,ba);
+    pts(char(tt'));
 
-% 
+    runNameOut=strsplit(char(tt'),'|');
+    takeName=runNameOut{2}(1:end-4);
+
+    
+    %keypresses for starting recording for OBS
+    robot = java.awt.Robot;
+    
+
+    client.stopRecord;
+    
+    pts(takeName);
+    client.setTakeName(['OPTI_',takeName]);
+    
+    %make sure to set OBS's hotkeys for record/stop record to f3/f4
+    %respectively
+    if vidOn
+        robot.keyPress(java.awt.event.KeyEvent.VK_F3);
+        pause(.05);
+        robot.keyRelease(java.awt.event.KeyEvent.VK_F3)
+    end
+    client.startRecord;
+
+return;
+end
+if(ba>=1)
+    
+    out=char(fread(obj,ba)');
+    if(out=='}')%end of run delimiter
+%         client = natnet();
+%         client.ConnectionType = 'Multicast';
+%         client.ClientIP ='127.0.0.1';
+%         client.HostIP = '127.0.0.1';
+%         client.connect();
+        client.stopRecord;
+        if vidOn
+            robot.keyPress(java.awt.event.KeyEvent.VK_F4);
+            pause(.1);
+            robot.keyRelease(java.awt.event.KeyEvent.VK_F4);
+        end
+        beep;
+    end
+end
+end
+end
