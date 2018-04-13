@@ -30,11 +30,11 @@ clear all;
 % maxSpeed= 1.016; %m/s
 % pctSpeed=.0173;
 % speed=pctSpeed*maxSpeed;
-samp=120;
+samp=80;
 [fb,fa]=butter(6,2/(samp/2),'low');
 
 
-fold=uigetdir('A:\2DSmartData\entangledData\4-11 multimarker');
+fold=uigetdir('A:\2DSmartData\entangledData\4-13 linear');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
 % fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)\stretchAll 11-20 paperTrials\type4only';
 % fold='A:\2DSmartData\entangledData\4-11 multimarker';
@@ -51,8 +51,8 @@ if (~exist(fullfile(fold,'dataOut.mat'),'file') && ~exist(fullfile(fold,'fractDa
             analyzeEntangleFileMM(fold,filez(i).name,freq);
         s(i).name=filez(i).name;
         s(i).fpars=allFpars(i,:);
-            [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(s(i).fpars(i,:),1);
-%         [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(allFpars(i,:),1);
+%             [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(s(i).fpars(i,:),1);
+        [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(allFpars(i,:),1);
     end
     save(fullfile(fold,'dataOut.mat'),'s','allFpars');
 else
@@ -69,6 +69,9 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Elastic, close all smarticles','Fracture On','Stress Avoiding Chain'...
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
+filtz=1;
+showFigs=[14];
+tpt=[2 2];
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
 types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -91,6 +94,9 @@ for i=1:length(s)
         end
     end
     if(cond)
+        if filtz
+        s(i).F=filter(fb,fa,s(i).F);  %filtered signal
+        end
         usedS(indcnt)=s(i);
         indcnt=indcnt+1;
     end
@@ -106,8 +112,7 @@ end
 [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
 end
 % showFigs=[9 10]
-showFigs=[3]
-tpt=[2 2];
+
 %% 1. single force vs time with strain overlay
 xx=1;
 if(showFigs(showFigs==xx))
@@ -184,20 +189,20 @@ if(showFigs(showFigs==xx))
     ind=1;
     
     pts('F vs. Strain for ',usedS(ind).name);
-    % plot(s(ind).strain,s(ind).F);
-    ff=usedS(ind).F;
-    ss=usedS(ind).strain;
-    ff1=filter(fb,fa,ff);  %filtered signal
-    colormapline(ss,ff,[],jet(100));
+%     plot(s(ind).strain,s(ind).F);
+%     ff=usedS(ind).F;
+%     ss=usedS(ind).strain;
+%     ff1=filter(fb,fa,ff);  %filtered signal
+    colormapline(usedS(ind).strain,usedS(ind).F,[],jet(100));
     xlabel('Strain');
     ylabel('Force (N)');
     figText(gcf,18)
     
-    figure(12312)
-    colormapline(ss,ff1,[],jet(100));
-    xlabel('Strain');
-    ylabel('Force (N)');
-    figText(gcf,18)
+%     figure(12312)
+%     colormapline(ss,ff1,[],jet(100));
+%     xlabel('Strain');
+%     ylabel('Force (N)');
+%     figText(gcf,18)
 end
 %% 4 plot comparison b/w activated system and regular, Force vs. Strain
 xx=4;
@@ -212,9 +217,7 @@ if(showFigs(showFigs==xx))
     %
     % xlimz=[-0.7,0.7];
     % ylimz=[-0.7,0.7];
-    
-    figure(xx)
-    hold on;
+   
     typesZ=[1 5];
     title(typeTitles{typesZ(1)+1});
     xlabel(xlab);

@@ -59,11 +59,36 @@ fpars(2)=fpars(2)/1000; %put strain in meters
 fpars(3)=fpars(3); %put system (H) width in smart widths
 figure(1000);
 clf;
+hold on;
 h=plot(t,strain);
 %[strainT,strainY,~,idx]
 dsPts=zeros(fpars(6)*2,3); %time1,strain1,idx1
-[dsPts(:,1),dsPts(:,2),~,dsPts(:,3)]=MagnetGInput(h,fpars(6)*2,1);
+% [dsPts(:,1),dsPts(:,2),~,dsPts(:,3)]=MagnetGInput(h,fpars(6)*2,1);
 
+np=fpars(6)*2;
+x=linspace(0,1,length(t));
+
+totalPts=fpars(6)*2;
+pys=strain.*exp(1-x); % fpars(6)/2
+pye=strain.*exp(x);%fpars(6)/2
+
+ns=strain-nanmean(strain);
+mys=-ns.*exp(1-x);%fpars(6)/2+1
+mye=-ns.*exp(x);%fpars(6)*2-(fpars(6)*3/2+1) mye(10
+
+[~,dsPts(2:4:np,3)]=findpeaks(pys,'npeaks',fpars(6)/2,'minpeakdistance',length(t)/fpars(6)*1.05);
+[~,dsPts(3:4:np,3)]=findpeaks(pye,'npeaks',fpars(6)/2,'minpeakdistance',length(t)/fpars(6)*1.05);
+[~,dsPts([1,4:4:12],3)]=findpeaks(mys,'minpeakheight',mye(1)*1.05,'npeaks',fpars(6)/2+1,'minpeakdistance',length(t)/fpars(6)*1.05);
+if(np>4)
+    [~,dsPts(5:4:(np-1),3)]=findpeaks(mye,'minpeakheight',mye(1)*1.05,'npeaks',fpars(6)*2-(fpars(6)*3/2+1),'minpeakdistance',length(t)/fpars(6)*1.05);
+end
+
+dsPts(:,2)=strain(dsPts(:,3));
+dsPts(:,1)=t(dsPts(:,3));
+
+
+plot(dsPts(:,1),dsPts(:,2),'.','r');
+pause;
 if ~isempty(find(isnan(strain), 1))
     id=find(isnan(strain),1);
     prevVal=strain(id-1);
