@@ -50,7 +50,7 @@ if (~exist(fullfile(fold,'dataOut.mat'),'file') && ~exist(fullfile(fold,'fractDa
     for i=1:N
         pts(i,'/',N);
         [allFpars(i,:),s(i).t,s(i).strain,s(i).F,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel]=...
-            analyzeEntangleFileMM(fold,filez(i).name,freq,0);
+            analyzeEntangleFileMM(fold,filez(i).name,freq,1);
         s(i).name=filez(i).name;
         s(i).fpars=allFpars(i,:);
         %             [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(s(i).fpars(i,:),1);
@@ -75,7 +75,7 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 filtz=1;
-showFigs=[8];
+showFigs=[6];
 tpt=[1 1];
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -199,6 +199,7 @@ if(showFigs(showFigs==xx))
     %     ss=usedS(ind).strain;
     %     ff1=filter(fb,fa,ff);  %filtered signal
     colormapline(usedS(ind).strain,usedS(ind).F,[],jet(100));
+%     plot(usedS(ind).strain,usedS(ind).F);
     xlabel('Strain');
     ylabel('Force (N)');
     figText(gcf,18)
@@ -427,7 +428,16 @@ if(showFigs(showFigs==xx))
     for i=1:length(uH)
         inds=find(allH==uH(i));
         uF(i)={[fractData(inds).fracFmax]};
-        uS(i)={[fractData(inds).fracStrainMax]};
+        
+        %%%Get strains from rob
+        h=[];
+        for(j=1:length(inds))
+            h(j)=usedS(inds(j)).rob(fractData(inds(j)).fracInd)*100;
+        end
+        uS(i)={h};
+        %%%%
+        
+%         uS(i)={[fractData(inds).fracStrainMax]};
         uFm(i)=mean(uF{i});
         uFerr(i)=std(uF{i});
         uSm(i)=mean(uS{i});
@@ -439,7 +449,7 @@ if(showFigs(showFigs==xx))
     title('Force at Fracture');
     errorbar(uH,uFm,uFerr,'linewidth',2);
     ylabel('Force (N)');
-    xlabel('Width (smarticle widths)');
+    xlabel('Confinement Height (cm)');
     figText(gcf,16)
     axis tight;
     
@@ -447,8 +457,8 @@ if(showFigs(showFigs==xx))
     hold on;
     title('Strain at Fracture');
     errorbar(uH,uSm,uSerr,'linewidth',2);
-    ylabel('Strain');
-    xlabel('Width (smarticle widths)');
+    ylabel('Strain (cm)');
+    xlabel('Confinement Height (cm)');
     figText(gcf,16);
     axis tight;
     
