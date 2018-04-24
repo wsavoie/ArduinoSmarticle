@@ -14,7 +14,7 @@
 
 #define led 13
 
-int randAmp = 400;//units of milliseconds
+int randAmp = 800;//units of milliseconds
 int maxRand = 1000;
 int del = 400;
 /* Instance Data & Declarations */
