@@ -12,23 +12,35 @@ frames=data.data(1:end,1);
 t=data.data(1:end,2);
 % x=data.data(:,3:3:ends
 
+%ft sensor is connected to end of chain
+%farthest point is start of chain
+
+%cs = chain start
+%ce = chain end
+
 z=data.data(1:end,5:3:end);
-[~,startChainIdx]=min(z(1,:),[],2);
-[~,chainEnd]=max(z(1,:),[],2);
+[~,FTidx]=min(z(1,:),[],2);
+[~,CS]=max(z(1,:),[],2);
 %assuming 3 markers 3 + 2 + 1=6
-FTPlateIdx=6-(startChainIdx+chainEnd);
-ID=[startChainIdx,chainEnd,FTPlateIdx];
+CE=6-(FTidx+CS);
+ID=[CS,CE,FTidx];
 % 
 % x=data.data(1:end,3:3:end);
 % y=data.data(1:end,4:3:end);
 % 
 % x=x-x(1,ID(1));
 % y=y-y(1,ID(1));
-z=z-z(1,ID(1));
+% z=z-z(1,ID(3));
+z=z-z(1,ID(2));
+z=-z;
+
 z=z(:,ID);
-
-
-
+% figure(23);
+% clf;
+% hold on;
+% plot(t,z(:,1),t,z(:,2),t,z(:,3))
+% legend({'chain start','chain end','FTsensor'});
+% title('asd');
 % q=sqrt(x.^2+y.^2+z.^2);
 
 

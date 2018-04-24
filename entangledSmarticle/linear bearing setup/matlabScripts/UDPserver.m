@@ -7,7 +7,7 @@ fclose(instrfindall);
 if(exist('udpServ'))
 delete(udpServ);
 end
-
+robot = java.awt.Robot;
 client = natnet();
 client.connect();
 udpServ = udp('', 'LocalHost', '', 'LocalPort', 1520);
@@ -29,8 +29,6 @@ if(ba>4)
 
     
     %keypresses for starting recording for OBS
-    robot = java.awt.Robot;
-    
 
     client.stopRecord;
     
@@ -39,12 +37,13 @@ if(ba>4)
     
     %make sure to set OBS's hotkeys for record/stop record to f3/f4
     %respectively
+    client.startRecord;
     if vidOn
         robot.keyPress(java.awt.event.KeyEvent.VK_F3);
         pause(.05);
         robot.keyRelease(java.awt.event.KeyEvent.VK_F3)
     end
-    client.startRecord;
+
 
 return;
 end
