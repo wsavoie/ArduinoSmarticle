@@ -28,12 +28,11 @@
 #define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
 
+//////////////////////////////
 /*Stress related vars*/
 int stressMoveThresh =5;
 uint8_t stressCount = 0;
-
-uint8_t stressThresh=20;
-
+uint8_t stressThresh=18;
 static int curr  = 0;
 bool stress = false;
 uint16_t samps = 8;
@@ -41,7 +40,11 @@ uint8_t sdel=50;
 /*current inertia*/
 int ciMax = 4; //current inertia max
 int cInertia = ciMax;
-
+int smin=600; //affects left servo u-shape (from back)
+int smax=2400;//=affects right servo u-shape (from back)
+int stressMin=1000;
+int stressMax=1900;
+////////////////////////
 /*Servo pins*/
 Servo S1;
 Servo S2;
@@ -98,8 +101,7 @@ void zShape();
 void uShape();
 void nShape();
 void rightSquareGaitCS();
-int smin=600; //affects left servo u-shape (from back)
-int smax=2400;//=affects right servo u-shape (from back)
+
 
 void setup() {
   S1.attach(servo1, smin, smax); 
@@ -131,17 +133,17 @@ void loop()
 ////////////////////////
 
   
-//////////STRESS RESPONSE///////////////
-  int mcurr=0;
-  stressThresh=18;
-  int ss=9;
-  for (int i = 0; i < 1<<ss; i++)
-    {
-      mcurr  = mcurr+analogRead(stressPin);
-    }
-    mcurr >>= ss;
-  bool notStress=currentMove(mcurr);
-////////////////////////////////////////
+////////STRESS RESPONSE///////////////
+//   int mcurr=0;
+////  stressThresh=18;
+//  int ss=9;
+//  for (int i = 0; i < 1<<ss; i++)
+//    {
+//      mcurr  = mcurr+analogRead(stressPin);
+//    }
+//    mcurr >>= ss;
+//  bool notStress=currentMove(mcurr);
+//////////////////////////////////////
 
 
 
@@ -215,7 +217,7 @@ bool currentMove(int sp)
   }
   else
   {
-    if(p1<1000&& p2>1900)
+    if(p1<stressMin&& p2>stressMax)
     {
       S1.writeMicroseconds(p1 = p1+50);
       S2.writeMicroseconds(p2 = p2-50);
