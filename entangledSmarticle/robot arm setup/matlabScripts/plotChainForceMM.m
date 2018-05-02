@@ -103,7 +103,7 @@ end
 [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
 end
 % showFigs=[9 10]
-showFigs=[17 13]
+showFigs=[17 13 14]
 tpt=[2 2];
 %% 1. single force vs time with strain overlay
 xx=1;

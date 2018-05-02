@@ -32,7 +32,7 @@ clear all;
 % maxSpeed= 1.016; %m/s
 % pctSpeed=.0173;
 % speed=pctSpeed*maxSpeed;
-samp=80;
+samp=120;
 [fb,fa]=butter(6,2/(samp/2),'low');
 
 
@@ -50,7 +50,7 @@ if (~exist(fullfile(fold,'dataOut.mat'),'file') && ~exist(fullfile(fold,'fractDa
     for i=1:N
         pts(i,'/',N);
         [allFpars(i,:),s(i).t,s(i).strain,s(i).F,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel]=...
-            analyzeEntangleFileMM(fold,filez(i).name,freq,1);
+            analyzeEntangleFileMM(fold,filez(i).name,freq,0);
         s(i).name=filez(i).name;
         s(i).fpars=allFpars(i,:);
         %             [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(s(i).fpars(i,:),1);
@@ -76,7 +76,7 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
 %%%%%%%%%%%%%%%%%%
 filtz=1;
 showFigs=[6];
-tpt=[1 1];
+tpt=[2 2];
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
 types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -311,12 +311,15 @@ if(showFigs(showFigs==xx))
         for j=1:length(currSpds)
             strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt);
             forcez(:,j)=usedS(currSpds(j)).F(stpt:edpt);
+            forcez(:,j)=forcez(:,j)-forcez(1,j);
+            strainz(:,j)=strainz(:,j)-strainz(1,j);
         end
         mforce(:,i)=mean(forcez,2);
         mstrainz(:,i)=mean(strainz,2);
         ef(:,i)=std(forcez,0,2);
         
         shadedErrorBar(mstrainz(:,i),mforce(:,i),ef(:,i),{'linewidth',2},.5);
+        pause
         legT{i}=['$\dot{\epsilon}$=',num2str(spds(i)),'mm/s'];
         
     end
