@@ -1376,7 +1376,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
-    filtz=1;
+    filtz=0;
     COM=cell(N*numBods,1);
     countIdx=1;
     for k=1:N
@@ -1395,12 +1395,74 @@ if(showFigs(showFigs==xx))
     end
     ma = ma.addAll(COM);
     tic;
+    
     if(isempty(ma.msd))
-        %         ma = ma.computeMSD;
-        load(fullfile(fold,'maSmartDat.mat'));
+%         ma = ma.computeMSD;
+        if(filtz)
+            if exist(fullfile(fold,'maSmartDatFilt.mat'),'file')
+                load(fullfile(fold,'maSmartDatFilt.mat'));
+            else
+                ma = ma.computeMSD;
+                save(fullfile(fold,'maSmartDatFilt.mat'),'ma');
+            end
+        else
+            if exist(fullfile(fold,'maSmartDatRaw.mat'),'file')
+                load(fullfile(fold,'maSmartDatRaw.mat'));
+            else
+                ma = ma.computeMSD;
+                save(fullfile(fold,'maSmartDatRaw.mat'),'ma');
+            end
+%             load(fullfile(fold,'maCOMDatRaw.mat'));
+        end
     end
-%     ma = ma.computeMSD;
-    toc;
+    toc
+    
+        [fo, gof]=ma.fitMeanMSD;
+    % [a b]=ma.fitMeanMSD;
+    D=fo.p1/2/ma.n_dim;
+    p=ma.getMeanMSD([]);
+    x=p(:,1);
+    y=p(:,2);
+    y=y(x>1.2&x<15);
+    x=x(x>1.2&x<15);
+    lx=log(x);
+    ly=log(y);
+    pom=fit(lx,ly,'poly1');
+    %mean of powers
+    clear x y lx ly
+    fs=zeros(length(ma.msd),1);
+    
+    for i=1:length(ma.msd)
+        a=ma.msd{i}(:,1:2);
+        x=a(:,1);
+        y=a(:,2);
+        y=y(x>1.2&x<15);
+        x=x(x>1.2&x<15);
+        [lx]=log(x);
+        [ly]=log(y);
+        plot(lx, ly);
+        [f,gof]=fit(lx,ly,'poly1');
+        fs(i)=f.p1;
+    end
+    %     figure
+    plot(lx, lx*pom.p1+log(D), '-', 'Color',[0,0,0], 'LineWidth', 1)
+    xlabel('log(Delay)')
+    ylabel('log(MSD)')
+    %     hold on
+    %     plot(lx, lx-10)
+    %     plot(lx, 2*(lx)-10)
+    pts('(*)mean of powers=', mean(fs),' stdev=', std(fs),'  power of mean=',pom.p1);
+    % std(fs);
+    
+    
+    ma = ma.fitMSD;
+    good_enough_fit = ma.lfit.r2fit > 0.8;
+    Dmean = mean( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+    Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+    fprintf('Found D = %.3e ± %.3e (mean ± std, N = %d)\n', ...
+        Dmean, Dstd, sum(good_enough_fit));
+    
+toc
 end
 %% 26 cloud diffusion com tracks
 xx=26;
@@ -1408,7 +1470,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
-    filtz=1;
+    filtz=0;
     COM=cell(N,1);
     
     for i=1:N
@@ -1425,8 +1487,23 @@ if(showFigs(showFigs==xx))
     ma = ma.addAll(COM);
     tic
     if(isempty(ma.msd))
-        %         ma = ma.computeMSD;
-        load(fullfile(fold,'maCOMDat.mat'));
+%         ma = ma.computeMSD;
+        if(filtz)
+            if exist(fullfile(fold,'maCOMDatFilt.mat'),'file')
+                load(fullfile(fold,'maCOMDatFilt.mat'));
+            else
+                ma = ma.computeMSD;
+                save(fullfile(fold,'maCOMDatFilt.mat'),'ma');
+            end
+        else
+            if exist(fullfile(fold,'maCOMDatRaw.mat'),'file')
+                load(fullfile(fold,'maCOMDatRaw.mat'));
+            else
+                ma = ma.computeMSD;
+                save(fullfile(fold,'maCOMDatRaw.mat'),'ma');
+            end
+%             load(fullfile(fold,'maCOMDatRaw.mat'));
+        end
     end
     toc
     [fo, gof]=ma.fitMeanMSD;
