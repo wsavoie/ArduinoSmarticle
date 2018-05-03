@@ -6,7 +6,8 @@ close all;
 % f='A:\2DSmartData\singleSmarticleTrack';
 % f='A:\2DSmartData\cloud\cloudTests 10-5 diamond and square gaits\';
 % f='A:\2DSmartData\cloud\cloud 9-30';
-f='A:\2DSmartData\cloud\cloud 2-27\';
+% f='A:\2DSmartData\cloud\cloud 2-27\';
+f='A:\2DSmartData\cloud\cloud 5-2-18\';
 fold=uigetdir(f);
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
@@ -33,18 +34,20 @@ pts(fold);
 %*16. plot stretched exponential data for different delays
 %*17-19. plot out phi for different delays
 %*20. plot out all gran temp data for different delays
-%*21 final gran temp R and T for all delays
-%*22/23 histogram of phi changes
-%*24 phi changes at all D
+%*21. final gran temp R and T for all delays
+%*22/23. histogram of phi changes
+%*24. phi changes at all D
+%*25. cloud diffusion all smart tracks
+%*26. cloud diffusion com tracks
 %************************************************************
-showFigs=[7 22];
+showFigs=[25];
 
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
 % cutoff/(sample/2)
 cutoff=2;
-sampRate=120;
+sampRate=30;
 filtOrder=6;
 [fb,fa]=butter(filtOrder,cutoff/(sampRate/2),'low');
 %  [b,a]=butter(6,1/120*2,'low');
@@ -133,7 +136,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     %     first get number of gait radii used
-    COM=cell(numBods,1);
+    COM=cell(N,1);
     for i=1:N
         COM{i}=[sum(usedMovs(i).x,2),sum(usedMovs(i).y,2)]/numBods;
         dists=sqrt(sum(abs(diff(COM{i})).^2,2)); %check for major jumps
@@ -150,9 +153,11 @@ if(showFigs(showFigs==xx))
         plot(COM{i}(:,1),COM{i}(:,2),'linewidth',lw);
     end
     
+    plot([-0.3,-0.3,0.3,0.3,-0.3],[0.3,-0.3,-0.3,0.3,0.3,],'k','linewidth',2);
     xlabel('x (m)');
     ylabel('y (m)');
-    axis([-.1,.1,-.1,.1]);
+    %     axis([-.1,.1,-.1,.1]);
+    axis equal
     figText(gcf,16);
     
 end
@@ -494,7 +499,7 @@ if(showFigs(showFigs==xx))
     
     mphi=mean(phimat,2);
     ephi=std(phimat,0,2);
-    shadedErrorBar([1:100:length(mphi)]./(usedMovs(1).fps),mphi(1:100:end),ephi(1:100:end),{},0.5);
+    shadedErrorBar([1:100:length(mphi)]./(usedMovs(1).fps),mphi(1:100:end),ephi(1:100:end),{'color','k','linewidth',2},0.5);
     
     mphi(end)
     
@@ -1320,7 +1325,7 @@ end
 %% 24 phi changes at all D
 xx=24;
 if(showFigs(showFigs==xx))
-    figure(55); lw=2;
+    figure(xx); lw=2;
     hold on;
     single = 9; % plotting out a single run
     
@@ -1348,20 +1353,125 @@ if(showFigs(showFigs==xx))
         P(:,:,i)=sqrt(sum((Z1-Z2).^2,3));
     end
     dpv=diff(pv,1,2);
-    dpvr=reshape(dpv,[numel(dpv),1]);    
+    dpvr=reshape(dpv,[numel(dpv),1]);
     pvr=reshape(pv(:,1:end-1),[numel(pv(:,1:end-1)),1]);
     [Y,E]=discretize(pvr,300);
     Z=E(Y);
     scatter(Z,dpvr,'k.');
-%     scatter(pvr,dpvr,'k.');
-%     for(i=1:outlen)
-%         scatter(pv(i,1:end-1),dpv(i,:),'k.');
-%     end
+    %     scatter(pvr,dpvr,'k.');
+    %     for(i=1:outlen)
+    %         scatter(pv(i,1:end-1),dpv(i,:),'k.');
+    %     end
     ylabel('Dist out');
     ylabel('Dist in');
     figure(123);
     histogram(dpvr);
-
+    
     figText(gcf,16);
+    
+end
+%% 25 cloud diffusion all smart tracks
+xx=25;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
+    filtz=1;
+    COM=cell(N*numBods,1);
+    countIdx=1;
+    for k=1:N
+        
+        for(i=1:numBods)
+            x= usedMovs(k).x(:,i);%-usedMovs(idx).x(1,i);
+            y= usedMovs(k).y(:,i);%-usedMovs(idx).y(1,i);
+            t= usedMovs(k).t(:,1);%-usedMovs(idx).y(1,i);
+            if(filtz)
+                x=filter(fb,fa,x);  %filtered signal
+                y=filter(fb,fa,y);  %filtered signal
+            end
+            COM{countIdx}=[t,x,y];
+            countIdx=countIdx+1;
+        end
+    end
+    ma = ma.addAll(COM);
+    tic;
+    if(isempty(ma.msd))
+        %         ma = ma.computeMSD;
+        load(fullfile(fold,'maSmartDat.mat'));
+    end
+%     ma = ma.computeMSD;
+    toc;
+end
+%% 26 cloud diffusion com tracks
+xx=26;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
+    filtz=1;
+    COM=cell(N,1);
+    
+    for i=1:N
+        t= usedMovs(i).t(:,1);%-usedMovs(idx).y(1,i);
+        if(filtz)
+            x=filter(fb,fa,usedMovs(i).x);  %filtered signal
+            y=filter(fb,fa,usedMovs(i).y);  %filtered signal
+        end
+        COM{i}=[t,sum(usedMovs(i).x,2)/numBods,sum(usedMovs(i).y,2)/numBods];
+        %         COM{i}=COM{i}-COM{i}(1,:);
+        %         plot(COM{i}(:,2),COM{i}(:,3),'linewidth',lw);
+        
+    end
+    ma = ma.addAll(COM);
+    tic
+    if(isempty(ma.msd))
+        %         ma = ma.computeMSD;
+        load(fullfile(fold,'maCOMDat.mat'));
+    end
+    toc
+    [fo, gof]=ma.fitMeanMSD;
+    % [a b]=ma.fitMeanMSD;
+    D=fo.p1/2/ma.n_dim;
+    p=ma.getMeanMSD([]);
+    x=p(:,1);
+    y=p(:,2);
+    y=y(x>1.2&x<15);
+    x=x(x>1.2&x<15);
+    lx=log(x);
+    ly=log(y);
+    pom=fit(lx,ly,'poly1');
+    %mean of powers
+    clear x y lx ly
+    fs=zeros(length(ma.msd),1);
+    
+    for i=1:length(ma.msd)
+        a=ma.msd{i}(:,1:2);
+        x=a(:,1);
+        y=a(:,2);
+        y=y(x>1.2&x<15);
+        x=x(x>1.2&x<15);
+        [lx]=log(x);
+        [ly]=log(y);
+        plot(lx, ly);
+        [f,gof]=fit(lx,ly,'poly1');
+        fs(i)=f.p1;
+    end
+    %     figure
+    plot(lx, lx*pom.p1+log(D), '-', 'Color',[0,0,0], 'LineWidth', 1)
+    xlabel('log(Delay)')
+    ylabel('log(MSD)')
+    %     hold on
+    %     plot(lx, lx-10)
+    %     plot(lx, 2*(lx)-10)
+    pts('(*)mean of powers=', mean(fs),' stdev=', std(fs),'  power of mean=',pom.p1);
+    % std(fs);
+    
+    
+    ma = ma.fitMSD;
+    good_enough_fit = ma.lfit.r2fit > 0.8;
+    Dmean = mean( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+    Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+    fprintf('Found D = %.3e ± %.3e (mean ± std, N = %d)\n', ...
+        Dmean, Dstd, sum(good_enough_fit));
     
 end
