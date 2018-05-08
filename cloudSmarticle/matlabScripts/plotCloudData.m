@@ -40,7 +40,7 @@ pts(fold);
 %*25. cloud diffusion all smart tracks
 %*26. cloud diffusion com tracks
 %************************************************************
-showFigs=[25];
+showFigs=[26];
 
 
 %params we wish to plot

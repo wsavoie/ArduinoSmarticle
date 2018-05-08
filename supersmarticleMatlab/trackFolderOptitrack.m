@@ -3,7 +3,7 @@
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 % fold=uigetdir('A:\2DSmartData\chordRing');
-fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\metal_allActive\all');
+fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -15,7 +15,7 @@ if RIGIDBODYNAMES
     activeName= ' active';
     inactiveName=' inactive';
     
-    otherName=activeName;
+    otherName=inactiveName;
     
 else
     rigidBodyName = 'rigid body 1';

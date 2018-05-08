@@ -7,10 +7,11 @@ clear all;
 
 
 % fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\superlightRing\extraMassAdded');
-% fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\metal_allActive\all');
+fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\');
 
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\regRing\redSmarts\metal_singleInactive_1-4_inactive_frame\all');
+% fold=uigetdir('A:\2DSmartData\regRing\redSmarts\metal_singleInactive_1-4_inactive_frame\all');
+
 load(fullfile(fold,'movieInfo.mat'));
 % figure(1)
 SPACE_UNITS = 'm';
@@ -64,10 +65,11 @@ fold
 %*47-48 plot r for a single trajectory and x,y
 %*49. get x and y variance
 %*50. view variance dependence on exp time length 
+%*51. plot gamma vs t 
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
-showFigs=[50];
+showFigs=[2 41];
 % showFigs=[1 29 37];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -82,8 +84,9 @@ minT=100000000000;%initalize as a huge number
 
 % [fb,fa]=butter(4,1/120*2*12,'low');
 
-samp=10;
-[fb,fa]=butter(6,2/(10/2),'low');
+samp=10; %sampleRate
+cutoff=2; %cutoff
+[fb,fa]=butter(6,cutoff/(samp/2),'low');
 for i=1:length(movs)
     
     cond=true;
@@ -188,11 +191,13 @@ xx=2;
 if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
-    
-    ma = ma.computeMSD;
+    if(isempty(ma.msd))
+        ma = ma.computeMSD;
+    end
+ 
     hax2=gca;
     set(gcf,'Renderer','painters'); %this allows fig to be copied as vectored img
-    ma.plotMSD(hax2);
+%     ma.plotMSD(hax2);
     ma.plotMeanMSD(hax2, 1,[],.5);
     %     ha
     [fo, gof]=ma.fitMeanMSD;
@@ -206,7 +211,7 @@ if(showFigs(showFigs==xx))
     % fo.p1/2/obj.n_dim, ci(1)/2/obj.n_dim, ci(2)/2/obj.n_dim, gof.adjrsquare);
     figText(gcf,14)
     axis tight
-    xlim([0 15]);
+%     xlim([0 15]);
 end
 %% 3 plot vcorr
 xx=3;
@@ -441,7 +446,7 @@ if(showFigs(showFigs==xx))
     if(isempty(ma.msd))
         ma = ma.computeMSD;
     end
-    p=ma.getMeanMSD;
+    p=ma.getMeanMSD;m
     idx = find(isnan(p(:,3)), 1, 'first');
     p = p(1:idx-1,:);
     
@@ -2202,7 +2207,7 @@ xx=41;
 if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
-    idx=1; %index of movie to look at
+    idx=3; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     for k=idx
         GTT=[];
@@ -2225,13 +2230,13 @@ if(showFigs(showFigs==xx))
             irot=iroto-theto(1);
             
             %             [fb,fa]=butter(6,1/120*2*12,'low');
-            x=filter(fb,fa,x);  %filtered signal
-            y=filter(fb,fa,y);  %filtered signal
-            thet=filter(fb,fa,thet);  %filtered signal
+%             x=filter(fb,fa,x);  %filtered signal
+%             y=filter(fb,fa,y);  %filtered signal
+%             thet=filter(fb,fa,thet);  %filtered signal
             
-            ix=filter(fb,fa,ix);  %filtered signal
-            iy=filter(fb,fa,iy);  %filtered signal
-            irot=filter(fb,fa,irot);  %filtered signal
+%             ix=filter(fb,fa,ix);  %filtered signal
+%             iy=filter(fb,fa,iy);  %filtered signal
+%             irot=filter(fb,fa,irot);  %filtered signal
             
             %
             
@@ -2907,4 +2912,33 @@ if(showFigs(showFigs==xx))
     axis([0,20,-5e-4,0]);
     ylabel('mean(v_y)')
     xlabel('')
+end
+%% 51 plot gamma vs t 
+xx=51;
+if(showFigs(showFigs==xx))
+     figure(xx)
+    hold on;
+    if(isempty(ma.msd))
+        ma = ma.computeMSD;
+    end
+%     if(isempty(maf.msd))
+%         maf = maf.computeMSD;
+%     end
+    p=ma.getMeanMSD;
+%     pf=maf.getMeanMSD;
+    co=.25;
+    [ffb,ffa]=butter(6,co/(samp/2),'low');
+    
+    gam=diff(log(p(2:end,2)))./diff(log(p(2:end,1)));
+%     gam=gam(2:end);
+    fgam=filter(ffb,ffa,gam);
+    plot(p(3:end,1),gam);
+    plot(p(3:end,1),fgam);
+%     plot(pf(2:end,1),diff(log(pf(:,2)))./diff(log(pf(:,1))))
+    
+    legend({'non-filtered','filtered'});
+    
+    ylabel('\gamma');
+    xlabel('delay (s)');
+    figText(gcf,16);
 end
