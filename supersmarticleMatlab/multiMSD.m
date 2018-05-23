@@ -7,7 +7,7 @@ clear all;
 
 
 % fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\superlightRing\extraMassAdded');
-fold=uigetdir('D:\Dropbox\data');
+fold=uigetdir('A:\2DSmartData');
 
 % fold=uigetdir('A:\2DSmartData\');
 % fold=uigetdir('A:\2DSmartData\regRing\redSmarts\metal_singleInactive_1-4_inactive_frame\all');
@@ -66,10 +66,11 @@ fold
 %*49. get x and y variance
 %*50. view variance dependence on exp time length
 %*51. plot gamma vs t
+%*52. plot x vs t with light with channel
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
-showFigs=[2 41];
+showFigs=[1,  52];
 % showFigs=[1 29 37];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -2958,4 +2959,34 @@ if(showFigs(showFigs==xx))
     ylabel('\gamma');
     xlabel('delay (s)');
     figText(gcf,16);
+end
+%% 52 plot x vs t with light with channel
+xx=52;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    ind=4;
+    plot(usedMovs(ind).t,usedMovs(ind).x*100);
+    xlabel('time (s)');
+    ylabel('x (cm)');
+    figText(gcf,16);
+    
+    
+    
+    lightStart=-1;%going to the left
+    t=usedMovs(ind).t;
+    [initDir,light]=readLightData(usedMovs(ind).fname);
+    light(end+1)=t(end);%append final time to light vector
+    ll=t;
+    for i=2:length(light)
+    ll(light(i-1)<t&t<=light(i))=initDir*(-1).^(i-1);
+    end
+    plot(t,ll*20+10,'k.');
+%     negLight=[]
+    
+%     x1=1:120;
+%     x2=121:240
+%     x3=241:360
+%     plot(
+    
 end
