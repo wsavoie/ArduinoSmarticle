@@ -42,8 +42,8 @@ pts(fold);
 %*27. cloud nearest neighbor distance
 %*28. cloud nearest neighbor distance for all runs *NOT DONE*
 %************************************************************
-showFigs=[11 27];
-
+% showFigs=[7 11 27];
+showFigs=[11];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -57,7 +57,7 @@ filtOrder=6;
 inds=1;
 maxT=0;
 minT=1e28;
-singInd=10;
+singInd=4;
 for i=1:length(movs)
     
     %     cond=true;
@@ -769,10 +769,16 @@ if(showFigs(showFigs==xx))
         GTTAll(:,k)=mean(GTT,2); %translational granular temp
         GTRAll(:,k)=mean(GTR,2); %translational granular temp
         %     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
+        figure(55);
+        hold on;
         plot(t,GTTAll(:,k));
+        figure(124);
+        hold on;
         plot(t,GTRAll(:,k),'--');
     end
+    figure(55);
     plot(t,mean(GTTAll,2),'k','linewidth',2);
+    figure(124);
     plot(t,mean(GTRAll,2),'--k','linewidth',2);
     
     xlabel('time (s)','interpreter','latex');
@@ -1598,16 +1604,16 @@ if(showFigs(showFigs==xx))
         P(P==0)=nan;
         [d(i,:) v(i,:)]=min(P,[],1,'omitnan');
         %         plot out shortest dist
-        %         for k=(1:robs)
-        %         scatter(usedMovs(single).x(i,k),usedMovs(single).y(i,k));
-        %         plot([usedMovs(single).x(i,k),usedMovs(single).x(i,v(i,k))],...
-        %             [usedMovs(single).y(i,k),usedMovs(single).y(i,v(i,k))]);
-        %         end
+%                 for k=(1:robs)
+%                 scatter(usedMovs(singInd).x(i,k),usedMovs(singInd).y(i,k));
+%                 plot([usedMovs(singInd).x(i,k),usedMovs(singInd).x(i,v(i,k))],...
+%                     [usedMovs(singInd).y(i,k),usedMovs(singInd).y(i,v(i,k))]);
+%                 end
     end
     dOut=d(:);
     xAx=ceil((1:frames*robs)/robs);
     scatter(xAx./usedMovs(singInd).fps,dOut);
-    plot([1:frames]./usedMovs(singInd).fps,mean(d,2),'r','linewidth',2);
+    plot([1:frames]./usedMovs(singInd).fps,mean(d,2),'k','linewidth',2);
     
     ylabel('min(smart distance)');
     xlabel('time(s)');
@@ -1617,24 +1623,42 @@ if(showFigs(showFigs==xx))
     hold on;
     md=mean(d,2);
     [dm,idx]=sort(mean(d(2:end,:),2));
-    gt=diff(GTTAll(:,singInd));
-    gr=diff(GTRAll(:,singInd));
+    dgt=diff(GTTAll(:,singInd));
+    dgr=diff(GTRAll(:,singInd));
+    gt=GTTAll(2:end,singInd);
+    gr=GTRAll(2:end,singInd);
     
-    gt=gt(idx);
-    gr=gr(idx);
+    dgt=dgt(idx);
+    dgr=dgr(idx);
     
-    plot(dm,gt,'-');
-    plot(dm,gr,'--');
+    plot(dm,dgr,'--');
+    plot(dm,dgt,'-');
+
 %     plot([1:frames]/usedMovs(singInd).fps,md);
-    ylabel('\langleSystem Granular Temp\rangle');
+    ylabel('\Delta \langleSystem Granular Temp\rangle');
     xlabel('\langleMin smarticle distance\rangle');
     figText(gcf,16);
 
     
     figure(124);
     plot([1:frames]/usedMovs(singInd).fps,md);
-     xlabel('\langletime(s)\rangle');
+     xlabel('time(s)');
     ylabel('\langleMin smarticle distance\rangle');
+    figText(gcf,16);
+    
+    figure(1256);
+    phiz=(A*n)./phi{singInd};
+    phiz=phiz(1:frames-1);
+    plot(dm,phiz)
+    xlabel('\langleMin smarticle distance\rangle');
+    ylabel('\phi');
+    figText(gcf,16);
+    
+        figure(3256);
+    plot(dm,gr,'--');
+    plot(dm,gt,'-');
+    ylabel('\langleSystem Granular Temp\rangle');
+    xlabel('\langleMin smarticle distance\rangle');
     figText(gcf,16);
 end
 %% 28 cloud nearest neighbor distance for all runs *NOT DONE*
