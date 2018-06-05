@@ -1,40 +1,25 @@
-function [XX,YY]=zackModelPars(its,A0,omega,m,gama,m1,m2,g,mu,f,phi,l1)
+function [XX,YY]=zackModelPars(its,A0,omega,m,gama,m1,m2,g,mu,f,phi,l1,varargin)
 %zackModelPars
 %X= [m_s/m_r,xavg,xstd,xvar]
 %Y= [m_s/m_r,yavg,ystd,yvar]
 
-Ai=zeros(its+1,1);
-Bi=zeros(its+1,1);
-
-for i=0:its
-    
-    mr = .25*m + i*.01*m;
-    mb = mr;
-    
-    afun=@(t)(2*(g*(2*m1+m2-mb)*t.*mu+A0*m2*omega*cos(gama+t.*omega)));
-    tau=fzero(afun,.0006);
-    
+AB=zeros(its,2);
+mx=4;%max ring ratio, (lightest ring) smart/ringWeight=RingRat
+mn=0.012; %min ring ratio
+MR=linspace(m/mx,m/mn,its); %.1 is heaviest
+for i=1:its
+    mr=MR(i);    
+    for j=1:2
+    mb=mr+m*(j-1);    
+    abfun=@(t)(2*(g*(2*m1+m2-mb)*t.*mu+A0*m2*omega*cos(gama+t.*omega)));
+    tau=fzero(abfun,.0006);
 %     sets some sort of upper bound?
     if tau>(1/omega)*(pi/2-gama)
         tau=1/omega*(pi/2-gama);
     end
-    
-    Ai(i+1)=(g*(2*m1+m2-mb)*tau.^2*mu+2*A0*m2*sin(gama+tau*omega))/(m1+m2+mb)...
+    AB(i,j)=(g*(2*m1+m2-mb)*tau.^2*mu+2*A0*m2*sin(gama+tau*omega))/(m1+m2+mb)...
         -(2*A0*m2*sin(gama))/(m1+m2+mb);
-    
-    %%%%%%%%%%bfun%%%%%%%%%%%%%%%
-    mr = .25*m + i*.01*m;
-    mb = mr + m;
-    bfun=@(t)(2*(g*(2*m1+m2-mb)*t.*mu+A0*m2*omega*cos(gama+t.*omega)));
-    tau=fzero(bfun,.0006);
-    if tau>(1/omega)*(pi/2-gama)
-        tau=1/omega*(pi/2-gama);
-    end
-    Bi(i+1)=(g*(2*m1+m2-mb)*tau.^2*mu+2*A0*m2*sin(gama+tau*omega))/(m1+m2+mb)...
-        -(2*A0*m2*sin(gama))/(m1+m2+mb);
-    
-    
-    
+    end  
 end
 
 
@@ -66,26 +51,55 @@ y=[y1 y2 y3 y4];
 
 %this might have to be zero to length of ai when comparing to mathematica
 %code
-[xx,yy,XX,YY]=deal(zeros(its+1,4));
-for i=0:its
-    XA=Ai(i+1);
-    XB=Bi(i+1);
-    YA=Ai(i+1);
-    YB=Bi(i+1);
+
+[XX,YY]=deal(zeros(its,2));
+
+% [XX,YY]=deal(zeros(its+1,4));
+% [stdx,stdy]=deal(zeros(its+1,2));
+% for i=0:its
+for i=1:its
+    XA=AB(i,1);
+    YA=AB(i,1);
+    
+    XB=AB(i,2);
+    YB=AB(i,2);
 
     d1=[XB,XA,XB];
     d0=[0,XA,XA];
     D1=[YB YB YB YB];
     D0=[0 YA YA 0];
-    [avg,stdz]=getAvg(X,x,Y,y,D1,D0,d1,d0,f,l1);
-    
-    xx(i+1,:)=[.25*m+.01*i*m,avg(1),stdz(1),stdz(1)^2];
-    yy(i+1,:)=[.25*m+.01*i*m,avg(2),stdz(2),stdz(2)^2];
-    
-    XX(i+1,:)=[1/(.25+i*.01),avg(1),stdz(1),stdz(1)^2];
-    
-    YY(i+1,:)=[1/(.25+i*.01),avg(2),stdz(2),stdz(2)^2];
-    
+    avg=getAvg(X,x,Y,y,D1,D0,d1,d0,f,l1);
+
+    XX(i,:)=[m/MR(i),avg(1)];
+    YY(i,:)=[m/MR(i),avg(2)];
+
 end
 
+
+% if length(varargin)
+%     T=varargin{1}(:,5);
+%     Ms=varargin{1}(:,1);
+%     [stdx, stdy]=deal(zeros(length(T),3));
+%     varx=zeros(1,length(T));
+%     for i=1:length(T)
+%         [~,ind]=min(abs(Ms(i)-(m./MR)));
+%         XA=Ai(ind);
+%         XB=Bi(ind);
+%         YA=Ai(ind);
+%         YB=Bi(ind);
+% 
+%         pref=-f/(4*pi^3*T(i));
+%         ll1=-4*XA*XB*l1*(2*l1+1)*(phi+pi-l1*phi);
+%         ll2=-XB^2*l1*(pi^3-6*pi*l1+2*pi^2*phi+6*(l1-1)*l1*phi);
+%         ll3=XA^2*(pi^3*(l1-2)+pi*(4*l1^2+2)+2*pi^2*phi-2*(l1-1)*(2*l1^2+1)*phi);
+%         ll4=-2*(-l1*phi+phi+pi)*(XA-XB*l1)*(4*l1*(XA-XB)*sin(phi)+cos(2*phi)*(XA-XB*l1));
+%         ll5=pi^2*sin(2*phi)*(XA.^2-XB.^2*l1);
+%         varx(i)=pref*(ll1+ll2+ll3+ll4+ll5);
+%         
+%         stdx(i,:)=[XX(ind,1),XX(ind,2),sqrt(varx(i))];
+%         stdy(i,:)=[YY(ind,1),YY(ind,2),sqrt(varx(i))];
+%         
+%     end     
+%      
+% end
 
