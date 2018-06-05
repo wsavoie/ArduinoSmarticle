@@ -39,9 +39,11 @@ pts(fold);
 %*24. phi changes at all D
 %*25. cloud diffusion all smart tracks
 %*26. cloud diffusion com tracks
+%*27. cloud nearest neighbor distance
+%*28. cloud nearest neighbor distance for all runs *NOT DONE*
 %************************************************************
-showFigs=[26];
-
+% showFigs=[7 11 27];
+showFigs=[11];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -55,6 +57,7 @@ filtOrder=6;
 inds=1;
 maxT=0;
 minT=1e28;
+singInd=4;
 for i=1:length(movs)
     
     %     cond=true;
@@ -440,7 +443,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ind=2;
-    single = 0; % plotting out a single run
+    single = singInd; % plotting out a single run
     
     %      figure(123123)
     %      [k,v]=convhull(R(:,1),R(:,2));
@@ -491,18 +494,19 @@ if(showFigs(showFigs==xx))
     
     %mean distance btween points
     
-    minT= min(cellfun(@length,aphi));
-    phimat=zeros(minT,length(aphi));
-    for(i=1:length(aphi))
-        phimat(:,i)=aphi{i}(1:minT);
+    if(~single)
+        minT= min(cellfun(@length,aphi));
+        phimat=zeros(minT,length(aphi));
+        for(i=1:length(aphi))
+            phimat(:,i)=aphi{i}(1:minT);
+        end
+        
+        mphi=mean(phimat,2);
+        ephi=std(phimat,0,2);
+        shadedErrorBar([1:100:length(mphi)]./(usedMovs(1).fps),mphi(1:100:end),ephi(1:100:end),{'color','k','linewidth',2},0.5);
+        
+        mphi(end)
     end
-    
-    mphi=mean(phimat,2);
-    ephi=std(phimat,0,2);
-    shadedErrorBar([1:100:length(mphi)]./(usedMovs(1).fps),mphi(1:100:end),ephi(1:100:end),{'color','k','linewidth',2},0.5);
-    
-    mphi(end)
-    
     saveOut=0;
     if(saveOut)
         if(exist('phi.mat','file')==2) %if first run has been saved
@@ -731,7 +735,7 @@ if(showFigs(showFigs==xx))
     hold on;
     saveOut=0;
     filtz=1;
-    idx=1; %index of movie to look at
+    idx=singInd; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     GTTAll=[];
     for k=1:N
@@ -765,10 +769,16 @@ if(showFigs(showFigs==xx))
         GTTAll(:,k)=mean(GTT,2); %translational granular temp
         GTRAll(:,k)=mean(GTR,2); %translational granular temp
         %     GTRAll(:,k)=mean(GTR,2); %rotational granular temp
+        figure(55);
+        hold on;
         plot(t,GTTAll(:,k));
+        figure(124);
+        hold on;
         plot(t,GTRAll(:,k),'--');
     end
+    figure(55);
     plot(t,mean(GTTAll,2),'k','linewidth',2);
+    figure(124);
     plot(t,mean(GTRAll,2),'--k','linewidth',2);
     
     xlabel('time (s)','interpreter','latex');
@@ -1230,7 +1240,13 @@ xx=21;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on
-    load('GT.mat');
+    if(exist(fullfile(fold,'GT.mat'),'file'))
+        load('GT.mat');
+    elseif(exist(fullfile(fold,'..\GT.mat'),'file'))
+        load(fullfile(fold,'..\GT.mat'));
+    else
+        error('couldn''t find GT.mat');
+    end
     
     for i=1:length(egtR)
         errR(i)=egtR{i}(end);
@@ -1397,7 +1413,7 @@ if(showFigs(showFigs==xx))
     tic;
     
     if(isempty(ma.msd))
-%         ma = ma.computeMSD;
+        %         ma = ma.computeMSD;
         if(filtz)
             if exist(fullfile(fold,'maSmartDatFilt.mat'),'file')
                 load(fullfile(fold,'maSmartDatFilt.mat'));
@@ -1412,12 +1428,12 @@ if(showFigs(showFigs==xx))
                 ma = ma.computeMSD;
                 save(fullfile(fold,'maSmartDatRaw.mat'),'ma');
             end
-%             load(fullfile(fold,'maCOMDatRaw.mat'));
+            %             load(fullfile(fold,'maCOMDatRaw.mat'));
         end
     end
     toc
     
-        [fo, gof]=ma.fitMeanMSD;
+    [fo, gof]=ma.fitMeanMSD;
     % [a b]=ma.fitMeanMSD;
     D=fo.p1/2/ma.n_dim;
     p=ma.getMeanMSD([]);
@@ -1462,7 +1478,7 @@ if(showFigs(showFigs==xx))
     fprintf('Found D = %.3e ± %.3e (mean ± std, N = %d)\n', ...
         Dmean, Dstd, sum(good_enough_fit));
     
-toc
+    toc
 end
 %% 26 cloud diffusion com tracks
 xx=26;
@@ -1487,7 +1503,7 @@ if(showFigs(showFigs==xx))
     ma = ma.addAll(COM);
     tic
     if(isempty(ma.msd))
-%         ma = ma.computeMSD;
+        %         ma = ma.computeMSD;
         if(filtz)
             if exist(fullfile(fold,'maCOMDatFilt.mat'),'file')
                 load(fullfile(fold,'maCOMDatFilt.mat'));
@@ -1502,7 +1518,7 @@ if(showFigs(showFigs==xx))
                 ma = ma.computeMSD;
                 save(fullfile(fold,'maCOMDatRaw.mat'),'ma');
             end
-%             load(fullfile(fold,'maCOMDatRaw.mat'));
+            %             load(fullfile(fold,'maCOMDatRaw.mat'));
         end
     end
     toc
@@ -1550,5 +1566,151 @@ if(showFigs(showFigs==xx))
     Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
     fprintf('Found D = %.3e ± %.3e (mean ± std, N = %d)\n', ...
         Dmean, Dstd, sum(good_enough_fit));
+    
+end
+%% 27 cloud nearest neighbor distance for single run
+xx=27;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
+    
+    
+    t=usedMovs(singInd).t(:,1);
+    
+    frames=length(t(t<minT));
+    robs=7;
+    %     P=zeros(robs,robs,frames);
+    P=zeros(robs,robs,1);
+    outlen=(robs^2-robs)/2;
+    %     pv=zeros(outlen,frames);
+    d=zeros(frames,robs);
+    v=zeros(frames,robs);
+    for i=1:frames
+        [X1,X2]=meshgrid(usedMovs(singInd).x(i,:));
+        [Y1,Y2]=meshgrid(usedMovs(singInd).y(i,:));
+        
+        
+        
+        Z1=cat(3,X1,Y1);
+        Z2=cat(3,X2,Y2);
+        % P(:,:,i)=sqrt(sum((Z1-Z2).^2,3));
+        
+        %         Z1=cat(3,triu(X1),triu(Y1));
+        %         Z2=cat(3,triu(X2),triu(Y2));
+        
+        %         p=sqrt(sum((Z1-Z2).^2,3));
+        %         pv(:,i)=p(triu(p)>0);
+        P(:,:)=sqrt(sum((Z1-Z2).^2,3));
+        P(P==0)=nan;
+        [d(i,:) v(i,:)]=min(P,[],1,'omitnan');
+        %         plot out shortest dist
+%                 for k=(1:robs)
+%                 scatter(usedMovs(singInd).x(i,k),usedMovs(singInd).y(i,k));
+%                 plot([usedMovs(singInd).x(i,k),usedMovs(singInd).x(i,v(i,k))],...
+%                     [usedMovs(singInd).y(i,k),usedMovs(singInd).y(i,v(i,k))]);
+%                 end
+    end
+    dOut=d(:);
+    xAx=ceil((1:frames*robs)/robs);
+    scatter(xAx./usedMovs(singInd).fps,dOut);
+    plot([1:frames]./usedMovs(singInd).fps,mean(d,2),'k','linewidth',2);
+    
+    ylabel('min(smart distance)');
+    xlabel('time(s)');
+    
+    
+    figure(1234);
+    hold on;
+    md=mean(d,2);
+    [dm,idx]=sort(mean(d(2:end,:),2));
+    dgt=diff(GTTAll(:,singInd));
+    dgr=diff(GTRAll(:,singInd));
+    gt=GTTAll(2:end,singInd);
+    gr=GTRAll(2:end,singInd);
+    
+    dgt=dgt(idx);
+    dgr=dgr(idx);
+    
+    plot(dm,dgr,'--');
+    plot(dm,dgt,'-');
+
+%     plot([1:frames]/usedMovs(singInd).fps,md);
+    ylabel('\Delta \langleSystem Granular Temp\rangle');
+    xlabel('\langleMin smarticle distance\rangle');
+    figText(gcf,16);
+
+    
+    figure(124);
+    plot([1:frames]/usedMovs(singInd).fps,md);
+     xlabel('time(s)');
+    ylabel('\langleMin smarticle distance\rangle');
+    figText(gcf,16);
+    
+    figure(1256);
+    phiz=(A*n)./phi{singInd};
+    phiz=phiz(1:frames-1);
+    plot(dm,phiz)
+    xlabel('\langleMin smarticle distance\rangle');
+    ylabel('\phi');
+    figText(gcf,16);
+    
+        figure(3256);
+    plot(dm,gr,'--');
+    plot(dm,gt,'-');
+    ylabel('\langleSystem Granular Temp\rangle');
+    xlabel('\langleMin smarticle distance\rangle');
+    figText(gcf,16);
+end
+%% 28 cloud nearest neighbor distance for all runs *NOT DONE*
+xx=28;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;    
+    
+    frames=size(usedMovs(singInd).t(:)<minT,1);
+    robs=7;
+    %     P=zeros(robs,robs,frames);
+    P=zeros(robs,robs,1);
+    outlen=(robs^2-robs)/2;
+    %     pv=zeros(outlen,frames);
+    d=zeros(frames,robs);
+    v=zeros(frames,robs);
+    for j=1:N
+    for i=1:frames
+        [X1,X2]=meshgrid(usedMovs(singInd).x(i,:));
+        [Y1,Y2]=meshgrid(usedMovs(singInd).y(i,:));
+        
+        
+        
+        Z1=cat(3,X1,Y1);
+        Z2=cat(3,X2,Y2);
+        % P(:,:,i)=sqrt(sum((Z1-Z2).^2,3));
+        
+        %         Z1=cat(3,triu(X1),triu(Y1));
+        %         Z2=cat(3,triu(X2),triu(Y2));
+        
+        %         p=sqrt(sum((Z1-Z2).^2,3));
+        %         pv(:,i)=p(triu(p)>0);
+        P(:,:)=sqrt(sum((Z1-Z2).^2,3));
+        P(P==0)=nan;
+        [d(i,:) v(i,:)]=min(P,[],1,'omitnan');
+        %         plot out shortest dist
+        %         for k=(1:robs)
+        %         scatter(usedMovs(single).x(i,k),usedMovs(single).y(i,k));
+        %         plot([usedMovs(single).x(i,k),usedMovs(single).x(i,v(i,k))],...
+        %             [usedMovs(single).y(i,k),usedMovs(single).y(i,v(i,k))]);
+        %         end
+    end
+    end
+    dOut=d(:);
+    xAx=ceil((1:frames*robs)/robs);
+    scatter(xAx,dOut);
+    plot([1:frames]./usedMovs(1).fps,mean(d,2));
+    
+    ylabel('min(smart distance)');
+    xlabel('frames');
+    figText(gcf,16);
+ 
+
     
 end
