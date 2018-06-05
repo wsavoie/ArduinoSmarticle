@@ -58,16 +58,25 @@ avg=getAvg(X,x,Y,y,D1,D0,d1,d0,f,l1);
 
 T=expX(5);
 
-pref=-f/(4*pi^3*T);
-ll1=-4*XA*XB*l1*(2*l1+1)*(-l1*phi+phi+pi);
-ll2=-XB^2*l1*(pi^3-6*pi*l1+2*pi^2*phi+6*(l1-1)*l1*phi);
-ll3=XA^2*(pi^3*(l1-2)+pi*(4*l1^2+2)+2*pi^2*phi-2*(l1-1)*(2*l1^2+1)*phi);
-ll4=-2*(-l1*phi+phi+pi)*(XA-XB*l1)*(4*l1*(XA-XB)*sin(phi)+cos(2*phi)*(XA-XB*l1));
-ll5=pi^2*sin(2*phi)*(XA.^2-XB.^2*l1);
-varx=pref*(ll1+ll2+ll3+ll4+ll5);
+%varX
+prefX=-f/(4*pi^3*T);
+llx1=-4*XA*XB*l1*(2*l1+1)*(-l1*phi+phi+pi);
+llx2=-XB^2*l1*(pi^3-6*pi*l1+2*pi^2*phi+6*(l1-1)*l1*phi);
+llx3=XA^2*(pi^3*(l1-2)+pi*(4*l1^2+2)+2*pi^2*phi-2*(l1-1)*(2*l1^2+1)*phi);
+llx4=-2*(-l1*phi+phi+pi)*(XA-XB*l1)*(4*l1*(XA-XB)*sin(phi)+cos(2*phi)*(XA-XB*l1));
+llx5=pi^2*sin(2*phi)*(XA.^2-XB.^2*l1);
+varx=prefX*(llx1+llx2+llx3+llx4+llx5);
+
+%varY
+prefY=1/(4*pi*T^2);
+lly1=YB^2*l1*(pi-2*phi);
+lly2=-YA^2*(pi*(l1-2)+2*phi);
+lly3=(YA.^2-YB.^2*l1)*sin(2*phi);
+vary=prefY*(lly1+lly2+lly3);
+
 
 stdx=[expX(1),avg(1),sqrt(varx)];
-stdy=[expX(1),avg(2),sqrt(varx)];
+stdy=[expX(1),avg(2),sqrt(vary)];
 
 
 

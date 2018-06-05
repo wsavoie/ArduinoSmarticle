@@ -49,14 +49,8 @@ Y=[Y1 Y2 Y3 Y4];
 y=[y1 y2 y3 y4];
     
 
-%this might have to be zero to length of ai when comparing to mathematica
-%code
-
 [XX,YY]=deal(zeros(its,2));
 
-% [XX,YY]=deal(zeros(its+1,4));
-% [stdx,stdy]=deal(zeros(its+1,2));
-% for i=0:its
 for i=1:its
     XA=AB(i,1);
     YA=AB(i,1);
