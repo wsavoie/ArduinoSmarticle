@@ -192,10 +192,10 @@
 <text x="60.4494625" y="-4.1148" size="1.778" layer="21" rot="R180">45,46 mm</text>
 <text x="60.2716625" y="-6.3754" size="1.778" layer="21" rot="R180">37 mm</text>
 <text x="60.2970625" y="-8.4836" size="1.778" layer="21" rot="R180">41 mm</text>
-<text x="60.6018625" y="-12.9032" size="1.778" layer="21" rot="R180">stress
+<text x="69.5172625" y="14.5034" size="1.778" layer="21" rot="R180">stress
 23 mm,   33 mm,   29 mm
 A0-front, A1-Back,  A2-side</text>
-<text x="27.5310625" y="-21.463" size="1.778" layer="21" rot="R180">pin13 to 24mm</text>
+<text x="66.3168625" y="5.461" size="1.778" layer="21" rot="R180">pin13 to 24mm</text>
 </plain>
 <libraries>
 <library name="SparkFun-Capacitors">
