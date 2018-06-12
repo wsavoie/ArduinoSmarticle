@@ -1,8 +1,8 @@
-function [XX,YY]=zackModelPars(its,A0,omega,m,gama,m1,m2,g,mu,f,phi,l1,varargin)
+function [XX,YY,stdz]=zackModelPars(its,A0,omega,m,gama,m1,m2,g,mu,f,phi,l1,varargin)
 %zackModelPars
 %X= [m_s/m_r,xavg,xstd,xvar]
 %Y= [m_s/m_r,yavg,ystd,yvar]
-
+T=120;
 AB=zeros(its,2);
 mx=4;%max ring ratio, (lightest ring) smart/ringWeight=RingRat
 mn=0.012; %min ring ratio
@@ -49,7 +49,7 @@ Y=[Y1 Y2 Y3 Y4];
 y=[y1 y2 y3 y4];
     
 
-[XX,YY]=deal(zeros(its,2));
+[XX,YY,stdz]=deal(zeros(its,2));
 
 for i=1:its
     XA=AB(i,1);
@@ -63,10 +63,33 @@ for i=1:its
     D1=[YB YB YB YB];
     D0=[0 YA YA 0];
     avg=getAvg(X,x,Y,y,D1,D0,d1,d0,f,l1);
-
+    
     XX(i,:)=[m/MR(i),avg(1)];
     YY(i,:)=[m/MR(i),avg(2)];
+    
+    %varX
+    prefX=-f/(4*pi^3*T);
+    llx1=-4*XA*XB*l1*(2*l1+1)*(-l1*phi+phi+pi);
+    llx2=-XB^2*l1*(pi^3-6*pi*l1+2*pi^2*phi+6*(l1-1)*l1*phi);
+    llx3=XA^2*(pi^3*(l1-2)+pi*(4*l1^2+2)+2*pi^2*phi-2*(l1-1)*(2*l1^2+1)*phi);
+    llx4=-2*(-l1*phi+phi+pi)*(XA-XB*l1)*(4*l1*(XA-XB)*sin(phi)+cos(2*phi)*(XA-XB*l1));
+    llx5=pi^2*sin(2*phi)*(XA.^2-XB.^2*l1);
+    varx=prefX*(llx1+llx2+llx3+llx4+llx5);
 
+    %varY zacks form
+    prefY=f*T/(4*pi*T^2);
+    lly1=YB^2*l1*(pi-2*phi);
+    lly2=-YA^2*(pi*(l1-2)+2*phi);
+    lly3=(YA.^2-YB.^2*l1)*sin(2*phi);
+    vary=prefY*(lly1+lly2+lly3);
+    
+    % %varY my form  
+%     prefY=f*T/(2*pi*T^2);
+%     lly1=-YA^2*(l1-1)*(pi-phi+cos(phi)*sin(phi));
+%     lly2=YB^2*pi*l1;
+%     vary=prefY*(lly1+lly2);
+    stdz(i,1)=sqrt(varx);
+    stdz(i,2)=sqrt(vary);
 end
 
 

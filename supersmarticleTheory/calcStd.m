@@ -67,14 +67,18 @@ llx4=-2*(-l1*phi+phi+pi)*(XA-XB*l1)*(4*l1*(XA-XB)*sin(phi)+cos(2*phi)*(XA-XB*l1)
 llx5=pi^2*sin(2*phi)*(XA.^2-XB.^2*l1);
 varx=prefX*(llx1+llx2+llx3+llx4+llx5);
 
-%varY
-prefY=1/(4*pi*T^2);
-lly1=YB^2*l1*(pi-2*phi);
-lly2=-YA^2*(pi*(l1-2)+2*phi);
-lly3=(YA.^2-YB.^2*l1)*sin(2*phi);
-vary=prefY*(lly1+lly2+lly3);
+% %varY zacks form
+    prefY=f*T/(4*pi*T^2);
+    lly1=YB^2*l1*(pi-2*phi);
+    lly2=-YA^2*(pi*(l1-2)+2*phi);
+    lly3=(YA.^2-YB.^2*l1)*sin(2*phi);
+    vary=prefY*(lly1+lly2+lly3);
 
-
+%varY my form  
+%     prefY=f*T/(2*pi*T^2);
+%     lly1=-YA^2*(l1-1)*(pi-phi+cos(phi)*sin(phi));
+%     lly2=YB^2*pi*l1;
+%     vary=prefY*(lly1+lly2);
 stdx=[expX(1),avg(1),sqrt(varx)];
 stdy=[expX(1),avg(2),sqrt(vary)];
 
