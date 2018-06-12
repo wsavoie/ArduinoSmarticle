@@ -75,7 +75,8 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 filtz=1;
-showFigs=[6];
+% showFigs=[6];
+showFigs=[1 3];
 tpt=[2 2];
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -423,6 +424,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     
+    smartWid=9.1; %cm
     load(fullfile(fold,'fractData.mat'));
     uH=sort(unique([fractData(:).H]),'ascend');
     allH=[fractData(:).H];
@@ -450,18 +452,20 @@ if(showFigs(showFigs==xx))
     subplot(1,2,1)
     hold on;
     title('Force at Fracture');
-    errorbar(uH,uFm,uFerr,'linewidth',2);
+    errorbar(smartWid./uH,uFm,uFerr,'linewidth',2);
     ylabel('Force (N)');
-    xlabel('Confinement Height (cm)');
+%     xlabel('Confinement Height (cm)');
+    xlabel('\lambda_i');
     figText(gcf,16)
     axis tight;
     
     subplot(1,2,2)
     hold on;
     title('Strain at Fracture');
-    errorbar(uH,uSm,uSerr,'linewidth',2);
+    errorbar(smartWid./uH,uSm,uSerr,'linewidth',2);
     ylabel('Strain (cm)');
-    xlabel('Confinement Height (cm)');
+%     xlabel('Confinement Height (cm)');
+    xlabel('\lambda_i');
     figText(gcf,16);
     axis tight;
     
