@@ -6,10 +6,10 @@ function [initDir,lights]=readLightData(fname)
 
 fname=[fname(1:end-3),'txt'];
 fid=fopen(fname,'r');
-
-out=fscanf(fid,['%f'])
+out=fscanf(fid,['%f']);
 fclose(fid);
 pts(out);
 initDir=out(1);
-lights=out(2:end);
+out
+lights=[0; out(2:end)];
 

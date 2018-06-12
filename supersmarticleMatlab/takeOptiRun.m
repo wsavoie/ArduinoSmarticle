@@ -1,5 +1,5 @@
 vidOn=1;
-t=1080; %seconds
+t=1500; %seconds
 client = natnet();
 
 %keypresses for starting recording for OBS
@@ -18,7 +18,7 @@ client.stopRecord;
 if vidOn
     robot.keyPress(java.awt.event.KeyEvent.VK_F3);
     pause(.05);
-    robot.keyRelease(java.awt.event.KeyEvent.VK_F3)
+    robot.keyRelease(java.awt.event.KeyEvent.VK_F3) 
 end
 client.startRecord;
 pause(t);

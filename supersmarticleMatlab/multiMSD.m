@@ -67,11 +67,12 @@ fold
 %*50. view variance dependence on exp time length
 %*51. plot gamma vs t
 %*52. plot x vs t with light with channel
+%*53. plot active smart diagram
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
-showFigs=[1,  52];
-% showFigs=[1 29 37];
+% showFigs=[1,  52 53];
+showFigs=[1 49];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -2702,7 +2703,7 @@ if(showFigs(showFigs==xx))
     L=length(usedMovs);
     correctDir=0;
     minT=1e10;
-    vvv=[];
+%     vvv=[];
     for i=1:length(usedMovs)
         minT=min(length(usedMovs(i).t),minT);
         % dpos=diff(pos);
@@ -2755,13 +2756,23 @@ if(showFigs(showFigs==xx))
         if newpos(end,2)>0
             correctDir=correctDir+1;
         end
-        vv=diff(newpos)./diff(usedMovs(i).t);
-        vvv=[vvv;vv];
+%         vv=diff(newpos)./diff(usedMovs(i).t);
+%         vvv(i)={vv};
+% %         vvv=[vvv;vv];
+%     end
+        h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
+        set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        endPos(i)=newpos(end,2);
+        nn(i,:)=newpos(end,:)./usedMovs(i).t(end);
     end
-    
-    mv=mean(vvv)
-    sv=std(vvv,1);
-    sv.^2
+        mn=mean(nn);
+        sdv=std(nn);
+        pts('mean((final y positions)/time)');
+        pts('ymean,ystd=',mn(1),',',sdv(1));
+        pts('xmean,xstd=',mn(2),',',sdv(2));
+%         meanz=[meanz,mean(nn)];
+%         valz=[valz,std(nn).^2];
+
 end
 %% 50. view variance dependence on exp time length
 xx=50;
@@ -2965,23 +2976,43 @@ xx=52;
 if(showFigs(showFigs==xx))
     figure(xx)
     hold on;
-    ind=4;
-    plot(usedMovs(ind).t,usedMovs(ind).x*100);
-    xlabel('time (s)');
-    ylabel('x (cm)');
-    figText(gcf,16);
+    ind=2;
+    xdist=usedMovs(ind).x*100; %in cm
+    xdist=xdist-sum([min(xdist) max(xdist)])/2;
+    xvt=1; %1 if plotting x vs t
+    
+    
     
     
     
     lightStart=-1;%going to the left
     t=usedMovs(ind).t;
-    [initDir,light]=readLightData(usedMovs(ind).fname);
+    t=t/2.5;
+    [initDir,light]=readLightData(fullfile(fold,usedMovs(ind).fname));
+    light=light/2.5;
     light(end+1)=t(end);%append final time to light vector
     ll=t;
     for i=2:length(light)
-    ll(light(i-1)<t&t<=light(i))=initDir*(-1).^(i-1);
+    ll(light(i-1)<t&t<=light(i))=-1*initDir*(-1).^(i-1);
     end
-    plot(t,ll*20+10,'k.');
+    bounds=[max(xdist) min(xdist)];
+    max(xdist-sum(bounds)/2);
+    
+    
+    if(~xvt)
+        xlabel('x (cm)');
+        ylabel('Gait Periods');
+        plot(xdist,t);
+        plot(ll*ceil(max(xdist)),t,'k.');
+    else
+        ylabel('x (cm)');
+        xlabel('Gait Periods');
+        plot(t,xdist);
+        plot(t,ll*ceil(max(xdist)),'k.');        
+        
+    end
+    
+    figText(gcf,16);
 %     negLight=[]
     
 %     x1=1:120;
@@ -2989,4 +3020,35 @@ if(showFigs(showFigs==xx))
 %     x3=241:360
 %     plot(
     
+end
+%% 53 plot active smart diagram
+xx=53;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    ind=2;
+    load(fullfile(fold,'trackedLightSmartChannel.mat'));
+    cols= get(gca,'colorOrder');
+    cols=cols(1:6,:);
+    smartChangeTimes=smartChangeTimes/2.5; %convert to gaitPeriod
+    for i=1:(length(smartChangeTimes)-1)
+        for k=1:length(smartsActive{i})
+            %vertices starting from top left clockwise
+            xVerts=[smartChangeTimes(i) smartChangeTimes(i+1)...
+                smartChangeTimes(i+1) smartChangeTimes(i)];
+            
+            yVerts=[(smartsActive{i}(k)+0.5),(smartsActive{i}(k)+0.5)...
+                (smartsActive{i}(k)-0.5) (smartsActive{i}(k)-0.5)];
+            patch(xVerts,yVerts,cols(smartsActive{i}(k)+1,:),'linestyle','none');
+        end
+    end
+%     xlim([0,25])
+    ylim([-0.5,5.5]);
+    
+    set(gca,'ytick',[0:5]);
+    
+    ylabel('Active smarticle index');
+    xlabel('Gait Periods');
+    figText(gcf,16);
+   
 end
