@@ -27,7 +27,7 @@
 %************************************************************
 % clearvars -except t
 % close all;
-clear all;
+clearvars -except kdat;
 
 % maxSpeed= 1.016; %m/s
 % pctSpeed=.0173;
@@ -37,8 +37,9 @@ samp=120;
 
 
 fold=uigetdir('A:\2DSmartData\entangledData\4-17');
+% fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
-% fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)\stretchAll 11-20 paperTrials\type4only';
+% fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)';
 % fold='A:\2DSmartData\entangledData\4-11 multimarker';
 freq=1000; %hz rate for polling F/T sensor
 fractD=0;%flag for fractData
@@ -76,7 +77,7 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
 %%%%%%%%%%%%%%%%%%
 filtz=1;
 % showFigs=[6];
-showFigs=[1 3];
+showFigs=[1];
 tpt=[2 2];
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -341,31 +342,36 @@ if(showFigs(showFigs==xx))
     %     tArea=zeros(uN,1);
     strMax=0;
     legText={};
-     timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+     timePts=[0,0]; %start and end pts, iteration to consider as "zero point"
     if exist('tpt','var')
         timePts=tpt; %if I want to set it up top
     end
     for(i=uN:-1:1)
        
         stpt=usedS(i).dsPts(timePts(1)*4+1,3);
-        edpt=usedS(i).dsPts(timePts(2)*4+4,3);
+        edpt=usedS(i).dsPts(timePts(1)*4+2,3);
+%         edpt=floor(mean(usedS(i).dsPts([timePts(2)*4+4:timePts(2)*4+5],3)));
+%         edpt=usedS(i).dsPts(timePts(2)*4+4,3);
+        strain=usedS(i).strain(stpt:edpt)-usedS(i).strain(stpt);
+        frc=usedS(i).F(stpt:edpt)-usedS(i).F(stpt);
         
         pts('F vs. Strain for ',usedS(i).name);
-        h1(i)=plot(usedS(i).strain(stpt:edpt),usedS(i).F(stpt:edpt));
+%         h1(i)=plot(usedS(i).strain(stpt:edpt),usedS(i).F(stpt:edpt));
+        h1(i)=plot(strain,frc);
         %             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
         %         tArea(i)=trapz(usedS(i).strain,usedS(i).F);
         %         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
-        [sm(i),smidx]=max(usedS(i).strain(stpt:edpt));
+        [sm(i),smidx]=max(strain);
         strMax=max(strMax,sm(i));
         
-        h2(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'k','linewidth',4);
-        h3(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'color',h1(i).Color,'linewidth',2);
+        h2(i)=plot([0,sm(i)],[0,frc(smidx)],'k','linewidth',4);
+        h3(i)=plot([0,sm(i)],[0,frc(smidx)],'color',h1(i).Color,'linewidth',2);
         
         set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
-        k(i)=usedS(i).F(smidx)/sm(i);
+        k(i)=frc(smidx)/sm(i);
         legText(i)={['k=',num2str(k(i),2)]};
         
     end
@@ -381,7 +387,8 @@ if(showFigs(showFigs==xx))
     ylabel('k');
     figText(gcf,20);
     plot(sm,k,'-o','linewidth',2,'markerfacecolor','w')
-    
+    kdat=[kdat;[mean(sm),std(sm),mean(k),std(k)]];
+%     errorbar(kdat(:,1),kdat(:,3),kdat(:,4),kdat(:,4),kdat(:,2),kdat(:,2))
 end
 %% 8. find and save fracture point
 xx=8;

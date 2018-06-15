@@ -21,6 +21,7 @@
 %*16. elastic response vs strain rate
 %*17. force (max) vs strain rate
 %*18. force (max) vs strain
+%*19. new type *7* plot force vs. strain for usedS with slope bar
 %*55. old force vs H data
 %************************************************************
 % clearvars -except t
@@ -1036,3 +1037,61 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
 end
 % i=24;plot(s(i).strain);hold on; plot(s(i).dsPts(:,3),s(i).dsPts(:,2),'o');
+%% 7. new type *7* plot force vs. strain for usedS with slope bar
+xx=19;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    subplot(1,2,1)
+    hold on;
+    % ind=2;
+    %     tArea=zeros(uN,1);
+    strMax=0;
+    legText={};
+     timePts=[0,0]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
+    for(i=uN:-1:1)
+       
+        stpt=usedS(i).dsPts(timePts(1)*4+1,3);
+        edpt=usedS(i).dsPts(timePts(1)*4+2,3);
+%         edpt=floor(mean(usedS(i).dsPts([timePts(2)*4+4:timePts(2)*4+5],3)));
+%         edpt=usedS(i).dsPts(timePts(2)*4+4,3);
+        strain=usedS(i).strain(stpt:edpt)-usedS(i).strain(stpt);
+        frc=usedS(i).F(stpt:edpt)-usedS(i).F(stpt);
+        
+        pts('F vs. Strain for ',usedS(i).name);
+%         h1(i)=plot(usedS(i).strain(stpt:edpt),usedS(i).F(stpt:edpt));
+        h1(i)=plot(strain,frc);
+        %             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
+        %         tArea(i)=trapz(usedS(i).strain,usedS(i).F);
+        %         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
+        [sm(i),smidx]=max(strain);
+        strMax=max(strMax,sm(i));
+        
+        h2(i)=plot([0,sm(i)],[0,frc(smidx)],'k','linewidth',4);
+        h3(i)=plot([0,sm(i)],[0,frc(smidx)],'color',h1(i).Color,'linewidth',2);
+        
+        set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
+        k(i)=frc(smidx)/sm(i);
+        legText(i)={['k=',num2str(k(i),2)]};
+        
+    end
+    legend(legText);
+    xlabel('Strain');
+    ylabel('Force (N)');
+    figText(gcf,20)
+    axis([0,round(strMax,2),-0.4,0.8]);
+    
+    subplot(1,2,2)
+    hold on;
+    xlabel('Strain');
+    ylabel('k');
+    figText(gcf,20);
+    plot(sm,k,'-o','linewidth',2,'markerfacecolor','w')
+    kdat=[kdat;[mean(sm),std(sm),mean(k),std(k)]];
+%     errorbar(kdat(:,1),kdat(:,3),kdat(:,4),kdat(:,4),kdat(:,2),kdat(:,2))
+end
