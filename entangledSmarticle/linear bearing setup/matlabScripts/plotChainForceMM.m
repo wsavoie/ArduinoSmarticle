@@ -35,12 +35,12 @@ clearvars -except kdat;
 % maxSpeed= 1.016; %m/s
 % pctSpeed=.0173;
 % speed=pctSpeed*maxSpeed;
-samp=120;
+samp=1000;
 [fb,fa]=butter(6,2/(samp/2),'low');
 
 
-% fold=uigetdir('A:\2DSmartData\entangledData\4-17');
-fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
+fold=uigetdir('A:\2DSmartData\entangledData\4-17');
+% fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
 % fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)';
 % fold='A:\2DSmartData\entangledData\4-11 multimarker';
@@ -79,8 +79,8 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 filtz=1;
-showFigs=[23];
-% showFigs=[21 22];
+showFigs=[6];
+% showFigs=[6];
 tpt=[2 2];
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -105,7 +105,9 @@ for i=1:length(s)
     end
     if(cond)
         if filtz
-            s(i).F=filter(fb,fa,s(i).F);  %filtered signal
+%             s(i).F=filter(fb,fa,s(i).F);  %filtered signal
+%             s(i).F=lowpass(,s(i).F,samps);  %filtered signal
+            s(i).F=lowpass(s(i).F,3,samp,'ImpulseResponse','iir');
         end
         usedS(indcnt)=s(i);
         indcnt=indcnt+1;
@@ -130,14 +132,20 @@ if(showFigs(showFigs==xx))
     hold on;
     ind=1;
     overlayStrain=1;
-    
+%     t=downsample(s(ind).t,10);
+%     f=downsample(s(ind).F,10);
+%     st=downsample(s(ind).strain,10);
     pts('F vs. T for ',s(ind).name);
     plot(s(ind).t,s(ind).F);
     maxF=max(s(ind).F);
     maxS=max(s(ind).strain);
-    
+
+%     plot(t,f);
+%     maxF=max(f);
+%     maxS=max(st);
     if(overlayStrain)
-        h=plot(s(ind).t,6*maxF*s(ind).strain);
+        h=plot(s(ind).t,maxF*s(ind).strain);
+%         h=plot(t,maxF*st);
         % text(0.4,0.9,'scaled strain','units','normalized','color',h.Color)
         legend({'Force','Scaled Strain'},'location','south')
     end
@@ -196,7 +204,9 @@ xx=3;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    ind=1;
+%     ind=1;
+% 	t=downsample(s(ind).t,10);
+%     f=downsample(s(ind).F,10);
     
     pts('F vs. Strain for ',usedS(ind).name);
     %     plot(s(ind).strain,s(ind).F);
@@ -204,7 +214,7 @@ if(showFigs(showFigs==xx))
     %     ss=usedS(ind).strain;
     %     ff1=filter(fb,fa,ff);  %filtered signal
     colormapline(usedS(ind).strain,usedS(ind).F,[],jet(100));
-    %     plot(usedS(ind).strain,usedS(ind).F);
+%     colormapline(st,f,[],jet(100));
     xlabel('Strain');
     ylabel('Force (N)');
     figText(gcf,18)
@@ -710,7 +720,7 @@ if(showFigs(showFigs==xx))
                 tArea(k)=trapz(x,y);
                 %                 velMax(k)=max(R.vel);
                 %                 velMax(k)=max(diff(x)./diff(tt));
-                velMax(k)=max(R.spd)
+                velMax(k)=max(R.spd);
                 strMax(k)=max(x);
             end
             velM(j)=mean(velMax);
@@ -1098,7 +1108,7 @@ if(showFigs(showFigs==xx))
         strainz=[];
         forcez=[];
         for j=1:length(currSpds)
-            strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt);
+            strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt).*diff(usedS(currSpds(j)).chain(stpt:edpt,:),1,2)';
             forcez(:,j)=usedS(currSpds(j)).F(stpt:edpt);
             tArea(i,j)=trapz(strainz(:,j),forcez(:,j));
         end
@@ -1112,8 +1122,8 @@ if(showFigs(showFigs==xx))
     
     text(0.4,0.9,['\epsilon=',num2str(usedS(1).SD),'mm'],'units','normalized')
     
-    xlabel('Strain');
-    ylabel('Force (N)');
+    xlabel('Strain rate');
+    ylabel('Work N mm');
     figText(gcf,18)
 end
 %% 20. apparatus strain
@@ -1211,7 +1221,6 @@ end
 xx=22;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
-    subplot(1,2,1)
     hold on;
     % ind=2;
     %     tArea=zeros(uN,1);
@@ -1274,14 +1283,19 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     
     dat=usedS(1);
-    fs = 1/dat.t(2);          % Sampling frequency
+    fs = 1000;          % Sampling frequency
     t = dat.t;        % Time vector
-    bandpass(dat.F,[0.02 0.5],fs)
-    
-    
-    
+%     lowpass(dat.F,.01,fs)
+    lowpass(s(i).F,2,samp,'ImpulseResponse','iir');
+% figure(400)
+% title('unfilt');
+% hold on;
+% plot(dat.t,dat.F)
+
+% 
+%     
 %            dat=usedS(1);
-%             Fs = 1/dat.t(2);          % Sampling frequency
+%             Fs = 1/diff(dat.t(1:2));          % Sampling frequency
 %             t = dat.t;        % Time vector
 %             L = length(t);             % Length of signal
 %             T = 1/Fs;             % Sampling period
@@ -1300,6 +1314,8 @@ if(showFigs(showFigs==xx))
 %             title('Single-Sided Amplitude Spectrum of X(t)')
 %             xlabel('f (Hz)')
 %             ylabel('|P1(f)|')
+            
+            
 %     
 end
 
