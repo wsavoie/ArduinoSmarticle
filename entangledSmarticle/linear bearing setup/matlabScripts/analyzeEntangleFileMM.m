@@ -1,5 +1,5 @@
 function [fpars,t,strain,F,L,rob,chain,dsPts, vel]=analyzeEntangleFileMM(fold,fname,FTfreq,varargin)
-%fpars = params from files [type,strain, sys width,del,version
+%fpars = params from files [type,strain,width,del,spd,its,version
 %time in seconds
 %strain, unitless
 %F in newtons
@@ -7,7 +7,7 @@ function [fpars,t,strain,F,L,rob,chain,dsPts, vel]=analyzeEntangleFileMM(fold,fn
 %chain end pts in meters
 %dsPts [time1,strain1,idx1;time2,strain2,idx2] strain start and endpts
 
-smartWidth=5.4; %5.4 cm for center link width
+smartWidth=5.3; %5.4 cm for center link width
 %6.4 cms from back to arm tip in u-shape
 mag=0;
 if [varargin{:}]

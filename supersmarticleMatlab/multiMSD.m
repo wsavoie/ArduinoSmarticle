@@ -68,11 +68,12 @@ fold
 %*51. plot gamma vs t
 %*52. plot x vs t with light with channel
 %*53. plot active smart diagram
+%*54. plot histogram of velocities
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
 % showFigs=[1,  52 53];
-showFigs=[1 49];
+showFigs=[1 54];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -1633,7 +1634,7 @@ if(showFigs(showFigs==xx))
     %     xl=xlim;
     %     plot(xl,[0,0],'k');
 end
-%% 31. partial Rot each track by the rotation of inactive smart and project
+%% 31. rotate chord trajectory ring about chord
 xx=31;
 if(showFigs(showFigs==xx))
     figure(xx)
@@ -2262,18 +2263,18 @@ if(showFigs(showFigs==xx))
             plot(0,0,'o','markerfacecolor','k','markeredgecolor','none');
             h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
             %             set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-%             plot(x(1),y(1),'o','markerfacecolor','k','markeredgecolor','none');
+            %             plot(x(1),y(1),'o','markerfacecolor','k','markeredgecolor','none');
             plot(ix(1),iy(1),'o','markerfacecolor','k','markeredgecolor','none');
             
-%             plot(x(600),y(600),'o','markerfacecolor','c','markeredgecolor','none');
+            %             plot(x(600),y(600),'o','markerfacecolor','c','markeredgecolor','none');
             plot(ix(600),iy(600),'o','markerfacecolor','c','markeredgecolor','none');
             
-%             plot(x(900),y(900),'o','markerfacecolor','b','markeredgecolor','none');
+            %             plot(x(900),y(900),'o','markerfacecolor','b','markeredgecolor','none');
             plot(ix(900),iy(900),'o','markerfacecolor','b','markeredgecolor','none');
             
-%             plot(x(end),y(end),'o','markerfacecolor','r','markeredgecolor','none');
+            %             plot(x(end),y(end),'o','markerfacecolor','r','markeredgecolor','none');
             plot(ix(end),iy(end),'o','markerfacecolor','r','markeredgecolor','none');
-    
+            
         end
     end
     xlabel('X(m)');
@@ -2285,7 +2286,7 @@ if(showFigs(showFigs==xx))
     %     plot([0,0],ylim,'r--','linewidth',1);
     %     plot(xlim,[0,0],'r--','linewidth',1);
     set(gca,'xtick',[-.3:0.15:.3],'ytick',[-.3:0.15:.3]); %same as 1
-%     %,'xticklabel',{ '' -0.2 '' -0.1 '' 0 '' 0.1 '' 0.2 ''},'yticklabel',{ '' -0.2 '' -0.1 '' 0 '' 0.1 '' 0.2 ''}
+    %     %,'xticklabel',{ '' -0.2 '' -0.1 '' 0 '' 0.1 '' 0.2 ''},'yticklabel',{ '' -0.2 '' -0.1 '' 0 '' 0.1 '' 0.2 ''}
     
     figText(gcf,16);
 end
@@ -2703,7 +2704,7 @@ if(showFigs(showFigs==xx))
     L=length(usedMovs);
     correctDir=0;
     minT=1e10;
-%     vvv=[];
+    %     vvv=[];
     for i=1:length(usedMovs)
         minT=min(length(usedMovs(i).t),minT);
         % dpos=diff(pos);
@@ -2756,23 +2757,23 @@ if(showFigs(showFigs==xx))
         if newpos(end,2)>0
             correctDir=correctDir+1;
         end
-%         vv=diff(newpos)./diff(usedMovs(i).t);
-%         vvv(i)={vv};
-% %         vvv=[vvv;vv];
-%     end
+        %         vv=diff(newpos)./diff(usedMovs(i).t);
+        %         vvv(i)={vv};
+        % %         vvv=[vvv;vv];
+        %     end
         h=plot(newpos(end,1),newpos(end,2),'ko','markersize',4,'MarkerFaceColor','r');
         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         endPos(i)=newpos(end,2);
         nn(i,:)=newpos(end,:)./usedMovs(i).t(end);
     end
-        mn=mean(nn);
-        sdv=std(nn);
-        pts('mean((final y positions)/time)');
-        pts('ymean,ystd=',mn(1),',',sdv(1));
-        pts('xmean,xstd=',mn(2),',',sdv(2));
-%         meanz=[meanz,mean(nn)];
-%         valz=[valz,std(nn).^2];
-
+    mn=mean(nn);
+    sdv=std(nn);
+    pts('mean((final y positions)/time)');
+    pts('ymean,ystd=',mn(1),',',sdv(1));
+    pts('xmean,xstd=',mn(2),',',sdv(2));
+    %         meanz=[meanz,mean(nn)];
+    %         valz=[valz,std(nn).^2];
+    
 end
 %% 50. view variance dependence on exp time length
 xx=50;
@@ -2993,7 +2994,7 @@ if(showFigs(showFigs==xx))
     light(end+1)=t(end);%append final time to light vector
     ll=t;
     for i=2:length(light)
-    ll(light(i-1)<t&t<=light(i))=-1*initDir*(-1).^(i-1);
+        ll(light(i-1)<t&t<=light(i))=-1*initDir*(-1).^(i-1);
     end
     bounds=[max(xdist) min(xdist)];
     max(xdist-sum(bounds)/2);
@@ -3008,17 +3009,17 @@ if(showFigs(showFigs==xx))
         ylabel('x (cm)');
         xlabel('Gait Periods');
         plot(t,xdist);
-        plot(t,ll*ceil(max(xdist)),'k.');        
+        plot(t,ll*ceil(max(xdist)),'k.');
         
     end
     
     figText(gcf,16);
-%     negLight=[]
+    %     negLight=[]
     
-%     x1=1:120;
-%     x2=121:240
-%     x3=241:360
-%     plot(
+    %     x1=1:120;
+    %     x2=121:240
+    %     x3=241:360
+    %     plot(
     
 end
 %% 53 plot active smart diagram
@@ -3042,7 +3043,7 @@ if(showFigs(showFigs==xx))
             patch(xVerts,yVerts,cols(smartsActive{i}(k)+1,:),'linestyle','none');
         end
     end
-%     xlim([0,25])
+    %     xlim([0,25])
     ylim([-0.5,5.5]);
     
     set(gca,'ytick',[0:5]);
@@ -3050,5 +3051,81 @@ if(showFigs(showFigs==xx))
     ylabel('Active smarticle index');
     xlabel('Gait Periods');
     figText(gcf,16);
-   
+    
 end
+%% 54 plot histogram of velocities
+xx=54;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    L=length(usedMovs);
+    correctDir=0;
+    minT=1e10;
+    for i=1:length(usedMovs)
+        minT=min(length(usedMovs(i).t),minT);
+        % dpos=diff(pos);
+        pos = [usedMovs(i).x, usedMovs(i).y];
+        rpos = bsxfun(@minus, pos, pos(1,:));
+        
+        % Subtract initial position
+        % Inactive particle position
+        iapos = [usedMovs(i).Ix, usedMovs(i).Iy];
+        iapos = bsxfun(@minus, iapos, pos(1,:));
+        
+        %get rid of nans in iapos and rpos
+        [nanr,~]=find(isnan(iapos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                iapos(nanr(qq),:)=iapos(nanr(qq)-1,:);
+            end
+        end
+        [nanr,~]=find(isnan(rpos));
+        
+        if ~isempty(nanr)
+            for qq=1:length(nanr)
+                rpos(nanr(qq),:)=rpos(nanr(qq)-1,:);
+            end
+        end
+        
+        
+        newpos=zeros(size(rpos));
+        for j=2:size(newpos,1)
+            % Get the change in the ring position in the world frame
+            deltaR = rpos(j, :) - rpos(j-1, :);
+            
+            % Get the vec1, tor from the ring COG to the inactive smarticle
+            rs = iapos(j-1, :) - rpos(j-1, :);  %HAD ERROR
+            if(norm(rs))
+                rs = rs./norm(rs);
+            end
+            ns=[-rs(2) rs(1)]; %a vec perpendicular vector to rs
+            %             ns=-ns;%this gets direction of perpendicular movement correct
+            %             deltay = ((rs*deltaR')/norm(rs)^2)*rs;
+            %             deltax = deltaR - deltay;
+            newpos(j, :) =[deltaR*ns',deltaR*rs'];
+            %       newpos(j, :) = [sign((rs./norm(rs))*(deltax'./norm(deltax)))*norm(deltax),...
+            %                           sign((rs./norm(rs))*(deltay'./norm(deltay)))*norm(deltay)];
+            
+        end
+        %         newpos=cumsum(newpos,2);
+        newpos=cumsum(newpos);
+        if newpos(end,2)>0
+            correctDir=correctDir+1;
+        end
+        endPos(i)=newpos(end,2);
+        nn(i)=newpos(end,2)./usedMovs(i).t(end);
+    end
+    pts('mean((final y positions)/time)', mean(nn),' +-',std(nn));
+    ringRad=.1905/2;
+    h1=histogram(nn,8);
+    xx=cumsum(diff(h1.BinEdges))+h1.BinEdges(1)-diff(h1.BinEdges)/2;
+    yy=h1.Values;
+    hold off;
+    plot(xx,yy);
+    hold on;
+    xlabel('Drift Velocity (m/s)')
+    ylabel('P(v)');
+    figText(gcf,16);
+end
+
