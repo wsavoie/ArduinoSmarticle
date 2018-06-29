@@ -1917,27 +1917,27 @@ if(showFigs(showFigs==xx))
         %dim 2 = [mean(|tran V| many smarts), mean(|rot V| many smarts)
         %dim 3 = exps
         v(:,:,idx)=[mean(sqrt((dx./dt).^2+(dy./dt).^2),2),mean(sqrt((dr./dt).^2),2)];
-%         v(:,:,idx)=[mean(dx.dy./dt,2),mean(dr./dt,2)];
-%         v(:,:,idx)=[mean(dx./dt,2),mean(dy./dt,2),mean(dr./dt,2)];
+        %         v(:,:,idx)=[mean(dx.dy./dt,2),mean(dr./dt,2)];
+        %         v(:,:,idx)=[mean(dx./dt,2),mean(dy./dt,2),mean(dr./dt,2)];
         %         h(idx)=plot(t(1:end-1),sqrt(v(:,1,idx).^2+v(:,2,idx).^2));
         %         plot(t(1:end-1),sqrt(v(:,3,idx).^2),'--','color',h(idx).Color);
     end
     
-%     vt=squeeze(sqrt(v(:,1,:).^2+v(:,2,:).^2));
-%     vr=squeeze(sqrt(v(:,3,:).^2));
-%     vr=squeeze(vr);
-      vt=squeeze(v(:,1,:));
-      vr=squeeze(v(:,2,:));
+    %     vt=squeeze(sqrt(v(:,1,:).^2+v(:,2,:).^2));
+    %     vr=squeeze(sqrt(v(:,3,:).^2));
+    %     vr=squeeze(vr);
+    vt=squeeze(v(:,1,:));
+    vr=squeeze(v(:,2,:));
     VT=mean(vt.^2,2)-mean(vt,2).^2;
     VR=mean(vr.^2,2)-mean(vr,2).^2;
     
     VT=sqrt(VT);
     VR=sqrt(VR);
     plot(t(1:end-1),VT,'k','linewidth',2);
-%     plot(t(1:end-1),sqrt(VR),'k','linewidth',2);
-%     plot(t(1:end-1),VT,'k','linewidth',2);
+    %     plot(t(1:end-1),sqrt(VR),'k','linewidth',2);
+    %     plot(t(1:end-1),VT,'k','linewidth',2);
     
-%     plot(t(1:end-1),sqrt(vm(:,1).^2+vm(:,2).^2),'k','linewidth',2);
+    %     plot(t(1:end-1),sqrt(vm(:,1).^2+vm(:,2).^2),'k','linewidth',2);
     %     plot(t(1:end-1),sqrt(vm(:,3).^2),'--k','linewidth',2);
     xlabel('\tau');
     ylabel('velocity cm/period');
@@ -1980,7 +1980,7 @@ if(showFigs(showFigs==xx))
         x=x-x(1);
         y=y-y(1);
         thet=thet-thet(1);
-                
+        
         if(filtz)
             %lowpass(x,5,1/diff(t(1:2)),'ImpulseResponse','iir');
             %x=lowpass(y,5,1/diff(t(1:2)));
@@ -1991,40 +1991,64 @@ if(showFigs(showFigs==xx))
         
         dx=diff(x); dy=diff(y);dr=diff(thet);dt=diff(t);
         v=sqrt((dx./dt).^2+(dy./dt).^2);
+        
+        v2=v.^2;
+        vr=sqrt((dr./dt).^2);
+        
         figure(50034);
         hold on;
         title('velocity of all particles in a single run');
-        ylabel('v');
+        ylabel('v^2');
         xlabel('\tau');
-        plot(t(2:end),v);
-        plot(t(2:end),mean(v,2),'k','linewidth',2);
         
-        vr=sqrt((dr./dt).^2);
+        plot(t(2:end),mean(v.^2,2),'k','linewidth',2);
+        plot(t(2:end),mean(v(:,1).^2,2));
+        
         %dim 1 represents time progression
         %dim 2 = [mean(|tran V| many smarts), mean(|rot V| many smarts)
         %dim 3 = exps
         %mean(mean(v)) of noisefloor;
-%         nf=8.856e-4;
-%         nfr=.0205;
-        V(:,:,idx)=[mean(v,2).^2,mean(vr,2).^2];
+        %         nf=8.856e-4;
+        %         nfr=.0205;
+
+        v3(:,idx)=mean(v.^2,2)-mean(v,2).^2;
+        v4(:,idx)=mean(v.^2,2);
     end
-%     vt=squeeze(sqrt(v(:,1,:).^2+v(:,2,:).^2));
-%     vr=squeeze(sqrt(v(:,3,:).^2));
-%     vr=squeeze(vr);
-      vt=squeeze(V(:,1,:));
-      vr=squeeze(V(:,2,:));
-    VT=mean(vt,2);
-    VR=mean(vr,2);
+    %     vt=squeeze(sqrt(v(:,1,:).^2+v(:,2,:).^2));
+    %     vr=squeeze(sqrt(v(:,3,:).^2));
+    %     vr=squeeze(vr);
+%     v2t=squeeze(mV(:,1,:));
+%     vt=squeeze(V(:,1,:));
+%     vr=squeeze(V(:,2,:));
+%     VT=mean(vt,2);
+% %     VV=mean(v2t,2)-mean(vt,2).^2;
     
-%     VT=sqrt(VT);
-%     VR=sqrt(VR);
-figure(xx);
-hold on;
-    plot(t(1:end-1),VT,'k','linewidth',2);
+%     VR=mean(vr,2);
+    VV=mean(v3,2);
+    VSTD=mean(v4,2);
+    %     VT=sqrt(VT);
+    %     VR=sqrt(VR);
+    figure(xx);
+    hold on;
+    windowM=movmean(VV,length(VV)/max(t));
+    plot(t(1:end-1),VV,'k','linewidth',1);
+    plot(t(1:end-1),windowM,'linewidth',3);
     xlabel('\tau');
-    ylabel('Granular Temperature m^2/\tau^2');
+    ylabel('\langlev^2\rangle (m^2/\tau^2)');
     figText(gcf,16);
-    xlim([0 70]);
+    xlim([0 80]);
+    
+%     plot(t(t<7)+73,windowM(t<7),'linewidth',1);    
+%     plot(t(t<7)+73,VV(t<7),'r','linewidth',1);
+
+    %a=sort(VSTD)
+    pct=@(x,vec) vec(round(((100-x)/100)*length(vec)));
+%     err=pct(1,sort(VSTD));
+%     shadedErrorBar(xlim,[mean(VSTD),mean(VSTD)],ones(2,1)*pct(5,sort(VSTD)),{},.5)
+%     plot(xlim,ones(2,1)*pct(5,sort(VSTD)),'linewidth',2)
+yy=ylim;
+ylim([0,yy(2)]);
+
 end
 %% 32 another version of COM plot with cleaner code
 xx=32;
@@ -2053,27 +2077,27 @@ if(showFigs(showFigs==xx))
         
         COM(:,:,i)=[sum(x,2),sum(y,2)]./numBods;
         COM(:,:,i)=COM(:,:,i)-COM(1,:,i);
-%         dists=sqrt(sum(abs(diff(COM(:,i))).^2,2)); %check for major jumps
-%         COM(:,i)=
-%         longDists=find(dists>.01);
-%         
-%         %eliminate long jumps
-%         while(longDists)
-%             COM(longDists(1)+1,:)=COM(longDists(1),:);
-%             dists=sqrt(sum(abs(diff(COM(:,i))).^2,2)); %check for major jumps
-%             longDists=find(dists>.005);
-%         end
-%         COM(:,i)=COM(:,i)-COM(1,:);
+        %         dists=sqrt(sum(abs(diff(COM(:,i))).^2,2)); %check for major jumps
+        %         COM(:,i)=
+        %         longDists=find(dists>.01);
+        %
+        %         %eliminate long jumps
+        %         while(longDists)
+        %             COM(longDists(1)+1,:)=COM(longDists(1),:);
+        %             dists=sqrt(sum(abs(diff(COM(:,i))).^2,2)); %check for major jumps
+        %             longDists=find(dists>.005);
+        %         end
+        %         COM(:,i)=COM(:,i)-COM(1,:);
         plot(COM(:,1,i),COM(:,2,i),'linewidth',lw);
     end
     
-%     plot([-0.3,-0.3,0.3,0.3,-0.3],[0.3,-0.3,-0.3,0.3,0.3,],'k','linewidth',2);
+    %     plot([-0.3,-0.3,0.3,0.3,-0.3],[0.3,-0.3,-0.3,0.3,0.3,],'k','linewidth',2);
     xlabel('X (m)');
     ylabel('Y (m)');
     axis([-.115,.115,-.115,.115]);
     set(gca,'XTick',[-0.1:.05:0.1],'XTicklabels',{'-0.1','','0','','0.1'});
     set(gca,'YTick',[-0.1:.05:0.1],'YTicklabels',{'-0.1','','0','','0.1'});
-%     axis equal
+    %     axis equal
     figText(gcf,16);
     
 end
