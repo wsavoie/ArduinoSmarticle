@@ -8,7 +8,6 @@
 %* 3. plot single Force vs. Strain
 %* 4. plot comparison b/w activated system and regular, Force vs. Strain
 %* 5. plot force vs. time for usedS
-%* 6. plot force vs. strain for usedS
 %* 7. plot force vs. strain for usedS with slope bar
 %* 8. find and save fracture point
 %* 9. plot fracture force vs height and strain vs height
@@ -79,9 +78,9 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 filtz=1;
-showFigs=[6];
+showFigs=[14];
 % showFigs=[6];
-tpt=[2 2];
+tpt=[1 1];
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
 types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -107,7 +106,7 @@ for i=1:length(s)
         if filtz
 %             s(i).F=filter(fb,fa,s(i).F);  %filtered signal
 %             s(i).F=lowpass(,s(i).F,samps);  %filtered signal
-            s(i).F=lowpass(s(i).F,3,samp,'ImpulseResponse','iir');
+            s(i).F=lowpass(s(i).F,3,samp);
         end
         usedS(indcnt)=s(i);
         indcnt=indcnt+1;
@@ -706,7 +705,7 @@ if(showFigs(showFigs==xx))
                 R=usedS(ids(k));
                 time2useS=R.dsPts(timePts(1)*4+1,3);%4 points per iteration
                 time2useE=R.dsPts(timePts(2)*4+4,3);
-                x=R.rob(time2useS:time2useE);
+                x=R.strain(time2useS:time2useE);
                 y=R.F(time2useS:time2useE)';
                 tt=R.t(time2useS:time2useE);
                 
@@ -1239,9 +1238,9 @@ if(showFigs(showFigs==xx))
     end
     % plot(s(ind).strain,s(ind).F);
     
-    
+    kval={};
     for i=1:length(spds)
-        
+
         currSpds=find([usedS(:).spd]==spds(i));
         dspts={usedS(currSpds).dsPts};
         stpt=min(cellfun(@(x) x(timePts(1)*4+1,3),dspts));
@@ -1253,15 +1252,27 @@ if(showFigs(showFigs==xx))
         strainz=[];
         forcez=[];
         for j=1:length(currSpds)
-            strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt);
-            forcez(:,j)=usedS(currSpds(j)).F(stpt:edpt);
-            forcez(:,j)=forcez(:,j)-forcez(1,j);
-            strainz(:,j)=strainz(:,j)-strainz(1,j);
+            s=usedS(currSpds(j)).strain;
+            f=usedS(currSpds(j)).F;
+%             s=s-s(1); f=f-f(1);
+            strainz(:,j)=s(stpt:edpt);
+            forcez(:,j)=f(stpt:edpt);
+            forcez(:,j)=forcez(:,j);
+            strainz(:,j)=strainz(:,j);
+            kval{i}(j,:)=polyfit(strainz(:,j),forcez(:,j),1);
         end
+        
+%         @f=polyfit(forcez,strainz,1);
         k2{i}=diff(forcez)./diff(strainz);
         E2(i,:)=(forcez(end,:)-forcez(1,:))./(strainz(end,:)-strainz(1,:));
         
     end
+    km=cell2mat(cellfun(@mean,kval,'uniformOutput',0)');
+    kerr=cell2mat(cellfun(@std,kval,'uniformOutput',0)');
+    errorbar(spds,km(:,1),kerr(:,1),'linewidth',2);
+    errorbar(spds,2*km(:,2),kerr(:,2),'linewidth',2);
+    
+    xlabel('strain rate');
     
     %
     %
