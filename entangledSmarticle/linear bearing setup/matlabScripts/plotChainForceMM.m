@@ -7,13 +7,14 @@
 %* 2. plot comparison b/w activated system and regular, Force vs. Time
 %* 3. plot single Force vs. Strain
 %* 4. plot comparison b/w activated system and regular, Force vs. Strain
-%* 5. plot force vs. time for usedS
+%* 5. plot force vs. time for all usedS
+%* 6. plot Force vs. Strain for usedS
 %* 7. plot force vs. strain for usedS with slope bar
 %* 8. find and save fracture point
 %* 9. plot fracture force vs height and strain vs height
 %*10. plot max recorded force on fracture runs
 %*11. plot select iterations of strain for single run
-%*12. get work from select strain iterations for single run
+%*12. get work from select strain iteration for single run
 %*13. get work from select strain iterations for many runs
 %*14. get work vs strain rate for many runs
 %*15. elastic response vs strain
@@ -37,9 +38,11 @@ clearvars -except kdat;
 samp=1000;
 [fb,fa]=butter(6,2/(samp/2),'low');
 
+lams=[0 2.25 4.15 7.3 17.15]./29.29;
 
-fold=uigetdir('A:\2DSmartData\entangledData\4-17');
-% fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
+% fold=uigetdir('A:\2DSmartData\entangledData\4-17');
+fold=uigetdir('A:\2DSmartData\entangledData\Akash data');
+% % fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
 % fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)';
 % fold='A:\2DSmartData\entangledData\4-11 multimarker';
@@ -52,7 +55,7 @@ if (~exist(fullfile(fold,'dataOut.mat'),'file') && ~exist(fullfile(fold,'fractDa
     s=struct;
     for i=1:N
         pts(i,'/',N);
-        [allFpars(i,:),s(i).t,s(i).strain,s(i).F,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel]=...
+        [allFpars(i,:),s(i).t,s(i).strain,s(i).F,s(i).Fa,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel,s(i).zop,s(i).xop]=...
             analyzeEntangleFileMM(fold,filez(i).name,freq,0);
         s(i).name=filez(i).name;
         s(i).fpars=allFpars(i,:);
@@ -78,12 +81,13 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 filtz=1;
-showFigs=[14];
+showFigs=[1 12];
 % showFigs=[6];
-tpt=[1 1];
+tpt=[1];
+indx=11;
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
-types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
+types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[1095 1110 1116 1129 1138];
 %%%%%%%%%%%%%%%%%%%%%%%%
 props={types strains Hs dels spds its vs};
 if ~isempty([props{:}])
@@ -129,7 +133,8 @@ xx=1;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    ind=1;
+%     ind=1;
+    ind=indx;
     overlayStrain=1;
 %     t=downsample(s(ind).t,10);
 %     f=downsample(s(ind).F,10);
@@ -203,7 +208,8 @@ xx=3;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-%     ind=1;
+    
+    ind=indx;
 % 	t=downsample(s(ind).t,10);
 %     f=downsample(s(ind).F,10);
     
@@ -275,6 +281,7 @@ if(showFigs(showFigs==xx))
     for(i=1:uN)
         pts('F vs. T for ',usedS(i).name);
         h(i)=plot(usedS(i).t,usedS(i).F);
+        hold on;
         maxF(i)=max(usedS(i).F);
         maxS(i)=max(usedS(i).strain);
         
@@ -286,6 +293,14 @@ if(showFigs(showFigs==xx))
             set(get(get(h3(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
             
         end
+        xlabel('time (s)','fontsize',18);
+        ylabel('force (N)','fontsize',18);
+%         pts(usedS(i).name);
+        text(.1,.3,['sd=',num2str(fpars(i,2)),' spd=',num2str(fpars(i,5)),...
+            ' v=',num2str(fpars(i,7))],'units','normalized')
+        pause
+        clf;
+        
     end
     xlabel('time (s)','fontsize',18);
     ylabel('force (N)','fontsize',18);
@@ -563,8 +578,8 @@ xx=12;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    ind=1;
-    timePts=[2,2]; %iteration to consider as "zero point"
+    ind=5;
+    timePts=[0,0]; %iteration to consider as "zero point"
     
     pts('F vs. Strain for ',usedS(ind).name);
     % plot(s(ind).strain,s(ind).F);
@@ -600,7 +615,10 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ind=1;
-    timePts=[2,2]; %start and end pts, iteration to consider as "zero point"
+        timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
     
     % plot(s(ind).strain,s(ind).F);
     
@@ -660,7 +678,7 @@ if(showFigs(showFigs==xx))
         legz(i)={['$\dot{\varepsilon}$=',num2str(velM(i),2),' cm/s']};
     end
     l=legend(legz,'interpreter','latex');
-    axis([0.05,.25,0,.12]);
+%     axis([0.05,.25,0,.12]);
     figText(gcf,18)
     l.FontSize=12;
 end
@@ -703,6 +721,7 @@ if(showFigs(showFigs==xx))
             for k=1:length(ids)
                 
                 R=usedS(ids(k));
+                
                 time2useS=R.dsPts(timePts(1)*4+1,3);%4 points per iteration
                 time2useE=R.dsPts(timePts(2)*4+4,3);
                 x=R.strain(time2useS:time2useE);

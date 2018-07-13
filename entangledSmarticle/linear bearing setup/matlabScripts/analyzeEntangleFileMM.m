@@ -1,4 +1,4 @@
-function [fpars,t,strain,F,L,rob,chain,dsPts, vel]=analyzeEntangleFileMM(fold,fname,FTfreq,varargin)
+function [fpars,t,strain,F,FA,L,rob,chain,dsPts,vel,z_op,x_op]=analyzeEntangleFileMM(fold,fname,FTfreq,varargin)
 %fpars = params from files [type,strain,width,del,spd,its,version
 %time in seconds
 %strain, unitless
@@ -19,36 +19,32 @@ end
     
 % ftFreq=1000;
 ft=importdata(fullfile(fold,fname));
-[t_op,z_op]= getOptiDataMM(fullfile(fold,['OPTI_',fname]));
+[t_op,z_op,x_op]= getOptiDataMM(fullfile(fold,['OPTI_',fname]));
 t=[1:length(ft(:,2))]'./FTfreq;
-F=ft(:,3);%y+ is backwards
+% F=ft(:,3);%z+ is backwards
+FA=(ft(:,1:3));
 
-%fix timing between scripts optitrack starts slightly first
-dd=t_op(end)-t(end);
+z_op=fillmissing(z_op,'linear');
+x_op=fillmissing(x_op,'linear');
+FA=fillmissing(FA,'linear');
+%frame of FT sensor is rotated 30 deg in xy plane
+%ensure the wire from FT is coming out of back and is horizontal 
+thet=deg2rad(30);
+R=[cos(thet) -sin(thet); sin(thet) cos(thet)];
 
-%old way of doing thiss
-% dd_ind=find(dd<t_op,1,'first');
-% t_op=t_op(dd_ind:end)-t_op(dd_ind);
-% z_op=z_op(dd_ind:end,:);
+FA(:,1:2)=[R*FA(:,1:2)']';
+%we dont need y direction after rotating 
+FA=FA(:,[1,3]);
+% FA(:,1:2)=R.*FA(:,1:2);
+% FA=FA(:,1);
 
-
-% %fix timing between scripts optitrack starts slightly first
-% dd=t_op(end)-t(end);
-% if dd>0 %op runs longer
-% %cut beginning off op
-% dd_ind=find(abs(dd)<t_op,1,'first');
-% t_op=t_op(dd_ind:end)-t_op(dd_ind);
-% z_op=z_op(dd_ind:end)-z_op(dd_ind);
-% else %ft runs longer
-% dd_ind=find(abs(dd)<t,1,'first');
-% t=t(dd_ind:end)-t(dd_ind);
-% F=F(dd_ind:end)-F(dd_ind);
-% end
-
+F=FA(:,2);
 
 %interpolate chain opti to length of FT data
 chain=interp1(t_op,z_op(:,1),t,'linear','extrap');
 chain(:,2)=interp1(t_op,z_op(:,2),t,'linear','extrap');
+
+x_op=interp1(t_op,x_op,t,'linear','extrap');
 
 %interpolate robot opti dat to length of FT data
 rob=interp1(t_op,z_op(:,3),t,'linear','extrap')/smartWidth;
@@ -128,11 +124,12 @@ else
 %     elseif ismember(fpars(end),[169])
 %         [~,c]=findpeaks(mys(2000:end),'minpeakprominence',0.016,'npeaks',fpars(6)/2,'minpeakdistance',length(t)/fpars(6)*peakdisk,'maxPeakHeight',.9);
 %     else
-        [~,c]=findpeaks(mys(2000:end),'npeaks',fpars(6)/2,'minpeakdistance',length(t)/fpars(6)*peakdisk);
+      startInd=2000;
+        [~,c]=findpeaks(mys(startInd:end),'npeaks',fpars(6)/2,'minpeakdistance',length(t)/fpars(6)*peakdisk);
         
 %     end
     
-    dsPts(4:4:np,3)=c+1999;
+    dsPts(4:4:np,3)=c+startInd-1;
     % pause;
     if(length(c)~=fpars(6)/2)
         warning('didn''t find enough points in mys')
@@ -189,12 +186,6 @@ end
 
 plot(dsPts(:,1),rob(dsPts(:,3)),'o')
 pause
-if ~isempty(find(isnan(strain), 1))
-    id=find(isnan(strain),1);
-    prevVal=strain(id-1);
-    strain(id-1:end)=prevVal;
-    pts('e in:',fullfile(fold,fname));
-end
 %get indices between first two points
 ptSpan=dsPts(1:2,3);
 d=diff(ptSpan)/4;
