@@ -69,11 +69,12 @@ fold
 %*52. plot x vs t with light with channel
 %*53. plot active smart diagram
 %*54. plot histogram of velocities
+%*55. true granular temperature mean squared vel
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
 % showFigs=[1,  52 53];
-showFigs=[1 54];
+showFigs=[1 51 55];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -2962,6 +2963,8 @@ if(showFigs(showFigs==xx))
     gam=diff(log(p(2:end,2)))./diff(log(p(2:end,1)));
     %     gam=gam(2:end);
     fgam=filter(ffb,ffa,gam);
+%     fgam=movmean(gam,1/diff(p(1:2,1))*1.5);
+%     fgam=lowpass(gam,.5,1/diff(p(3:4)));
     plot(p(3:end,1),gam);
     plot(p(3:end,1),fgam);
     %     plot(pf(2:end,1),diff(log(pf(:,2)))./diff(log(pf(:,1))))
@@ -3128,4 +3131,86 @@ if(showFigs(showFigs==xx))
     ylabel('P(v)');
     figText(gcf,16);
 end
+%% 55. true granular temperature mean squared vel
+xx=55;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
+    %requires that all runs have the same number of smarticles
+    n=size(usedMovs(1).x,2);
+    downSampBy=10;
+    GTTAll=[];
+    GTRAll=[];
+    filtz=0;
+    mT=usedMovs(1).t(minT);
+    for(idx=1:N)
+        
+        %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
+        %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
+        
+        x=usedMovs(idx).x;
+        y=usedMovs(idx).y;
+        thet=usedMovs(idx).rot;
+        t=usedMovs(idx).t(:,1);
+        
+        x=x(t(:)<=mT,:);
+        y=y(t(:)<=mT,:);
+        thet=thet(t(:)<=mT,:);
+        t=t(t(:)<=mT,:);
+        t=t/2.5; %put in gait period form
+        
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+        
+        if(filtz)
+            %lowpass(x,5,1/diff(t(1:2)),'ImpulseResponse','iir');
+            %x=lowpass(y,5,1/diff(t(1:2)));
+            x=filter(fb,fa,x);  %filtered signal
+            y=filter(fb,fa,y);  %filtered signal
+            thet=filter(fb,fa,thet);  %filtered signal
+        end
+        
+        dx=diff(x); dy=diff(y);dr=diff(thet);dt=diff(t);
+        v(:,idx)=sqrt((dx./dt).^2+(dy./dt).^2);
+        
+        v2=v.^2;
+        vr=sqrt((dr./dt).^2);
+        
+        v4(:,idx)=mean(v.^2,2);
+    end
+    %     vt=squeeze(sqrt(v(:,1,:).^2+v(:,2,:).^2));
+    %     vr=squeeze(sqrt(v(:,3,:).^2));
+    %     vr=squeeze(vr);
+%     v2t=squeeze(mV(:,1,:));
+%     vt=squeeze(V(:,1,:));
+%     vr=squeeze(V(:,2,:));
+%     VT=mean(vt,2);
+% %     VV=mean(v2t,2)-mean(vt,2).^2;
+    
+%     VR=mean(vr,2);
 
+    VV=mean(v.^2,2)-mean(v,2).^2;
+    %     VT=sqrt(VT);
+    %     VR=sqrt(VR);
+
+    windowM=movmean(VV,length(VV)/max(t));
+    plot(t(1:end-1),VV,'k','linewidth',1);
+    plot(t(1:end-1),windowM,'linewidth',3);
+    xlabel('\tau');
+    ylabel('\langlev^2\rangle (m^2/\tau^2)');
+    figText(gcf,16);
+    xlim([0 80]);
+    
+%     plot(t(t<7)+73,windowM(t<7),'linewidth',1);    
+%     plot(t(t<7)+73,VV(t<7),'r','linewidth',1);
+
+    %a=sort(VSTD)
+    pct=@(x,vec) vec(round(((100-x)/100)*length(vec)));
+%     err=pct(1,sort(VSTD));
+%     shadedErrorBar(xlim,[mean(VSTD),mean(VSTD)],ones(2,1)*pct(5,sort(VSTD)),{},.5)
+%     plot(xlim,ones(2,1)*pct(5,sort(VSTD)),'linewidth',2)
+yy=ylim;
+ylim([0,yy(2)]);
+
+end
