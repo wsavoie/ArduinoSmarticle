@@ -40,7 +40,7 @@ idx=1;
 badIdx=0;
 failedAttempts=struct;
 if(exist('otherName','var'))
-warning(['may want to change last argument in RIGIDBODYNAMES current name is ',otherName])
+    warning(['may want to change last argument in RIGIDBODYNAMES current name is ',otherName])
 end
 for i=1:nMovs
     
@@ -75,9 +75,9 @@ if(badIdx>0)
     warning([num2str(badIdx),' failed runs']);
     msg=cell(1,badIdx);
     for i=1:badIdx
-%         msg{yi}=failedAttempts(i).name;
+        %         msg{yi}=failedAttempts(i).name;
         pts(failedAttempts(i).name);
     end
-%     h=msgbox(msg,'errors');
+    %     h=msgbox(msg,'errors');
 end
 beep;
