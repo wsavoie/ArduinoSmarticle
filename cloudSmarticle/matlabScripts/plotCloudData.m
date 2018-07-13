@@ -45,9 +45,11 @@ pts(fold);
 %*30. mean velocity vs time
 %*31. true granular temperature mean squared vel
 %*32. another version of COM plot with cleaner code
+%*33. MSD added from 44 on multimsd file
+%*34. plot gamma vs t
 %************************************************************
 % showFigs=[7 11 27];
-showFigs=[31];
+showFigs=[25 33 34];
 
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
@@ -2099,5 +2101,106 @@ if(showFigs(showFigs==xx))
     set(gca,'YTick',[-0.1:.05:0.1],'YTicklabels',{'-0.1','','0','','0.1'});
     %     axis equal
     figText(gcf,16);
+    
+end
+%% 33. MSD added from 44 on multimsd file
+xx=33;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    fitT=0; %linear = 1; parab=0;
+    
+
+    
+    
+    if(isempty(ma.msd))
+        ma = ma.computeMSD;
+    end
+    
+    if(fitT)
+        ma.plotMeanMSD(gca, true)
+        [fo, gof] = ma.fitMeanMSD;
+        plot(fo)
+        
+        ma = ma.fitMSD;
+        good_enough_fit = ma.lfit.r2fit > 0.8;
+        Dmean = mean( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+        Dstd  =  std( ma.lfit.a(good_enough_fit) ) / 2 / ma.n_dim;
+        
+        fprintf('Estimation of the diffusion coefficient from linear fit of the MSD curves:\n')
+        fprintf('D = %.3g +- %.3g (mean +- std, N = %d)\n', ...
+            Dmean, Dstd, sum(good_enough_fit));
+    else
+        ma.plotMeanMSD(gca, true)
+        A = ma.getMeanMSD;
+        t = A(:, 1); % delay vector
+        msd = A(:,2); % msd
+        std_msd = A(:,3); % we will use inverse of the std as weights for the fit
+        std_msd(1) = std_msd(2); % avoid infinity weight
+        
+        ft = fittype('a*x + c*x^2');
+        [fo, gof] = fit(t, msd, ft, 'Weights', 1./std_msd, 'StartPoint', [0 0]);
+        
+        hold on
+        plot(fo)
+        legend off
+        ma.labelPlotMSD
+        
+        Dfit = fo.a / 4;
+        Vfit = sqrt(fo.c);
+        
+        ci = confint(fo);
+        Dci = ci(:,1) / 4;
+        Vci = sqrt(ci(:,2));
+        
+        fprintf('Parabolic fit of the average MSD curve with 95%% confidence interval:\n')
+        
+        fprintf('D = %.3g [ %.3g - %.3g ] %s\n', ...
+            Dfit, Dci(1), Dci(2), [SPACE_UNITS '²/' TIME_UNITS]);
+        
+        fprintf('V = %.3g [ %.3g - %.3g ] %s\n', ...
+            Vfit, Vci(1), Vci(2), [SPACE_UNITS '/' TIME_UNITS]);
+    end
+    
+end
+%% 34 plot gamma vs t
+xx=34;
+if(showFigs(showFigs==xx))
+    figure(xx)
+    hold on;
+    if(isempty(ma.msd))
+        ma = ma.computeMSD;
+    end
+    COM2={};
+    mb = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
+    inds=[10];
+    for(i=1:length(inds))
+        x= [usedMovs(inds(i)).t(:,1),mean(usedMovs(inds(i)).x,2),mean(usedMovs(inds(i)).y,2)];
+        COM2{i}=downsample(x,9);
+    end
+    mb=mb.addAll(COM2);
+    mb=mb.computeMSD;
+    
+    p=mb.getMeanMSD;
+    %     pf=maf.getMeanMSD;
+    co=.25;
+    [ffb,ffa]=butter(6,co/(sampRate/2),'low');
+    
+    gam=diff(log(p(2:end,2)))./diff(log(p(2:end,1)));
+    %     gam=gam(2:end);
+%     fgam=filter(ffb,ffa,gam);
+    fgam=movmean(gam,1/diff(p(1:2,1))*1.5);
+    co=80; %cut off ending inds;
+    plot(p(3:end-co,1),gam(1:end-co));
+    plot(p(3:end-co,1),fgam(1:end-co));
+    %     plot(pf(2:end,1),diff(log(pf(:,2)))./diff(log(pf(:,1))))
+    ylim([-0.5,2.5]);
+    xlim([0,120]);
+    legend({'non-filtered','filtered'});
+    
+    ylabel('\gamma');
+    xlabel('delay (s)');
+    figText(gcf,16);
+
     
 end
