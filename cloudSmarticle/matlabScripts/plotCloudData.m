@@ -49,8 +49,8 @@ pts(fold);
 %*34. plot gamma vs t
 %************************************************************
 % showFigs=[7 11 27];
-showFigs=[25 33 34];
-
+% showFigs=[25 33 31 7 29];
+showFigs=[35];
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
 % cutoff/(sample/2)
@@ -1964,12 +1964,12 @@ if(showFigs(showFigs==xx))
     GTRAll=[];
     filtz=0;
     for(idx=1:N)
-        
+%             for(idx=3)
         %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
         %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
         
         x=usedMovs(idx).x;
-        y=usedMovs(idx).y;
+        y=usedMovs(idx).y;  
         thet=usedMovs(idx).rot;
         t=usedMovs(idx).t(:,1);
         
@@ -2003,9 +2003,12 @@ if(showFigs(showFigs==xx))
         ylabel('v^2');
         xlabel('\tau');
         
-        plot(t(2:end),mean(v.^2,2),'k','linewidth',2);
-        plot(t(2:end),mean(v(:,1).^2,2));
+%         plot(t(2:end),mean(v.^2,2),'k','linewidth',2);
+%         plot(t(2:end),mean(v(:,1).^2,2));
+%         rr=mean(v.^2,2)-mean(v,2).^2;
         
+        wm=movmean(rr,length(rr)/max(t));
+%         plot(t(2:end),wm*50+.2);
         %dim 1 represents time progression
         %dim 2 = [mean(|tran V| many smarts), mean(|rot V| many smarts)
         %dim 3 = exps
@@ -2203,4 +2206,104 @@ if(showFigs(showFigs==xx))
     figText(gcf,16);
 
     
+end
+
+%% 35. gran temp and phi
+xx=35;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
+    %requires that all runs have the same number of smarticles
+    A=.051*.021; %area (l*w) of smarticle in m
+    n=size(usedMovs(1).x,2);
+    downSampBy=10;
+    s=0.1428;%straight leg length of smarticle
+    otherAngs=(180-(1-2/n)*180)/2*pi/180;
+    sig=s*cos(otherAngs);%optitrack straight length of regular polygon
+    maxAreaOpti=1/4*n*sig^2*cot(pi/n); %max optitrack convex hull area
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    filtz=0;
+    pTot=[];
+    vTot=[];
+    for(idx=1:N)
+%         for(idx=3)
+                
+
+
+        %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
+        %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
+        
+        x=usedMovs(idx).x;
+        y=usedMovs(idx).y;  
+        thet=usedMovs(idx).rot;
+        t=usedMovs(idx).t(:,1);
+        
+        x=x(t(:)<minT,:);
+        y=y(t(:)<minT,:);
+        thet=thet(t(:)<minT,:);
+        t=t(t(:)<minT,:);
+        t=t/2.5; %put in gait period form
+        
+        x=x-x(1);
+        y=y-y(1);
+        thet=thet-thet(1);
+        
+        if(filtz)
+            %lowpass(x,5,1/diff(t(1:2)),'ImpulseResponse','iir');
+            %x=lowpass(y,5,1/diff(t(1:2)));
+            x=filter(fb,fa,x);  %filtered signal
+            y=filter(fb,fa,y);  %filtered signal
+            thet=filter(fb,fa,thet);  %filtered signal
+        end
+        
+        %%%%%phi
+        V=zeros(1,length(x));
+        for i=1:length(x)
+            R=[x(i,:)',y(i,:)'];
+            [~,V(i)]=convhull(R(:,1),R(:,2));
+        end
+        phi=V;
+        phi=(A*n)./phi;
+        %%%%%%%%%%%
+        
+        
+        
+        dx=diff(x); dy=diff(y);dr=diff(thet);dt=diff(t);
+        v=sqrt((dx./dt).^2+(dy./dt).^2);
+        
+        v2=v.^2;
+        vr=sqrt((dr./dt).^2);
+       
+        ylabel('<v^2>');
+        xlabel('phi');
+        
+%         plot(t(2:end),mean(v.^2,2),'k','linewidth',2);
+%         plot(t(2:end),mean(v(:,1).^2,2));
+%         rr=mean(v.^2,2)-mean(v,2).^2;
+%         rr=mean(v,2).^2;
+        rr=mean(v.^2,2);
+        wm=movmean(rr,length(rr)/max(t));
+        scatter(downsample(phi(2:end),5),downsample(wm,5),'.k');
+        pTot=[pTot,phi(2:end)];
+        vTot=[vTot,wm'];
+    end
+figText(gcf,16);
+
+
+figure(123145);
+c=histogram(pTot,round(sqrt(length(pTot))),'Normalization','probability','displaystyle','stairs');hold on;
+% plot(c.BinEdges(2:end)-diff(c.BinEdges(1:2))/2,c.Values,'r','linewidth',2)
+ylabel('P(phi)');
+xlabel('phi');
+figText(gcf,20);
+
+
+figure(123148);
+d=histogram(vTot,round(sqrt(length(vTot))),'Normalization','probability','displaystyle','stairs');hold on;
+% plot(d.BinEdges(2:end)-diff(d.BinEdges(1:2))/2,d.Values,'r','linewidth',2)
+ylabel('P(<v^2>');
+xlabel('<v^2>');
+
+figText(gcf,20);
+
 end

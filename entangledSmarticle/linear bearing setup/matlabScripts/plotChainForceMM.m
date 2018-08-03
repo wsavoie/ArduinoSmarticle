@@ -38,10 +38,10 @@ clearvars -except kdat;
 samp=1000;
 [fb,fa]=butter(6,2/(samp/2),'low');
 
-lams=[0 2.25 4.15 7.3 17.15]./29.29;
+lams=[0 1.75 2.25 4.15 7.3 17.15]./29.29;
 
 % fold=uigetdir('A:\2DSmartData\entangledData\4-17');
-fold=uigetdir('A:\2DSmartData\entangledData\Akash data');
+fold=uigetdir('A:\2DSmartData\entangledData\7-31');
 % % fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
 % fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)';
@@ -81,13 +81,13 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 filtz=1;
-showFigs=[1 12];
-% showFigs=[6];
-tpt=[1];
-indx=11;
+showFigs=[14];
+% showFigs=[5];
+tpt=[1 1];
+indx=4;
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
-types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[1095 1110 1116 1129 1138];
+types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
 %%%%%%%%%%%%%%%%%%%%%%%%
 props={types strains Hs dels spds its vs};
 if ~isempty([props{:}])
@@ -209,7 +209,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     
-    ind=indx;
+    ind=9;
 % 	t=downsample(s(ind).t,10);
 %     f=downsample(s(ind).F,10);
     
@@ -1107,14 +1107,34 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     spds=unique([usedS(:).spd]);
-    startIt=3; %iteration to consider as "zero point"
     timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
     if exist('tpt','var')
         timePts=tpt; %if I want to set it up top
     end
     % plot(s(ind).strain,s(ind).F);
     
-    
+    %%%%%%%%%%%%%%%%%
+%                     R=usedS(ids(k));
+%                 
+%                 time2useS=R.dsPts(timePts(1)*4+1,3);%4 points per iteration
+%                 time2useE=R.dsPts(timePts(2)*4+4,3);
+%                 x=R.strain(time2useS:time2useE);
+%                 y=R.F(time2useS:time2useE)';
+%                 tt=R.t(time2useS:time2useE);
+%                 
+%                 %                 x=x-x(1);%zero at start iteration
+%                 %                 y=y-y(1);
+%                 %                 x=x-R.strain(1);%zero at start iteration
+%                 x=x-x(1);%zero at start iteration
+%                 y=y-y(1);
+%                 
+%                 
+%                 tArea(k)=trapz(x,y);
+%                 %                 velMax(k)=max(R.vel);
+%                 %                 velMax(k)=max(diff(x)./diff(tt));
+%                 velMax(k)=max(R.spd);
+%                 strMax(k)=max(x);
+    %%%%%%%%%%%%%%%%%
     for i=1:length(spds)
         pts('F vs. Strain for ',usedS(i).name);
         currSpds=find([usedS(:).spd]==spds(i));
@@ -1125,16 +1145,19 @@ if(showFigs(showFigs==xx))
         %         minT=min(cellfun(@(x) size(x,1),{usedS(currSpds).t}));
         strainz=[];
         forcez=[];
+        tArea=[];
         for j=1:length(currSpds)
             strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt).*diff(usedS(currSpds(j)).chain(stpt:edpt,:),1,2)';
             forcez(:,j)=usedS(currSpds(j)).F(stpt:edpt);
-            tArea(i,j)=trapz(strainz(:,j),forcez(:,j));
+%             tArea(i,j)=trapz(strainz(:,j),forcez(:,j));
+            tArea(j)=trapz(strainz(:,j),forcez(:,j));
         end
-        
+        totArea{i}=tArea;
     end
-    mArea=mean(tArea,2);
-    eArea=std(tArea,0,2);
-    
+%     mArea=mean(tArea,2);
+%     eArea=std(tArea,0,2);
+      mArea=cellfun(@mean,totArea);
+      eArea=cellfun(@std,totArea);
     
     errorbar(spds,mArea,eArea,'linewidth',2);
     

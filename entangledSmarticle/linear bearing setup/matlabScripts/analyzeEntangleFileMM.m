@@ -19,6 +19,7 @@ end
     
 % ftFreq=1000;
 ft=importdata(fullfile(fold,fname));
+pts(fname);
 [t_op,z_op,x_op]= getOptiDataMM(fullfile(fold,['OPTI_',fname]));
 t=[1:length(ft(:,2))]'./FTfreq;
 % F=ft(:,3);%z+ is backwards
@@ -88,7 +89,7 @@ else
     mys=mys+-1*min(mys);
     mys=mys./max(mys);
     
-    pts(fname);
+
     
     mye=-ns.*exp(expMult*x);%fpars(6)*2-(fpars(6)*3/2+1) mye(10
     mye=mye./max(mye);%fpars(6)*2-(fpars(6)*3/2+1) mye(10
