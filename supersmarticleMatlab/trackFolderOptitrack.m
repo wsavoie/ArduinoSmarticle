@@ -3,10 +3,10 @@
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 % fold=uigetdir('A:\2DSmartData\chordRing');
-fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\metal_allActive\all');
+fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\');
 f=dir2(fullfile(fold,'*.csv'));
 
-RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
+RIGIDBODYNAMES = false; %make true if tracking multiple things (i.e. inactive smarticles)
 clearvars rigidBodyName
 if RIGIDBODYNAMES
     rigidBodyName{1} = ' ring';
@@ -15,7 +15,7 @@ if RIGIDBODYNAMES
     activeName= ' active';
     inactiveName=' inactive';
     
-    otherName=activeName;
+    otherName=rigidBodyName{2};
     
 else
     rigidBodyName = 'rigid body 1';
@@ -39,7 +39,9 @@ steps = nMovs;
 idx=1;
 badIdx=0;
 failedAttempts=struct;
-warning(['may want to change last argument in RIGIDBODYNAMES current name is ',otherName])
+if(exist('otherName','var'))
+    warning(['may want to change last argument in RIGIDBODYNAMES current name is ',otherName])
+end
 for i=1:nMovs
     
     % for i =1:length(f)
@@ -73,9 +75,9 @@ if(badIdx>0)
     warning([num2str(badIdx),' failed runs']);
     msg=cell(1,badIdx);
     for i=1:badIdx
-%         msg{yi}=failedAttempts(i).name;
+        %         msg{yi}=failedAttempts(i).name;
         pts(failedAttempts(i).name);
     end
-%     h=msgbox(msg,'errors');
+    %     h=msgbox(msg,'errors');
 end
 beep;

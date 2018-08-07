@@ -72,23 +72,21 @@ if ~isempty(ind) || data.textdata{r,6}=='W' %has ring rigid body
     t=t(1:dec:end,:);
     x = -data.data(1:dec:end,ringInd+4); %was 7
     y = data.data(1:dec:end,ringInd+6); %was 9
-    z = data.data(1:dec:end,ringInd+5); %was 8
-    
-    
-    
-    
+    z = data.data(1:dec:end,ringInd+5); %was 8 
     ang=ang(1:dec:end,:);
     % pts('rigid body sys');
     
     allDat=[x,y,ang];
-    aa=find(isnan([x,y,ang]));%find if any nans
-    while(aa)
-    for(qq=1:size(allDat,2))
-        nanidx=find(isnan(allDat(:,qq)));
-        allDat(nanidx,qq)=allDat(nanidx-1,qq);
-    end
-    aa=find(isnan(allDat));
-    end
+    allDat=fillmissing(allDat,'linear');
+    
+%     aa=find(isnan([x,y,ang]));%find if any nans
+%     while(aa)
+%     for(qq=1:size(allDat,2))
+%         nanidx=find(isnan(allDat(:,qq)));
+%         allDat(nanidx,qq)=allDat(nanidx-1,qq);
+%     end
+%     aa=find(isnan(allDat));
+%     end
     [x,y,ang]=separateVec(allDat,1);
 %     nanIndsx=find(isnan(x));
 %     while(nanIndsx)
@@ -134,16 +132,17 @@ else
 %     y(nanIndsy)=y(nanIndsy-1);
 %     ang(nanIndsrot)=ang(nanIndsrot-1);
 
-    allDat=[x,y,ang];
-    aa=find(isnan([x,y,ang]));%find if any nans
-    while(aa)
-    for(qq=1:size(allDat,2))
-        nanidx=find(isnan(allDat(:,qq)));
-        allDat(nanidx,qq)=allDat(nanidx-1,qq);
-    end
-    aa=find(isnan(allDat));
-    end
-    [x,y,ang]=separateVec(allDat,1);
+    allDat=[x,y];
+    allDat=fillmissing(allDat,'linear');
+%     aa=find(isnan([x,y,ang]));%find if any nans
+%     while(aa)
+%     for(qq=1:size(allDat,2))
+%         nanidx=find(isnan(allDat(:,qq)));
+%         allDat(nanidx,qq)=allDat(nanidx-1,qq);
+%     end
+%     aa=find(isnan(allDat));
+%     end
+    [x,y]=separateVec(allDat,1);
 
     comx=mean(x,2);
     comy=mean(y,2);

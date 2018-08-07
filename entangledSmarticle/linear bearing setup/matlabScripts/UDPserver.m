@@ -3,11 +3,17 @@ myip='130.207.141.229';
 roboip='130.207.140.133';
 
 % global client
+try
 fclose(instrfindall);
+catch 
+end
 if(exist('udpServ'))
 delete(udpServ);
 end
 robot = java.awt.Robot;
+client.ConnectionType = 'Multicast';
+client.ClientIP ='127.0.0.1';
+client.HostIP = '127.0.0.1';
 client = natnet();
 client.connect();
 udpServ = udp('', 'LocalHost', '', 'LocalPort', 1520);

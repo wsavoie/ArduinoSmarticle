@@ -1,4 +1,4 @@
-function [t,z]=getOptiDataMM(fname)
+function [t,z,x]=getOptiDataMM(fname)
 %outputs time and z data in seconds and mm
 
 
@@ -18,7 +18,10 @@ t=data.data(1:end,2);
 %cs = chain start
 %ce = chain end
 
-z=data.data(1:end,5:3:end);
+z=fillmissing(data.data(1:end,5:3:end),'linear');
+x=fillmissing(data.data(1:end,3:3:end),'linear');
+
+
 [~,FTidx]=min(z(1,:),[],2);
 [~,CS]=max(z(1,:),[],2);
 %assuming 3 markers 3 + 2 + 1=6
@@ -31,10 +34,17 @@ ID=[CS,CE,FTidx];
 % x=x-x(1,ID(1));
 % y=y-y(1,ID(1));
 % z=z-z(1,ID(3));
+
 z=z-z(1,ID(2));
 z=-z;
-
 z=z(:,ID);
+
+x=x-x(1,ID(2));
+x=-x;
+x=x(:,ID);
+
+
+
 % figure(23);
 % clf;
 % hold on;

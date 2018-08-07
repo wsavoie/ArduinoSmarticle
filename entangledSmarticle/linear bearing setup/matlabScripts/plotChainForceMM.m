@@ -7,14 +7,14 @@
 %* 2. plot comparison b/w activated system and regular, Force vs. Time
 %* 3. plot single Force vs. Strain
 %* 4. plot comparison b/w activated system and regular, Force vs. Strain
-%* 5. plot force vs. time for usedS
-%* 6. plot force vs. strain for usedS
+%* 5. plot force vs. time for all usedS
+%* 6. plot Force vs. Strain for usedS
 %* 7. plot force vs. strain for usedS with slope bar
 %* 8. find and save fracture point
 %* 9. plot fracture force vs height and strain vs height
 %*10. plot max recorded force on fracture runs
 %*11. plot select iterations of strain for single run
-%*12. get work from select strain iterations for single run
+%*12. get work from select strain iteration for single run
 %*13. get work from select strain iterations for many runs
 %*14. get work vs strain rate for many runs
 %*15. elastic response vs strain
@@ -23,22 +23,28 @@
 %*18. force (max) vs strain
 %*19. redone work vs strain rate
 %*20. apparatus strain
+%*21. measure k continuously over course of strain
+%*22. another way to do k
+%*23. fft of force for SAC trials
 %*55. old force vs H data
 %************************************************************
 % clearvars -except t
 % close all;
-clear all;
+clearvars -except kdat;
 
 % maxSpeed= 1.016; %m/s
 % pctSpeed=.0173;
 % speed=pctSpeed*maxSpeed;
-samp=80;
+samp=1000;
 [fb,fa]=butter(6,2/(samp/2),'low');
 
+lams=[0 1.75 2.25 4.15 7.3 17.15]./29.29;
 
-fold=uigetdir('A:\2DSmartData\entangledData\4-17');
+% fold=uigetdir('A:\2DSmartData\entangledData\4-17');
+fold=uigetdir('A:\2DSmartData\entangledData\7-31');
+% % fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
-% fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)\stretchAll 11-20 paperTrials\type4only';
+% fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)';
 % fold='A:\2DSmartData\entangledData\4-11 multimarker';
 freq=1000; %hz rate for polling F/T sensor
 fractD=0;%flag for fractData
@@ -49,8 +55,8 @@ if (~exist(fullfile(fold,'dataOut.mat'),'file') && ~exist(fullfile(fold,'fractDa
     s=struct;
     for i=1:N
         pts(i,'/',N);
-        [allFpars(i,:),s(i).t,s(i).strain,s(i).F,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel]=...
-            analyzeEntangleFileMM(fold,filez(i).name,freq,1);
+        [allFpars(i,:),s(i).t,s(i).strain,s(i).F,s(i).Fa,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel,s(i).zop,s(i).xop]=...
+            analyzeEntangleFileMM(fold,filez(i).name,freq,0);
         s(i).name=filez(i).name;
         s(i).fpars=allFpars(i,:);
         %             [s(i).type,s(i).SD,s(i).H,s(i).del,s(i).spd,s(i).its,s(i).v]=separateVec(s(i).fpars(i,:),1);
@@ -75,8 +81,10 @@ typeTitles={'Inactive Smarticles','Regular Chain','Viscous, open first 2 smartic
     'Fracture SAC'};
 %%%%%%%%%%%%%%%%%%
 filtz=1;
-showFigs=[6];
+showFigs=[14];
+% showFigs=[5];
 tpt=[1 1];
+indx=4;
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
 types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -88,33 +96,35 @@ end
 setP1=[];
 indcnt=1;
 % if(fractD==0)
-    for i=1:length(s)
-        cond=1;
-        for j=1:length(props)
-            
-            if ~isempty(props{j})
-                if(~any(props{j}==s(i).fpars(j)))
-                    cond=0;
-                end
+for i=1:length(s)
+    cond=1;
+    for j=1:length(props)
+        
+        if ~isempty(props{j})
+            if(~any(props{j}==s(i).fpars(j)))
+                cond=0;
             end
         end
-        if(cond)
-            if filtz
-                s(i).F=filter(fb,fa,s(i).F);  %filtered signal
-            end
-            usedS(indcnt)=s(i);
-            indcnt=indcnt+1;
+    end
+    if(cond)
+        if filtz
+%             s(i).F=filter(fb,fa,s(i).F);  %filtered signal
+%             s(i).F=lowpass(,s(i).F,samps);  %filtered signal
+            s(i).F=lowpass(s(i).F,3,samp);
         end
+        usedS(indcnt)=s(i);
+        indcnt=indcnt+1;
     end
-    if ~exist('usedS','var')
-        error('No file with specified parameters exists in folder');
-    end
-    uN=length(usedS);
-    fpars=zeros(uN,7);
-    for i=1:uN
-        fpars(i,:)=usedS(i).fpars;
-    end
-    [type,SD,H,del,spd,it,v]=separateVec(fpars,1);
+end
+if ~exist('usedS','var')
+    error('No file with specified parameters exists in folder');
+end
+uN=length(usedS);
+fpars=zeros(uN,7);
+for i=1:uN
+    fpars(i,:)=usedS(i).fpars;
+end
+[type,SD,H,del,spd,it,v]=separateVec(fpars,1);
 % end
 % showFigs=[9 10]
 
@@ -123,16 +133,23 @@ xx=1;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    ind=1;
+%     ind=1;
+    ind=indx;
     overlayStrain=1;
-    
+%     t=downsample(s(ind).t,10);
+%     f=downsample(s(ind).F,10);
+%     st=downsample(s(ind).strain,10);
     pts('F vs. T for ',s(ind).name);
     plot(s(ind).t,s(ind).F);
     maxF=max(s(ind).F);
     maxS=max(s(ind).strain);
-    
+
+%     plot(t,f);
+%     maxF=max(f);
+%     maxS=max(st);
     if(overlayStrain)
-        h=plot(s(ind).t,6*maxF*s(ind).strain);
+        h=plot(s(ind).t,maxF*s(ind).strain);
+%         h=plot(t,maxF*st);
         % text(0.4,0.9,'scaled strain','units','normalized','color',h.Color)
         legend({'Force','Scaled Strain'},'location','south')
     end
@@ -191,7 +208,10 @@ xx=3;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    ind=1;
+    
+    ind=9;
+% 	t=downsample(s(ind).t,10);
+%     f=downsample(s(ind).F,10);
     
     pts('F vs. Strain for ',usedS(ind).name);
     %     plot(s(ind).strain,s(ind).F);
@@ -199,7 +219,7 @@ if(showFigs(showFigs==xx))
     %     ss=usedS(ind).strain;
     %     ff1=filter(fb,fa,ff);  %filtered signal
     colormapline(usedS(ind).strain,usedS(ind).F,[],jet(100));
-%     plot(usedS(ind).strain,usedS(ind).F);
+%     colormapline(st,f,[],jet(100));
     xlabel('Strain');
     ylabel('Force (N)');
     figText(gcf,18)
@@ -261,6 +281,7 @@ if(showFigs(showFigs==xx))
     for(i=1:uN)
         pts('F vs. T for ',usedS(i).name);
         h(i)=plot(usedS(i).t,usedS(i).F);
+        hold on;
         maxF(i)=max(usedS(i).F);
         maxS(i)=max(usedS(i).strain);
         
@@ -272,6 +293,14 @@ if(showFigs(showFigs==xx))
             set(get(get(h3(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
             
         end
+        xlabel('time (s)','fontsize',18);
+        ylabel('force (N)','fontsize',18);
+%         pts(usedS(i).name);
+        text(.1,.3,['sd=',num2str(fpars(i,2)),' spd=',num2str(fpars(i,5)),...
+            ' v=',num2str(fpars(i,7))],'units','normalized')
+        pause
+        clf;
+        
     end
     xlabel('time (s)','fontsize',18);
     ylabel('force (N)','fontsize',18);
@@ -311,12 +340,15 @@ if(showFigs(showFigs==xx))
         for j=1:length(currSpds)
             strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt);
             forcez(:,j)=usedS(currSpds(j)).F(stpt:edpt);
+            forcez(:,j)=forcez(:,j)-forcez(1,j);
+            strainz(:,j)=strainz(:,j)-strainz(1,j);
         end
         mforce(:,i)=mean(forcez,2);
         mstrainz(:,i)=mean(strainz,2);
         ef(:,i)=std(forcez,0,2);
         
         shadedErrorBar(mstrainz(:,i),mforce(:,i),ef(:,i),{'linewidth',2},.5);
+        pause
         legT{i}=['$\dot{\epsilon}$=',num2str(spds(i)),'mm/s'];
         
     end
@@ -337,31 +369,36 @@ if(showFigs(showFigs==xx))
     %     tArea=zeros(uN,1);
     strMax=0;
     legText={};
-     timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+    timePts=[0,0]; %start and end pts, iteration to consider as "zero point"
     if exist('tpt','var')
         timePts=tpt; %if I want to set it up top
     end
     for(i=uN:-1:1)
-       
+        
         stpt=usedS(i).dsPts(timePts(1)*4+1,3);
-        edpt=usedS(i).dsPts(timePts(2)*4+4,3);
+        edpt=usedS(i).dsPts(timePts(1)*4+2,3);
+        %         edpt=floor(mean(usedS(i).dsPts([timePts(2)*4+4:timePts(2)*4+5],3)));
+        %         edpt=usedS(i).dsPts(timePts(2)*4+4,3);
+        strain=usedS(i).strain(stpt:edpt)-usedS(i).strain(stpt);
+        frc=usedS(i).F(stpt:edpt)-usedS(i).F(stpt);
         
         pts('F vs. Strain for ',usedS(i).name);
-        h1(i)=plot(usedS(i).strain(stpt:edpt),usedS(i).F(stpt:edpt));
+        %         h1(i)=plot(usedS(i).strain(stpt:edpt),usedS(i).F(stpt:edpt));
+        h1(i)=plot(strain,frc);
         %             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
         %         tArea(i)=trapz(usedS(i).strain,usedS(i).F);
         %         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
-        [sm(i),smidx]=max(usedS(i).strain(stpt:edpt));
+        [sm(i),smidx]=max(strain);
         strMax=max(strMax,sm(i));
         
-        h2(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'k','linewidth',4);
-        h3(i)=plot([0,sm(i)],[0,usedS(i).F(smidx)],'color',h1(i).Color,'linewidth',2);
+        h2(i)=plot([0,sm(i)],[0,frc(smidx)],'k','linewidth',4);
+        h3(i)=plot([0,sm(i)],[0,frc(smidx)],'color',h1(i).Color,'linewidth',2);
         
         set(get(get(h1(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         %         set(get(get(h2(i),'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         %         fill([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)],'k','facecolor','c')
-        k(i)=usedS(i).F(smidx)/sm(i);
+        k(i)=frc(smidx)/sm(i);
         legText(i)={['k=',num2str(k(i),2)]};
         
     end
@@ -377,7 +414,8 @@ if(showFigs(showFigs==xx))
     ylabel('k');
     figText(gcf,20);
     plot(sm,k,'-o','linewidth',2,'markerfacecolor','w')
-    
+    kdat=[kdat;[mean(sm),std(sm),mean(k),std(k)]];
+    %     errorbar(kdat(:,1),kdat(:,3),kdat(:,4),kdat(:,4),kdat(:,2),kdat(:,2))
 end
 %% 8. find and save fracture point
 xx=8;
@@ -420,6 +458,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     
+    smartWid=9.1; %cm
     load(fullfile(fold,'fractData.mat'));
     uH=sort(unique([fractData(:).H]),'ascend');
     allH=[fractData(:).H];
@@ -437,7 +476,7 @@ if(showFigs(showFigs==xx))
         uS(i)={h};
         %%%%
         
-%         uS(i)={[fractData(inds).fracStrainMax]};
+        %         uS(i)={[fractData(inds).fracStrainMax]};
         uFm(i)=mean(uF{i});
         uFerr(i)=std(uF{i});
         uSm(i)=mean(uS{i});
@@ -447,18 +486,20 @@ if(showFigs(showFigs==xx))
     subplot(1,2,1)
     hold on;
     title('Force at Fracture');
-    errorbar(uH,uFm,uFerr,'linewidth',2);
+    errorbar(smartWid./uH,uFm,uFerr,'linewidth',2);
     ylabel('Force (N)');
-    xlabel('Confinement Height (cm)');
+    %     xlabel('Confinement Height (cm)');
+    xlabel('\lambda_i');
     figText(gcf,16)
     axis tight;
     
     subplot(1,2,2)
     hold on;
     title('Strain at Fracture');
-    errorbar(uH,uSm,uSerr,'linewidth',2);
+    errorbar(smartWid./uH,uSm,uSerr,'linewidth',2);
     ylabel('Strain (cm)');
-    xlabel('Confinement Height (cm)');
+    %     xlabel('Confinement Height (cm)');
+    xlabel('\lambda_i');
     figText(gcf,16);
     axis tight;
     
@@ -537,8 +578,8 @@ xx=12;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
-    ind=1;
-    timePts=[2,2]; %iteration to consider as "zero point"
+    ind=5;
+    timePts=[0,0]; %iteration to consider as "zero point"
     
     pts('F vs. Strain for ',usedS(ind).name);
     % plot(s(ind).strain,s(ind).F);
@@ -574,7 +615,10 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     ind=1;
-    timePts=[2,2]; %start and end pts, iteration to consider as "zero point"
+        timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
     
     % plot(s(ind).strain,s(ind).F);
     
@@ -634,7 +678,7 @@ if(showFigs(showFigs==xx))
         legz(i)={['$\dot{\varepsilon}$=',num2str(velM(i),2),' cm/s']};
     end
     l=legend(legz,'interpreter','latex');
-    axis([0.05,.25,0,.12]);
+%     axis([0.05,.25,0,.12]);
     figText(gcf,18)
     l.FontSize=12;
 end
@@ -675,25 +719,26 @@ if(showFigs(showFigs==xx))
             tArea=zeros(size(ids));
             strMax=zeros(size(ids));
             for k=1:length(ids)
-           
+                
                 R=usedS(ids(k));
+                
                 time2useS=R.dsPts(timePts(1)*4+1,3);%4 points per iteration
                 time2useE=R.dsPts(timePts(2)*4+4,3);
-                x=R.rob(time2useS:time2useE);
+                x=R.strain(time2useS:time2useE);
                 y=R.F(time2useS:time2useE)';
                 tt=R.t(time2useS:time2useE);
                 
                 %                 x=x-x(1);%zero at start iteration
                 %                 y=y-y(1);
-%                 x=x-R.strain(1);%zero at start iteration
+                %                 x=x-R.strain(1);%zero at start iteration
                 x=x-x(1);%zero at start iteration
                 y=y-y(1);
                 
                 
                 tArea(k)=trapz(x,y);
-%                 velMax(k)=max(R.vel);
-%                 velMax(k)=max(diff(x)./diff(tt));
-                velMax(k)=max(R.spd)
+                %                 velMax(k)=max(R.vel);
+                %                 velMax(k)=max(diff(x)./diff(tt));
+                velMax(k)=max(R.spd);
                 strMax(k)=max(x);
             end
             velM(j)=mean(velMax);
@@ -719,7 +764,7 @@ if(showFigs(showFigs==xx))
     axis auto
     %     axis([0 .25 -.05 .15])
     l.FontSize=12;
-%     ylim([0 0.2])
+    %     ylim([0 0.2])
 end
 %% 15. elastic response vs strain
 xx=15;
@@ -820,8 +865,8 @@ if(showFigs(showFigs==xx))
     warning('change smidx');
     %     strF=struct; %strainFinal
     %     strFerr;
-%     uspd=unique(
-%     sM=zeros(length(uspd),length(strAmt));
+    %     uspd=unique(
+    %     sM=zeros(length(uspd),length(strAmt));
     for i=1:length(strAmt)
         %I want to find number of SD's for for the given gamma I'm
         %searching
@@ -1009,7 +1054,7 @@ if(showFigs(showFigs==xx))
             strMax=zeros(size(ids));
             F=zeros(size(ids));
             for k=1:length(ids)
-                                R=usedS(ids(k));
+                R=usedS(ids(k));
                 %                 time2useS=R.dsPts(((timePts(1))*4-3),3);%4 points per iteration
                 %                 time2useE=R.dsPts(timePts(2)*4,3);
                 time2useS=R.dsPts(timePts(1)*4+1,3);%4 points per iteration
@@ -1025,15 +1070,15 @@ if(showFigs(showFigs==xx))
                 x=x-R.strain(1);%zero at start iteration
                 y=y-R.F(1);
                 F(k)=mean(y);
-%                 velMax(k)=max(R.vel);
+                %                 velMax(k)=max(R.vel);
                 strMax(k)=mean(x);
                 
                 
                 
-               
-%                 
-%                 L=diff(R.chain,1,2);
-%                 velMax(k)=max(R.vel*L(1));
+                
+                %
+                %                 L=diff(R.chain,1,2);
+                %                 velMax(k)=max(R.vel*L(1));
             end
             strM(j)=mean(strMax);
             strE(j)=std(strMax);
@@ -1062,14 +1107,34 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     spds=unique([usedS(:).spd]);
-    startIt=3; %iteration to consider as "zero point"
     timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
     if exist('tpt','var')
         timePts=tpt; %if I want to set it up top
     end
     % plot(s(ind).strain,s(ind).F);
     
-    
+    %%%%%%%%%%%%%%%%%
+%                     R=usedS(ids(k));
+%                 
+%                 time2useS=R.dsPts(timePts(1)*4+1,3);%4 points per iteration
+%                 time2useE=R.dsPts(timePts(2)*4+4,3);
+%                 x=R.strain(time2useS:time2useE);
+%                 y=R.F(time2useS:time2useE)';
+%                 tt=R.t(time2useS:time2useE);
+%                 
+%                 %                 x=x-x(1);%zero at start iteration
+%                 %                 y=y-y(1);
+%                 %                 x=x-R.strain(1);%zero at start iteration
+%                 x=x-x(1);%zero at start iteration
+%                 y=y-y(1);
+%                 
+%                 
+%                 tArea(k)=trapz(x,y);
+%                 %                 velMax(k)=max(R.vel);
+%                 %                 velMax(k)=max(diff(x)./diff(tt));
+%                 velMax(k)=max(R.spd);
+%                 strMax(k)=max(x);
+    %%%%%%%%%%%%%%%%%
     for i=1:length(spds)
         pts('F vs. Strain for ',usedS(i).name);
         currSpds=find([usedS(:).spd]==spds(i));
@@ -1080,23 +1145,26 @@ if(showFigs(showFigs==xx))
         %         minT=min(cellfun(@(x) size(x,1),{usedS(currSpds).t}));
         strainz=[];
         forcez=[];
+        tArea=[];
         for j=1:length(currSpds)
-            strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt);
+            strainz(:,j)=usedS(currSpds(j)).strain(stpt:edpt).*diff(usedS(currSpds(j)).chain(stpt:edpt,:),1,2)';
             forcez(:,j)=usedS(currSpds(j)).F(stpt:edpt);
-            tArea(i,j)=trapz(strainz(:,j),forcez(:,j));
+%             tArea(i,j)=trapz(strainz(:,j),forcez(:,j));
+            tArea(j)=trapz(strainz(:,j),forcez(:,j));
         end
-        
+        totArea{i}=tArea;
     end
-    mArea=mean(tArea,2);
-    eArea=std(tArea,0,2);
-    
+%     mArea=mean(tArea,2);
+%     eArea=std(tArea,0,2);
+      mArea=cellfun(@mean,totArea);
+      eArea=cellfun(@std,totArea);
     
     errorbar(spds,mArea,eArea,'linewidth',2);
     
     text(0.4,0.9,['\epsilon=',num2str(usedS(1).SD),'mm'],'units','normalized')
     
-    xlabel('Strain');
-    ylabel('Force (N)');
+    xlabel('Strain rate');
+    ylabel('Work N mm');
     figText(gcf,18)
 end
 %% 20. apparatus strain
@@ -1105,12 +1173,12 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     for(i=1:uN)
-    pts(usedS(i).name);
-    hold on;
-    plot(usedS(i).t,usedS(i).rob)
-    plot(usedS(i).t,usedS(i).chain(:,1))
-    plot(usedS(i).t,usedS(i).chain(:,2))
-%     pause
+        pts(usedS(i).name);
+        hold on;
+        plot(usedS(i).t,usedS(i).rob)
+        plot(usedS(i).t,usedS(i).chain(:,1))
+        plot(usedS(i).t,usedS(i).chain(:,2))
+        %     pause
     end
     
     xlabel('time (s)','fontsize',18);
@@ -1119,6 +1187,191 @@ if(showFigs(showFigs==xx))
     
     figText(gcf,16)
 end
+%% 21. measure k continuously over course of strain
+xx=21;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    subplot(1,2,1)
+    hold on;
+    % ind=2;
+    %     tArea=zeros(uN,1);
+    strMax=0;
+    legText={};
+    timePts=[0,0]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
+    
+    for(i=uN:-1:1)
+        figure(xx);
+        hold off;
+        stpt=usedS(i).dsPts(timePts(1)*4+1,3);
+        edpt=usedS(i).dsPts(timePts(2)*4+2,3)-300;
+        stpt=floor((edpt-stpt)/2+stpt);
+        strain=usedS(i).strain(stpt:edpt)-usedS(i).strain(stpt);
+        frc=usedS(i).F(stpt:edpt)-usedS(i).F(stpt);
+        
+        pts('F vs. Strain for ',usedS(i).name);
+        %         h1(i)=plot(usedS(i).strain(stpt:edpt),usedS(i).F(stpt:edpt));
+        h1(i)=plot(usedS(i).strain-usedS(i).strain(stpt),usedS(i).F-usedS(i).F(stpt),'linewidth',0.5);
+        hold on;
+        plot(strain,frc,'linewidth',2);
+        
+        %             colormapline(usedS(i).strain,usedS(i).F,[],jet(100));
+        %         tArea(i)=trapz(usedS(i).strain,usedS(i).F);
+        %         A(i)=polyarea([usedS(i).strain;usedS(i).strain(1)],[usedS(i).F;usedS(i).F(1)]);
+        
+        
+        [sm(i),smidx]=max(strain);
+        strMax=max(strMax,sm(i));
+        %         figure(124);
+        %         hold on;
+        k{i}=diff(frc)./diff(strain');
+        E(i)=(frc(end)-frc(1))/(strain(end)-strain(1));
+        %         plot(strain(1:end-1), k{i});
+        
+        
+    end
+    figure(124);
+    hold on;
+    minLen=min(cellfun(@length,k,'UniformOutput',1));
+    nk=zeros(minLen,length(k));
+    for(i=1:length(k))
+        nk(:,i)=k{i}(1:minLen);
+    end
+    plot(mean(nk,2,'omitnan'));
+    
+    [mean(E) mean(mean(nk))]
+    
+    %     legend(legText);
+    %     xlabel('Strain');
+    %     ylabel('Force (N)');
+    %     figText(gcf,20)
+    %     axis([0,round(strMax,2),-0.4,0.8]);
+    %
+    %     subplot(1,2,2)
+    %     hold on;
+    %     xlabel('Strain');
+    %     ylabel('k');
+    %     figText(gcf,20);
+    %     plot(sm,k,'-o','linewidth',2,'markerfacecolor','w')
+    %     kdat=[kdat;[mean(sm),std(sm),mean(k),std(k)]];
+    %     errorbar(kdat(:,1),kdat(:,3),kdat(:,4),kdat(:,4),kdat(:,2),kdat(:,2))
+end
+%% 22. another way to do k
+xx=22;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    % ind=2;
+    %     tArea=zeros(uN,1);
+    strMax=0;
+    legText={};
+    timePts=[0,0]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
+    
+    spds=unique([usedS(:).spd]);
+    startIt=3; %iteration to consider as "zero point"
+    timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
+    % plot(s(ind).strain,s(ind).F);
+    
+    kval={};
+    for i=1:length(spds)
+
+        currSpds=find([usedS(:).spd]==spds(i));
+        dspts={usedS(currSpds).dsPts};
+        stpt=min(cellfun(@(x) x(timePts(1)*4+1,3),dspts));
+        edpt=min(cellfun(@(x) x(timePts(2)*4+2,3)-300,dspts));
+        stpt=floor((edpt-stpt)/2+stpt);
+        %         strain=usedS(i).strain(stpt:edpt)-usedS(i).strain(stpt);
+        
+        %         minT=min(cellfun(@(x) size(x,1),{usedS(currSpds).t}));
+        strainz=[];
+        forcez=[];
+        for j=1:length(currSpds)
+            s=usedS(currSpds(j)).strain;
+            f=usedS(currSpds(j)).F;
+%             s=s-s(1); f=f-f(1);
+            strainz(:,j)=s(stpt:edpt);
+            forcez(:,j)=f(stpt:edpt);
+            forcez(:,j)=forcez(:,j);
+            strainz(:,j)=strainz(:,j);
+            kval{i}(j,:)=polyfit(strainz(:,j),forcez(:,j),1);
+        end
+        
+%         @f=polyfit(forcez,strainz,1);
+        k2{i}=diff(forcez)./diff(strainz);
+        E2(i,:)=(forcez(end,:)-forcez(1,:))./(strainz(end,:)-strainz(1,:));
+        
+    end
+    km=cell2mat(cellfun(@mean,kval,'uniformOutput',0)');
+    kerr=cell2mat(cellfun(@std,kval,'uniformOutput',0)');
+    errorbar(spds,km(:,1),kerr(:,1),'linewidth',2);
+    errorbar(spds,2*km(:,2),kerr(:,2),'linewidth',2);
+    
+    xlabel('strain rate');
+    
+    %
+    %
+    %         k{i}=diff(frc)./diff(strain');
+    %         E(i)=(frc(end)-frc(1))/(strain(end)-strain(1));
+    % figure(124);
+    % hold on;
+    %    minLen=min(cellfun(@length,k,'UniformOutput',1));
+    %    nk=zeros(minLen,length(k));
+    %    for(i=1:length(k))
+    %         nk(:,i)=k{i}(1:minLen);
+    %    end
+    %    plot(mean(nk,2,'omitnan'));
+    
+end
+%% 23. fft of force for SAC trials
+xx=23;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    
+    dat=usedS(1);
+    fs = 1000;          % Sampling frequency
+    t = dat.t;        % Time vector
+%     lowpass(dat.F,.01,fs)
+    lowpass(s(i).F,2,samp,'ImpulseResponse','iir');
+% figure(400)
+% title('unfilt');
+% hold on;
+% plot(dat.t,dat.F)
+
+% 
+%     
+%            dat=usedS(1);
+%             Fs = 1/diff(dat.t(1:2));          % Sampling frequency
+%             t = dat.t;        % Time vector
+%             L = length(t);             % Length of signal
+%             T = 1/Fs;             % Sampling period
+%     
+%             X=dat.F;
+%     %         X=sin(2*pi*1.5*t)+2*t;
+%             k=(X(end)-X(1))/(t(end)-t(1));
+%             X2=X-k.*t;
+%             Y=fft(X2);
+%     
+%             P2 = abs(Y/L);
+%             P1 = P2(1:L/2+1);
+%             P1(2:end-1) = 2*P1(2:end-1);
+%             f = Fs*(0:(L/2))/L;
+%             plot(f,P1);
+%             title('Single-Sided Amplitude Spectrum of X(t)')
+%             xlabel('f (Hz)')
+%             ylabel('|P1(f)|')
+            
+            
+%     
+end
+
 %% 55. old force vs h data
 xx=55;
 if(showFigs(showFigs==xx))
