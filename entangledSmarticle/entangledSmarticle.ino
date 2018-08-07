@@ -133,19 +133,29 @@ void loop()
 ////////////////////////
 
   
-////////STRESS RESPONSE///////////////
+//////STRESS RESPONSE///////////////
+   int mcurr=0;
+  stressThresh=18;
+  int ss=9;
+  for (int i = 0; i < 1<<ss; i++)
+    {
+      mcurr  = mcurr+analogRead(stressPin);
+    }
+    mcurr >>= ss;
+  bool notStress=currentMove(mcurr);
+////////////////////////////////////
+
+////////STRESS RESPONSE2///////////////
 //   int mcurr=0;
 ////  stressThresh=18;
-//  int ss=9;
+//  int ss=8;
 //  for (int i = 0; i < 1<<ss; i++)
 //    {
 //      mcurr  = mcurr+analogRead(stressPin);
 //    }
 //    mcurr >>= ss;
-//  bool notStress=currentMove(mcurr);
+//  bool notStress=currentMove2(mcurr);
 //////////////////////////////////////
-
-
 
 
 ///////////different maneuvers///////////
@@ -226,8 +236,29 @@ bool currentMove(int sp)
   }
 //  delay(sdel);  
 return true;
-} 
+}
 
+bool currentMove2(int sp)
+{
+  if(sp<stressThresh)
+  {
+    uShape();
+  }
+  else
+  {
+    if(p1<stressMin&& p2>stressMax)
+    {
+      S1.writeMicroseconds(p1 = p1+100);
+      S2.writeMicroseconds(p2 = p2-100);
+      delay(100);
+      S1.writeMicroseconds(p1 = p1-50);
+      S2.writeMicroseconds(p2 = p2+50);
+    }
+    
+  }
+//  delay(sdel);  
+return true;
+} 
 /* Uses FFT analysis to calculate the dominant frequency picked up by the microphone */
 double findFrequency() {
   double startTime = micros();

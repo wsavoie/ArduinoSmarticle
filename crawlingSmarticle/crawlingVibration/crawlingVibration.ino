@@ -37,9 +37,10 @@
 
 static int lightLevel1 = 0;
 static int lightLevel2 = 0;
+static int lightLevel3 = 255;
 static int lightThresh1 = 255;
 static int lightThresh2 = 255;
-
+static int lightThresh3 = 255;
 
 /*light vars */
 int liMax=5 ;
@@ -151,7 +152,10 @@ void loop()
   double freq = findFrequency();
   analyzeFrequency(freq);
   }
-//  vibrate();
+  else
+  {
+  vibrate();
+  }
   /*int meanCurr = 0;
   for (int i = 0; i < 1<<samps; i++)
   {
@@ -448,9 +452,9 @@ bool analyzeLight()
   // Get the light levels from the voltage dividers
   lightLevel1 = analogRead(pr1);
   lightLevel2 = analogRead(pr2);
-  
+  lightLevel3 = analogRead(pr3);
   // High readings are associated with light exposure
-  if (lightLevel1>lightThresh1 || lightLevel2>lightThresh2)
+  if (lightLevel1>lightThresh1 || lightLevel2>lightThresh2 || lightLevel3>lightThresh3)
   { // If the light exposure one either sensor is high
     lightInertia>=iOn ? lightInertia=iOn : lightInertia++; 
     if(lightInertia>=0)

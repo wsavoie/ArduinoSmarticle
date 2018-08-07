@@ -27,7 +27,7 @@
 #define stressPin A7    // CHANGE BACK TO orig a7 or a3
 #define randPin A4    // CHANGE BACK TO a7
 #define led 13    //13 SCK
-
+#define vibrationMotor     13      // CHANGE BACK TO a6
 
 /*Stress related vars*/
 int stressMoveThresh = 9;
@@ -54,11 +54,11 @@ bool ledVal = false;
 /* FFT Stuff */
 arduinoFFT FFT = arduinoFFT(); //creates new FFT object
 const uint16_t samples = 64;
-int const fN= 10; //number of frequencies
+int const fN= 11; //number of frequencies
 int currFreq=6;
 //double samplingFrequency = 8300; //breadboard: elapsed time ~ 7700us
 double samplingFrequency = 7950; //smarticle: elapsed time ~ 8050us
-int freqCenters[fN] = {600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500};
+int freqCenters[fN] = {600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600};
 int freqAcceptThresh = 50;  //+-30Hz from freqCenter is accepted
 int freqUpperBounds[fN];
 int freqLowerBounds[fN];
@@ -243,7 +243,10 @@ void performFunc(int type){
       break;     
     case 9:
       negativeSquare();
-      break;                              
+      break;
+     case 10:
+      vibrate();
+      break;                                  
     default:
       straighten();
       break;
@@ -401,7 +404,11 @@ void light(bool a)
     digitalWrite(led, LOW);
 }
 
-
+void vibrate() {
+  digitalWrite(vibrationMotor, HIGH);
+  delay(del*3);
+  digitalWrite(vibrationMotor, LOW);
+}
 /*void currentRead(uint16_t meanCurrVal)
 {
   static bool v = true;

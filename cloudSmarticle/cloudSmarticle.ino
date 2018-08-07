@@ -14,8 +14,8 @@
 
 #define led 13
 
-int randAmp = 800;//units of milliseconds
-int maxRand = 1000;
+int randAmp = 0;//units of milliseconds
+int maxRand = 1000; //change this back to 1000!
 int del = 400;
 /* Instance Data & Declarations */
 Servo S1;
