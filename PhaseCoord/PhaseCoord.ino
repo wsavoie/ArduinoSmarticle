@@ -41,8 +41,8 @@ bool start = false;
 int servo=2;
 static bool ledVal= true;
 void circleGait();
-
-
+void starGait();
+void starCrossGait();
 void setup() {
   S1.attach(servo1, 600, 2400);
   S2.attach(servo2, 600, 2400);
@@ -80,7 +80,7 @@ void loop() {
       
     
     double freq = findFrequency();
-    if (freq > testFreq+10-20 && freq < testFreq+10+20)
+    if (freq > testFreq+10-10 && freq < testFreq+10+10)
     {
       freqVal=0;
       for(int k=0; k<avgN;k++)
@@ -101,7 +101,7 @@ void loop() {
     light(ledVal= !ledVal);
     
     //float temp= 150.0-150.0/freqVal;
-    leftSquareGait();
+    starCrossGait();
     //delay(globalDelay-10);
     //delayMicroseconds((indDel-globalDelay+10)*1000);
     
@@ -224,7 +224,41 @@ void zGait() {
   }
 }
   
-  
+void starGait() {
+  static int A1[] = {0,64,84,116,180,135,154,84,26,45};
+  static int A2[] = {71,64,0,64,71,116,180,148,180,116};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    p1o=p1;  p2o=p2;
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    setDly(p1o,p2o);
+//    delay(globalDelay-10);
+//    delayMicroseconds((indDel-globalDelay+10)*1000);
+    
+    delay(dly/freqVal);
+    //delay(dly-10);
+    //delayMicroseconds((dly/freqVal-dly+10)*1000);
+  }
+}
+
+void starCrossGait() {
+  static int A1[] = {0,180,26,84,154};
+  static int A2[] = {71,71,180,0,180};
+  for (int i = 0; i < (sizeof(A1)/sizeof(int)); i++)
+  {
+    p1o=p1;  p2o=p2;
+    S1.writeMicroseconds(p1 = A1[i] * 10 + 600);
+    S2.writeMicroseconds(p2 = A2[i] * 10 + 600);
+    setDly(p1o,p2o);
+//    delay(globalDelay-10);
+//    delayMicroseconds((indDel-globalDelay+10)*1000);
+    
+    delay(dly/freqVal);
+    //delay(dly-10);
+    //delayMicroseconds((dly/freqVal-dly+10)*1000);
+  }
+}
 void setDly(int p1o,int p2o)
 {
   dly=spddel*max(abs(p1o-p1),abs(p2o-p2))/10.0;
