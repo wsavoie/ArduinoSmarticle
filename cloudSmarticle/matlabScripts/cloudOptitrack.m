@@ -66,80 +66,35 @@ if ~isempty(ind) || data.textdata{r,6}=='W' %has ring rigid body
     comy=y;
     comz=z;
     ang=ang(1:dec:end,:);
-    % pts('rigid body sys');
     
-    nanIndsx=find(isnan(x));
-    nanIndsy=find(isnan(y));
-    nanIndsrot=find(isnan(ang));
+    allDat=[x,y,ang];
+%     allDat=fillmissing(allDat,'linear');
     
-    for(i=1:length(nanIndsx))
-        if(nanIndsx(i)==1)
-            x(i)=x(find(~isnan(x),1));
-        else
-            x(nanIndsx(i))=x(nanIndsx(i)-1);
-        end
-    end
-    for(i=1:length(nanIndsy))
-        if(nanIndsy(i)==1)
-            y(i)=y(find(~isnan(y),1));
-        else
-            y(nanIndsy(i))=y(nanIndsy(i)-1);
-        end
-    end
-    for(i=1:length(nanIndsrot))
-        if(nanIndsrot(i)==1)
-            ang(i)=ang(find(~isnan(ang),1));
-        else
-            ang(nanIndsrot(i))=ang(nanIndsrot(i)-1);
-        end
-    end
-    ang=unwrap(ang);
-    for(i=1:size(x,1))
-        XX{i}=x(i,:);
-        YY{i}=y(i,:);
-    end
+
+    a=diff(allDat);
+    [r,~]=find(a(:,1:2)>1e-3);
+    count=0;
+%     while(r)
+%         allDat(r,1:2)=allDat(r-1,1:2);
+%         a=diff(allDat);
+%         [r,~]=find(abs(a(:,1:2))>1e-3);
+%         count=count+1;
+%         if(count>1000)
+%             warning('stuck');
+%         end
+%     end
     
-    
-    %     %getting rid of translational jumps
-    %     trans=[x,y];
-    %
-    %     distx=abs(diff(x)); %check for major jumps
-    %     [longDistsx]=find(distx>.04);
-    %     disty=abs(diff(y)); %check for major jumps
-    %     [longDistsy]=find(disty>.04);
-    %     %eliminate long jumps
-    %     while(longDistsx)
-    %         x(longDistsx(1)+1)=x(longDistsx(1));
-    %         distx=abs(diff(x)); %check for major jumps
-    %         [longDistsx]=find(distx>.04);
-    %     end
-    %     while(longDistsy)
-    %         trans(longDistsy(1)+1)=trans(longDistsy(1));
-    %         disty=abs(diff(x)); %check for major jumps
-    %         [longDistsy]=find(disty>.04);
-    %     end
-    %     x=trans(:,1);
-    %     y=trans(:,2);
-    %
-    %     %eliminate ang jumps
-    %     maxAngJump=5*pi/180;
-    %     rots=abs(diff(ang));
-    %     longAngs=find(rots>maxAngJump);
-    %     while(longAngs)
-    %         ang(longAngs(1)+1)=ang(longAngs(1));
-    %         rots=abs(diff(ang));
-    %         longAngs=find(rots>maxAngJump);
-    %     end
-    %
+    allDat=fillmissing(allDat,'linear');
+    [x,y,ang]=separateVec(allDat,1);
+    comx=x;
+    comy=y;
     varargout{1}=ang;
 else
-    % -repmat(data.data(1,3:3:end),[size(data.data(:,3:3:end),1),1])
-    goodCols=sum(~isnan(data.data(1,:))); %sums total amount of non-nan cols
-    %     sum(~isnan(movs(idx).x(1,:)))
+
     t = data.data(:,2);
-    x = -data.data(:,3:3:goodCols); %was 3:3:end
-    y = data.data(:,3+2:3:goodCols); %was 5:3:end
-    z = data.data(:,3+1:3:goodCols); %was 4:3:end
+    x = -data.data(:,3:3:end); %was 3:3:end
+    y = data.data(:,3+2:3:end); %was 5:3:end
+    z = data.data(:,3+1:3:end); %was 4:3:end
     
     %decimate by dec
     t=t(1:dec:end,:);
@@ -147,16 +102,10 @@ else
     y=y(1:dec:end,:);
     z=z(1:dec:end,:);
     
-    nanIndsx=find(isnan(x));
-    nanIndsy=find(isnan(y));
-    
-    for i=1:length(nanIndsx)
-        x(nanIndsx(i))=x(nanIndsx(i)-1);
-    end
-    for i=1:length(nanIndsy)
-        y(nanIndsy(i))=y(nanIndsy(i)-1);
-    end
-    
+    allDat=[x,y];
+    allDat=fillmissing(allDat,'spline');
+    [x,y]=separateVec(allDat,1);
+
     comx=mean(x,2);
     comy=mean(y,2);
 end
@@ -166,7 +115,5 @@ comx=comx-comx(1);
 comy=comy-comy(1);
 
 COM=[t,comx,comy];
-COM(any(isnan(COM),2),:)=[];
-
 tracks=cell(1);
 tracks{1}= COM;

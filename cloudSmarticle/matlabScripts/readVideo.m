@@ -3,7 +3,7 @@ SAVEOUTMOVIE=0;
 tic
 hh=figure(1000);
 hh.Position=[0 0 1920 1000];
-[filename,fold]=uigetfile(fullfile('A:\SmarticleAreaFractionData','*.avi;*.mp4'));
+[filename,fold]=uigetfile(fullfile('A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\3 smart phase state','*.avi;*.mp4'));
 V = VideoReader(fullfile(fold,filename));
 fps=V.framerate;
 N = round(V.duration*fps);

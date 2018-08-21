@@ -5,7 +5,7 @@ vidOn=1;
 robot = java.awt.Robot;
 client.connect();
 
-% Set the conenction type to the multicast of Optitrack and set the proper
+% Set the conenction type to  the multicast of Optitrack and set the proper
 % local loopback IPs./
 % client.ConnectionType = 'Multicast';
 % client.ClientIP ='127.0.0.1';

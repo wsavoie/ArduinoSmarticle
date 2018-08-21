@@ -1,7 +1,7 @@
 clear all
 % fold=uigetdir('A:\2DSmartData');
 
-fold=uigetdir('A:\2DSmartData\cloud\cloud 2-27');
+fold=uigetdir('A:\2DSmartData\cloud\cloud 5-2-18\rand 0');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -18,7 +18,7 @@ if RIGIDBODYNAMES
     %names of bodies will be "something #"
 else
     %     rigidBodyName = 'rigid body 1';
-    numBods= 8;
+    numBods= 7;
 end
 
 % r=.9525;

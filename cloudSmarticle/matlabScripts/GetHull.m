@@ -1,4 +1,4 @@
-function [b,solidity,CH,BW] = GetHull(I)
+function [b,solidity,CH,BW] = GetHull(I,h)
 %%
 
 % close all; clear all; clc;
@@ -9,39 +9,35 @@ function [b,solidity,CH,BW] = GetHull(I)
 
 % subplot(2,2,2);
 
-% I = rgb2gray(I);
+I = rgb2gray(I);
 
-BW = I < 200;
+BW = I > 70;
 % BW1=BW;
 R = 8; N = 8;
 SE = strel('disk',R,N);
 % 
-BW = imdilate(BW,SE);
-BW = imerode(BW,SE);
+
+
 BW = imclose(BW,SE);
-BW = bwareaopen(BW, 2000);
-BW = imclose(BW,SE);
+% BW = imdilate(BW,SE);
+% BW = imerode(BW,SE);
+BW = bwareaopen(BW, 15);
+% BW = imclose(BW,SE);
 
-
-% figure(200); imshow(BW);
-
-% J = regionfill(I,x,y);
-
-% BW = BW1;
-
+% clf;
 % imshow(BW);
-% title('Closed Binary Image');
 
-% subplot(2,2,3);
+
+
 CH = bwconvhull(BW);
-% imshow(CH);
-% title('Union Convex Hull');
+
 
 bwArea = sum(BW(:));
 chArea = sum(CH(:));
 solidity = bwArea/chArea;
 
 % subplot(2,2,4);
+% b = cell2mat(bwboundaries(CH));
 b = cell2mat(bwboundaries(CH));
 % imshow(BW);
 % title('Image Convex Hull');
