@@ -22,7 +22,7 @@ movegui(h,[2300,500]);
 %code for saving out to a movie
 if(SAVEOUTMOVIE)
     filenameOut=[filename(1:end-4),'Outs'];
-    vid = VideoWriter(['A:\SmarticleAreaFractionData\',filenameOut,'.avi'],'Motion JPEG AVI');
+    vid = VideoWriter(fullfile(fold,'out',[filenameOut,'.avi']),'Motion JPEG AVI');
     open(vid);
 end
 marker='-';
@@ -67,11 +67,10 @@ for(i=2:N)
     
     a=readFrame(V);
     I=a(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:);
-    %      waitbar(i/N,h,{['Processing frame: ',num2str(i),'/',num2str(N)]});
-    [hull,solidity(i), ~,~]=GetHull(I,h);
-    area(i)=polyarea([hull(:,2)],[hull(:,1)]);
-    p(i)={[hull(:,2),hull(:,1)]};
-    
+    [solidity(i),area(i),p(i)]=processImage(I,h);
+%         [hull,solidity(i), ~,~]=GetHull(I,h);
+%     area(i)=polyarea([hull(:,2)],[hull(:,1)]);
+%     p(i)={[hull(:,2),hull(:,1)]};    
     if(SAVEOUTMOVIE)
 %             figure(15);
             imshow(I,'border','tight','initialMagnification','fit');
@@ -84,7 +83,7 @@ for(i=2:N)
     end
 end
 
-phi=totSmartArea/area;
+phi=totSmartArea./area;
 
 % parfor i=1:N2
 

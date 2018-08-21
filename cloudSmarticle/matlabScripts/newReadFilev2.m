@@ -15,14 +15,14 @@ area=zeros(N,1);
 hull=cell(N,1);
 
 %create waitbar
-closeWaitbar;
-h = waitbar(0,'Please wait...');
-movegui(h,[2300,500]);
+% closeWaitbar;
+% h = waitbar(0,'Please wait...');
+% movegui(h,[2300,500]);
 
 %code for saving out to a movie
 if(SAVEOUTMOVIE)
     filenameOut=[filename(1:end-4),'Outs'];
-    vid = VideoWriter(['A:\SmarticleAreaFractionData\',filenameOut,'.avi'],'Motion JPEG AVI');
+    vid = VideoWriter(fullfile(fold,'out',[filenameOut,'.avi']),'Motion JPEG AVI');
     open(vid);
 end
 marker='-';
@@ -67,7 +67,6 @@ for(i=2:N)
     
     a=readFrame(V);
     I=a(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:);
-    I=gpuArray(I);
     [solidity(i),area(i),p(i)]=processImage(I,h);
 %         [hull,solidity(i), ~,~]=GetHull(I,h);
 %     area(i)=polyarea([hull(:,2)],[hull(:,1)]);
