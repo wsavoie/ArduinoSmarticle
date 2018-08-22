@@ -1,5 +1,6 @@
 % close(V)
 clear all
+close all;
 SAVEOUTMOVIE=1;
 numBods=7;
 
@@ -41,12 +42,11 @@ imshow(a);
 hold on;
 rect=round(getrect);
 I(1)={a(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:)};
-figure(1232);
+figure(1231)
 imshow(I{1});
 figure(10);
 p=cell(N,1);
 %pic
-
 %define measurements in mm
 bodSize=[53.5 21.25]; %bodyL,bodyW
 armSize=[3.25 42.25]; %armL, armW
@@ -63,6 +63,7 @@ totSmartArea=smartArea*numBods;
 tic
 h=figure(55);
 close(10);
+close(1231);
 for(i=2:N)
     
     a=readFrame(V);
@@ -99,5 +100,7 @@ if(SAVEOUTMOVIE)
     %     close(V);
 end
 close
+figure(28);
+plot(phi);
 save([fold,filenameOut,'.mat'],'phi','p','hull');
 toc
