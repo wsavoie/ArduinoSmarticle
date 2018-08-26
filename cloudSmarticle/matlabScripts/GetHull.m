@@ -11,16 +11,15 @@ function [b,solidity,CH,BW] = GetHull(I,h)
 
 I = rgb2gray(I);
 
-BW = I > 70;
+BW = I > 90;
 % BW1=BW;
 R = 8; N = 8;
 SE = strel('disk',R,N);
 % 
 
-
+BW = imdilate(BW,SE);
 BW = imclose(BW,SE);
-% BW = imdilate(BW,SE);
-% BW = imerode(BW,SE);
+BW = imerode(BW,SE);
 BW = bwareaopen(BW, 15);
 % BW = imclose(BW,SE);
 
