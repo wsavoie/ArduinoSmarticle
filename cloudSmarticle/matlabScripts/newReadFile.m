@@ -1,5 +1,6 @@
 % close(V)
 clear all
+close all;
 SAVEOUTMOVIE=1;
 numBods=7;
 
@@ -10,14 +11,7 @@ fps=V.framerate;
 N = round(V.duration*fps);
 
 %define the vol frac and hull area vars
-solidity=zeros(N,1);
 area=zeros(N,1);
-hull=cell(N,1);
-
-%create waitbar
-closeWaitbar;
-h = waitbar(0,'Please wait...');
-movegui(h,[2300,500]);
 
 %code for saving out to a movie
 if(SAVEOUTMOVIE)
@@ -28,8 +22,6 @@ end
 marker='-';
 % while hasFrame(V)
 %for long videos parfor is better for this initial serial loop
-I=cell(N,1);
-c=zeros(1,N);
 % p(N)=patch;
 
 % a1(N)=axes;
@@ -41,12 +33,11 @@ imshow(a);
 hold on;
 rect=round(getrect);
 I(1)={a(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:)};
-figure(1232);
+figure(1231)
 imshow(I{1});
 figure(10);
 p=cell(N,1);
 %pic
-
 %define measurements in mm
 bodSize=[53.5 21.25]; %bodyL,bodyW
 armSize=[3.25 42.25]; %armL, armW
@@ -63,18 +54,19 @@ totSmartArea=smartArea*numBods;
 tic
 h=figure(55);
 close(10);
+close(1231);
 for(i=2:N)
     
     a=readFrame(V);
     I=a(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:);
-    [solidity(i),area(i),p(i)]=processImage(I,h);
+    [~,area(i),p]=processImage(I,h);
 %         [hull,solidity(i), ~,~]=GetHull(I,h);
 %     area(i)=polyarea([hull(:,2)],[hull(:,1)]);
 %     p(i)={[hull(:,2),hull(:,1)]};    
     if(SAVEOUTMOVIE)
 %             figure(15);
             imshow(I,'border','tight','initialMagnification','fit');
-            patch(p{i}(:,1),p{i}(:,2),'r','FaceAlpha',.3);
+            patch(p(:,1),p(:,2),'r','FaceAlpha',.3);
             writeVideo(vid,getframe(gcf));
             clf;
     end
@@ -99,5 +91,7 @@ if(SAVEOUTMOVIE)
     %     close(V);
 end
 close
-save([fold,filenameOut,'.mat'],'phi','p','hull');
+figure(28);
+plot(phi);
+save([fold,filenameOut,'.mat'],'phi','dist');
 toc
