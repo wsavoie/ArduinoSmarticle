@@ -6,7 +6,7 @@
 fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\');
 f=dir2(fullfile(fold,'*.csv'));
 
-RIGIDBODYNAMES = false; %make true if tracking multiple things (i.e. inactive smarticles)
+RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
 clearvars rigidBodyName
 if RIGIDBODYNAMES
     rigidBodyName{1} = ' ring';
@@ -16,7 +16,7 @@ if RIGIDBODYNAMES
     inactiveName=' inactive';
     
     otherName=rigidBodyName{2};
-    
+    numBods = 4;
 else
     rigidBodyName = 'rigid body 1';
 end

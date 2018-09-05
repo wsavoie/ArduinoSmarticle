@@ -1,4 +1,4 @@
-t=180; %seconds
+t=60; %seconds
 client = natnet();
 vidOn=1;
 %keypresses for starting recording for OBS

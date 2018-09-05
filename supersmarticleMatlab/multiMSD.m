@@ -1,4 +1,4 @@
-clear all;
+% clear all;
 % close all;
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
@@ -7,7 +7,7 @@ clear all;
 
 
 % fold=uigetdir('A:\2DSmartData\comRingPlay\redSmarts\superlightRing\extraMassAdded');
-fold=uigetdir('A:\2DSmartData');
+fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\superlightring');
 
 % fold=uigetdir('A:\2DSmartData\');
 % fold=uigetdir('A:\2DSmartData\regRing\redSmarts\metal_singleInactive_1-4_inactive_frame\all');
@@ -70,11 +70,12 @@ fold
 %*53. plot active smart diagram
 %*54. plot histogram of velocities
 %*55. true granular temperature mean squared vel
+%*56. rotate trajectories by set amount
 %************************************************************
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
 % showFigs=[1,  52 53];
-showFigs=[1 51 55];
+showFigs=[1 55];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -3035,24 +3036,28 @@ if(showFigs(showFigs==xx))
     cols= get(gca,'colorOrder');
     cols=cols(1:6,:);
     smartChangeTimes=smartChangeTimes/2.5; %convert to gaitPeriod
+    rStart=392; %time when direction starts towards right
+    rEnd=427;   %time when direction ends towards right
     for i=1:(length(smartChangeTimes)-1)
         for k=1:length(smartsActive{i})
             %vertices starting from top left clockwise
+            %right dir goes 392-427tau or 16:20s and ends at 17:48
+            
             xVerts=[smartChangeTimes(i) smartChangeTimes(i+1)...
                 smartChangeTimes(i+1) smartChangeTimes(i)];
             
             yVerts=[(smartsActive{i}(k)+0.5),(smartsActive{i}(k)+0.5)...
                 (smartsActive{i}(k)-0.5) (smartsActive{i}(k)-0.5)];
-            patch(xVerts,yVerts,cols(smartsActive{i}(k)+1,:),'linestyle','none');
+            patch(xVerts-rStart,yVerts,cols(smartsActive{i}(k)+1,:),'linestyle','none');
         end
     end
-    %     xlim([0,25])
+    xlim([0,rEnd-rStart])
     ylim([-0.5,5.5]);
     
-    set(gca,'ytick',[0:5]);
-    
-    ylabel('Active smarticle index');
-    xlabel('Gait Periods');
+    set(gca,'ytick',[0:5],'yticklabel',{'' '1' '' '3' '' '5'});
+    set(gca,'xtick',[0:5:35],'xticklabel',{'0' '' '10' '' '20' '' '30' ''});
+    ylabel('Inactive Index');
+    xlabel('Time ()');
     figText(gcf,16);
     
 end
@@ -3138,11 +3143,9 @@ if(showFigs(showFigs==xx))
     hold on;
     %requires that all runs have the same number of smarticles
     n=size(usedMovs(1).x,2);
-    downSampBy=10;
-    GTTAll=[];
-    GTRAll=[];
     filtz=0;
     mT=usedMovs(1).t(minT);
+    dsb=5; %downsample amount
     for(idx=1:N)
         
         %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
@@ -3163,6 +3166,10 @@ if(showFigs(showFigs==xx))
         y=y-y(1);
         thet=thet-thet(1);
         
+%         x=downsample(x,dsb);
+%         y=downsample(y,dsb);
+%         thet=downsample(thet,dsb);
+%         t=downsample(t,dsb);
         if(filtz)
             %lowpass(x,5,1/diff(t(1:2)),'ImpulseResponse','iir');
             %x=lowpass(y,5,1/diff(t(1:2)));
@@ -3172,29 +3179,17 @@ if(showFigs(showFigs==xx))
         end
         
         dx=diff(x); dy=diff(y);dr=diff(thet);dt=diff(t);
+        
         v(:,idx)=sqrt((dx./dt).^2+(dy./dt).^2);
-        
-        v2=v.^2;
         vr=sqrt((dr./dt).^2);
-        
-        v4(:,idx)=mean(v.^2,2);
     end
-    %     vt=squeeze(sqrt(v(:,1,:).^2+v(:,2,:).^2));
-    %     vr=squeeze(sqrt(v(:,3,:).^2));
-    %     vr=squeeze(vr);
-%     v2t=squeeze(mV(:,1,:));
-%     vt=squeeze(V(:,1,:));
-%     vr=squeeze(V(:,2,:));
-%     VT=mean(vt,2);
-% %     VV=mean(v2t,2)-mean(vt,2).^2;
     
-%     VR=mean(vr,2);
-
     VV=mean(v.^2,2)-mean(v,2).^2;
     %     VT=sqrt(VT);
     %     VR=sqrt(VR);
 
     windowM=movmean(VV,length(VV)/max(t));
+    
     plot(t(1:end-1),VV,'k','linewidth',1);
     plot(t(1:end-1),windowM,'linewidth',3);
     xlabel('\tau');
@@ -3213,4 +3208,84 @@ if(showFigs(showFigs==xx))
 yy=ylim;
 ylim([0,yy(2)]);
 
+end
+%% 56 rotate trajectories by set amount
+xx=56;
+if(showFigs(showFigs==xx))
+    figure(xx)
+        hold on;
+    hax1=gca;
+    %     ma.plotTracks(hax1,i);
+    
+    axis([-.25 .25 -.25 .25]);
+    thet=-pi;
+    rotV= [cos(thet) -sin(thet); sin(thet) cos(thet)];
+    tracks = ma.tracks;
+    tracks=cellfun(@(x) [rotV*[x(:,2),x(:,3)]']',tracks,'UniformOutput',0);
+    for i=1:length(tracks)
+        hold on;
+        plot(tracks{i}(:,1),tracks{i}(:,2),'-');
+        vx=norm(tracks{i}(end,1)./ma.tracks{i}(end,1));
+        vy=norm(tracks{i}(end,2)./ma.tracks{i}(end,1));
+%         v=norm(mean(diff(tracks{i})./diff(ma.tracks{i}(:,1))));
+        vvx=[vvx, vx];
+        vvy=[vvy, vy];
+        %     pause
+    end
+    ma.labelPlotTracks
+    %     text(0,0+.01,'start')
+    h=plot(0,0,'ro','markersize',8,'MarkerFaceColor','k');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    yl=get(gca,'ylim'); xl=get(gca,'xlim');
+    c=max(abs(xl)); xlim([-c,c]);
+    c=max(abs(yl)); ylim([-c,c]);
+    axis equal
+    
+    axis([-.3 .3 -.3 .3]);
+    xl=xlim; yl=ylim;
+    set(gca,'xtick',[-.2:.1:.2],'ytick',[-.2:.1:.2]);
+    yl=get(gca,'ylim'); xl=get(gca,'xlim');
+    h=plot(xl,[0,0],'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    h=plot([0,0],yl,'r');
+    set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    xp = 0;
+    yp = 0;
+    for i=1:length(ma.tracks)
+        %         pause(100)
+        h=plot([tracks{i}(end,1)], [tracks{i}(end,2)],'ko-','markersize',4,'MarkerFaceColor','r');
+        %         leg(i)=h;
+        set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+        if tracks{i}(end,1) > 0
+            xp = xp + 1;
+        end
+        
+        if tracks{i}(end,2) > 0
+            yp = yp + 1;
+        end
+        
+        
+        hold on
+        x=['v',num2str(usedMovs(i).pars(5))];
+        legT{i}=['v',num2str(usedMovs(i).pars(5))];
+        
+    end
+    legend(legT);
+    legend off;
+    xpercent = xp/length(tracks);
+    ypercent = yp/length(tracks);
+    %     text(0,-0.25,['Towards X = ',num2str(xpercent,'%.3f')], 'fontsize',16)
+    %     text(0, 0.25,['Towards Y = ',num2str(ypercent,'%.3f')],'fontsize',16)
+    disp(['Trials = ',num2str(length(tracks),'%.d')])
+    disp(['Towards X = ',num2str(xpercent,'%.3f')])
+    disp(['Towards Y = ',num2str(ypercent,'%.3f')])
+    %     title('Whole Time-Scale Displacements');
+    
+    %     ringRad=.1905/2;
+    %     h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+    %     set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+    figText(gcf,14)
+    ringRad=.1905/2;
+    h=plot(ringRad*cos(0:.01:2*pi),ringRad*sin(0:.01:2*pi),'k','linewidth',2);
+    
 end

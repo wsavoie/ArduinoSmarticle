@@ -53,10 +53,13 @@ pts(fold);
 %*37. plot trajectory for single particle
 %*38. gran temp vs time
 %*39. hist of v at diff phi vals
+%*40. plot v and new phi
+%*41. new phi vs time
 %************************************************************
 % showFigs=[7 11 27];
 % showFigs=[25 33 31 7 29];
-showFigs=[39];
+showFigs=[40 39];
+showFigs=[1];
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
 % cutoff/(sample/2)
@@ -64,7 +67,9 @@ cutoff=.3;
 sampRate=120;
 filtOrder=6;
 [fb,fa]=butter(filtOrder,cutoff/(sampRate/2),'low');
-
+L=0.053;%length of smart body
+W=.021;%width of smart body
+A=L*W;
 %  [b,a]=butter(6,1/120*2,'low');
 % props={};
 inds=1;
@@ -149,12 +154,16 @@ end
 %% 2 plot COM trail of each run
 xx=2;
 if(showFigs(showFigs==xx))
-    figure(xx); lw=2;
+    figure(xx); lw=1;
     hold on;
     %     first get number of gait radii used
     COM=cell(N,1);
+    downsamp=10;
     for i=1:N
-        COM{i}=[sum(usedMovs(i).x,2),sum(usedMovs(i).y,2)]/numBods;
+        x=downsample(usedMovs(i).x,downsamp);
+        y=downsample(usedMovs(i).y,downsamp);
+        COM{i}=[sum(x,2),sum(y,2)]/numBods;
+        
         dists=sqrt(sum(abs(diff(COM{i})).^2,2)); %check for major jumps
         longDists=find(dists>.01);
         
@@ -166,10 +175,17 @@ if(showFigs(showFigs==xx))
         end
         
         COM{i}=bsxfun(@minus, COM{i}, COM{i}(1,:));
-        plot(COM{i}(:,1),COM{i}(:,2),'linewidth',lw);
+        
+        specialPlots=[8 13 14 16];
+        if any(i==specialPlots)
+            plot(COM{i}(:,1),COM{i}(:,2),'linewidth',3);
+        else
+            plot(COM{i}(:,1),COM{i}(:,2),'linewidth',lw);
+        end
+            
     end
     
-    plot([-0.3,-0.3,0.3,0.3,-0.3],[0.3,-0.3,-0.3,0.3,0.3,],'k','linewidth',2);
+    plot([-0.3,-0.3,0.3,0.3,-0.3],[0.3,-0.3,-0.3,0.3,0.3,],'k','linewidth',1.5);
     xlabel('x (m)');
     ylabel('y (m)');
     %     axis([-.1,.1,-.1,.1]);
@@ -211,7 +227,6 @@ if(showFigs(showFigs==xx))
     rF=zeros(numBods,2,N); %final points
     vI=zeros(1,N);
     vF=zeros(1,N);
-    A=.051*.021; %area (l*w) of smarticle in m
     
     for(idx=1:N)
         n=size(usedMovs(idx).x,2);%number of particles
@@ -274,9 +289,9 @@ if(showFigs(showFigs==xx))
     %     if(ROT), GrM=zeros(minT,N); end
     %     GtM1=zeros(minT,N);
     m=.032; %mass of red smarticle
-    L=.14; %total length smarticle
-    I=(1/12)*m*L^2;
-    
+    LL=.14; %total length smarticle
+    I=(1/12)*m*LL^2;
+
     %     for idx=1:N
     Gt=zeros(size(usedMovs(idx).xdot,1),numBods);
     if(ROT), Gr=Gt; end
@@ -357,7 +372,7 @@ if(showFigs(showFigs==xx))
     mb=.025; Lb=0.054;
     ma=.07/2; La=0.035;
     m=2*ma+mb;
-    L=.052;%com of arm to center body com
+
     Ia=(1/12)*ma*(.0032^2+.035^2)+ma*L^2;
     Ib=(1/12)*mb*(.054^2+.022^2);
     I=2*Ia+Ib;
@@ -489,7 +504,7 @@ if(showFigs(showFigs==xx))
         %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
         phi(:,idx)=V;
     end
-    A=.051*.021; %area (l*w) of smarticle in m
+    
     n=size(usedMovs(idx).x,2);%number of particles
     s=0.1428;%straight leg length of smarticle
     otherAngs=(180-(1-2/n)*180)/2*pi/180;
@@ -1081,7 +1096,6 @@ if(showFigs(showFigs==xx))
         %         rF(end,:,idx)=[usedMovs(idx).x(end,1)',usedMovs(idx).y(end,1)'];
         phi{idx}=V;
     end
-    A=.051*.021; %area (l*w) of smarticle in m
     n=size(usedMovs(idx).x,2);%number of particles
     s=0.1428;%straight leg length of smarticle
     otherAngs=(180-(1-2/n)*180)/2*pi/180;
@@ -1806,7 +1820,7 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     %requires that all runs have the same number of smarticles
-    A=.051*.021; %area (l*w) of smarticle in m
+    
     n=size(usedMovs(1).x,2);
     downSampBy=10;
     s=0.1428;%straight leg length of smarticle
@@ -1877,7 +1891,7 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     %requires that all runs have the same number of smarticles
-    A=.051*.021; %area (l*w) of smarticle in m
+   
     n=size(usedMovs(1).x,2);
     downSampBy=10;
     s=0.1428;%straight leg length of smarticle
@@ -1959,7 +1973,7 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     %requires that all runs have the same number of smarticles
-    A=.051*.021; %area (l*w) of smarticle in m
+
     n=size(usedMovs(1).x,2);
     s=0.1428;%straight leg length of smarticle
     otherAngs=(180-(1-2/n)*180)/2*pi/180;
@@ -1968,31 +1982,16 @@ if(showFigs(showFigs==xx))
     GTTAll=[];
     GTRAll=[];
     filtz=0;
-    for(idx=1:N)
-        %             for(idx=3)
-        %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
-        %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
+    downSampBy=4;
+    gaitLen=1.6;
+    withR=1;
+     pts('plot', xx,' downsampling=',downSampBy, ' gait period=',gaitLen, ' include rotation=',withR);
+    clear v3;
+    v3=[];
+%      for(idx=7)
+     for(idx=1:N)   
+        [x,y,thet,t]= getMovDat(usedMovs(idx),filtz,gaitLen,minT,downSampBy);
         
-        x=usedMovs(idx).x;
-        y=usedMovs(idx).y;
-        thet=usedMovs(idx).rot;
-        t=usedMovs(idx).t(:,1);
-        
-        x=x(t(:)<minT,:);
-        y=y(t(:)<minT,:);
-        thet=thet(t(:)<minT,:);
-        t=t(t(:)<minT,:);
-        t=t/2.5;
-        
-        x=x-x(1);
-        y=y-y(1);
-        thet=thet-thet(1);
-        %
-        %         x=downsample(x,5);
-        %         y=downsample(y,5);
-        %         thet=downsample(thet,5);
-        %         t=downsample(t,5);
-        %
         if(filtz)
             %             lowpass(x,1,1/diff(t(1:2)),'ImpulseResponse','iir');
             x=lowpass(x,.008,'ImpulseResponse','iir');
@@ -2002,20 +2001,16 @@ if(showFigs(showFigs==xx))
             % %             y=filter(fb,fa,y);  %filtered signal
             %             thet=filter(fb,fa,thet);  %filtered signal
         end
-        
-        
-        dx=diff(x); dy=diff(y);dr=diff(thet);dt=diff(t);
-        v=sqrt((dx./dt).^2+(dy./dt).^2);
-        vr=sqrt((dr./dt).^2);
-        
-        v3(:,idx)=mean(v,2);
+    
+        [V]=calcGranTemp(x,y,thet,t,L,withR);
+        v3=[v3,V];
         
     end
     %     vt=squeeze(sqrt(v(:,1,:).^2+v(:,2,:).^2));
     
     %     VV=mean(v3.^2,2);
-    VV=mean(v3.^2,2)-mean(v3,2).^2;
-    
+%     VV=mean(v3.^2,2)-mean(v3,2).^2;
+    VV=mean(v3,2);
     figure(xx);
     hold on;
     windowM=movmean(VV,length(VV)/max(t));
@@ -2023,14 +2018,14 @@ if(showFigs(showFigs==xx))
     plot(t(1:end-1),windowM,'linewidth',3);
     xlabel('\tau');
     ylabel('\langlev^2\rangle (m^2/\tau^2)');
-    figText(gcf,16);
-    xlim([0 80]);
+    figText(gcf,16);1
+
     
     %     plot(t(t<7)+73,windowM(t<7),'linewidth',1);
     %     plot(t(t<7)+73,VV(t<7),'r','linewidth',1);
     
     %a=sort(VSTD)
-    pct=@(x,vec) vec(round(((100-x)/100)*length(vec)));
+%     pct=@(x,vec) vec(round(((100-x)/100)*length(vec)));
     %     err=pct(1,sort(VSTD));
     %     shadedErrorBar(xlim,[mean(VSTD),mean(VSTD)],ones(2,1)*pct(5,sort(VSTD)),{},.5)
     %     plot(xlim,ones(2,1)*pct(5,sort(VSTD)),'linewidth',2)
@@ -2197,8 +2192,7 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     %requires that all runs have the same number of smarticles
-    A=.051*.021; %area (l*w) of smarticle in m
-    L=0.051;
+   
     n=size(usedMovs(1).x,2);
     downSampBy=10;
     s=0.1428;%straight leg length of smarticle
@@ -2270,7 +2264,7 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     %requires that all runs have the same number of smarticles
-    A=.051*.021; %area (l*w) of smarticle in m
+  
     n=size(usedMovs(1).x,2);
     s=0.1428;%straight leg length of smarticle
     otherAngs=(180-(1-2/n)*180)/2*pi/180;
@@ -2395,8 +2389,6 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     %requires that all runs have the same number of smarticles
-    A=.051*.021; %area (l*w) of smarticle in m
-    L=.051;
     n=size(usedMovs(1).x,2);
     downSampBy=1;
     s=0.1428;%straight leg length of smarticle
@@ -2463,8 +2455,6 @@ if(showFigs(showFigs==xx))
     figure(xx);
     hold on;
     %requires that all runs have the same number of smarticles
-    A=.053*.021; %area (l*w) of smarticle in m
-    L=0.053;
     n=size(usedMovs(1).x,2);
     downSampBy=10;
     
@@ -2504,4 +2494,173 @@ if(showFigs(showFigs==xx))
     
     figText(gcf,20);
     
+end
+
+%% 40. plot v and new phi
+xx=40;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
+    %requires that all runs have the same number of smarticles
+    n=size(usedMovs(1).x,2);
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    pTot=[];
+    wmPhi=[];
+    vTot=[];
+    wmTot=[];
+    v2Tot=[];
+    wm2Tot=[];
+    filtz=0;
+    gaitLen=1.6;
+    downSampBy=4;
+    withR=1;
+    for(idx=1:N)
+        [x,y,thet,t]= getMovDat(usedMovs(idx),filtz,gaitLen,minT,downSampBy);
+        
+        %add rotational energy
+   
+        V=calcGranTemp(x,y,thet,t,L,withR);
+        wm=movmean(V,length(V)/max(t));
+%         V(V>1)=0;
+        phi=usedMovs(idx).phiMov(2:end);
+        phi=phi(1:length(V));
+        wph=movmean(phi,length(phi)/max(t));
+        
+        pTot=[pTot,phi'];
+        vTot=[vTot,V'];
+        wmTot=[wmTot,wm'];
+        wmPhi=[wmPhi,wph'];
+%         v2Tot=[v2Tot,VV2'];
+%         wm2Tot=[wm2Tot,wm2'];
+        
+    end
+    
+ 
+    ylabel('<V^2>');
+    xlabel('\phi');
+    
+    scatter(pTot,vTot,'.');
+    scatter(wmPhi,wmTot,'r.');
+    figText(gcf,16);
+   
+    figure(123);
+    d=histogram(vTot,round(sqrt(length(vTot))),'Normalization','pdf','displaystyle','stairs');hold on;
+    plot([d.BinEdges(1), d.BinEdges(2:end)-diff(d.BinEdges(1:2))/2],[0,d.Values],'r','linewidth',2)
+    d.Visible=false;
+    ylabel('P(<v^2>)');
+    xlabel('<v^2>');
+    figText(gcf,20);
+%     d=histogram(vTot(pTot>.25&pTot<.3),round(sqrt(length(vTot(pTot>.2&pTot<.3)))),'Normalization','probability','displaystyle','stairs');hold on;
+%     plot([d.BinEdges(1), d.BinEdges(2:end)-diff(d.BinEdges(1:2))/2],[0,d.Values],'r','linewidth',2)
+%     d.Visible=false
+%     ylabel('P(<v^2>');
+%     xlabel('<v^2>');
+%   
+%     
+%     subplot(
+figText(gcf,20);
+figure(169);
+
+split=7;
+subplot(2,split,[1:split])
+hold on;
+scatter(pTot,vTot,'.');
+    scatter(wmPhi,wmTot,'r.');
+
+minn=0.37;
+maxx=.5;
+
+% minn=0.05;
+% maxx=.27;
+vec=linspace(minn,maxx,split+1);
+yl=ylim;
+for i=2:length(vec)
+    plot([vec(i),vec(i)],yl,'-k','linewidth',2);
+end
+xlabel('\phi');
+ylabel('<V^2>');
+
+for(i=1:split)
+subplot(2,split,split+i);
+    d=histogram(wmTot(wmPhi>vec(i)&wmPhi<vec(i+1)),round(sqrt(length(wmTot(wmPhi>vec(i)&wmPhi<vec(i+1))))),'Normalization','pdf','displaystyle','stairs');hold on;
+    plot([d.BinEdges(1), d.BinEdges(2:end)-diff(d.BinEdges(1:2))/2],[0,d.Values],'r','linewidth',2)
+    d.Visible=false;
+    if(i==1)
+    ylabel('P(<V^2>)');
+    xlabel('<V^2>');
+    end
+
+    title(['V(',num2str(vec(i),2),'<\phi<',num2str(vec(i+1),2),')']);
+    
+    xlim([0,.006])
+    ylim([0,.3]);
+end
+figText(gcf,20);
+figure(144);
+c=subplot(2,1,1);
+hold on;
+scatter(pTot,vTot,'k.');
+scatter(wmPhi,wmTot,'r.');
+c.ColorOrderIndex=1;
+for i=2:length(vec)
+    plot([vec(i),vec(i)],yl,'-','linewidth',2);
+end
+xlabel('\phi');
+ylabel('<V^2>');
+
+c=subplot(2,1,2);
+
+for(i=1:split)
+	hold on;
+    d=histogram(wmTot(wmPhi>vec(i)&wmPhi<vec(i+1)),round(sqrt(length(wmTot(wmPhi>vec(i)&wmPhi<vec(i+1))))),'Normalization','pdf','displaystyle','stairs');hold on;
+    c.ColorOrderIndex=i;
+    mean(wmTot(wmPhi>vec(i)&wmPhi<vec(i+1)))
+    plot([d.BinEdges(1), d.BinEdges(2:end)-diff(d.BinEdges(1:2))/2],[0,d.Values],'linewidth',2)
+    delete(d);
+end
+xlabel('<V^2>');
+ylabel('P(<V^2>)');
+    
+figText(gcf,20);
+end
+
+%% 41. new phi vs time
+xx=41;
+if(showFigs(showFigs==xx))
+    figure(xx);
+    hold on;
+    %requires that all runs have the same number of smarticles
+    n=size(usedMovs(1).x,2);
+    
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    tphi=[];
+    twphi=[];
+    
+    filtz=0;
+    gaitLen=1.6;
+    downSampBy=4;
+    withR=1;
+    for(idx=1:N)
+        [x,y,thet,t]= getMovDat(usedMovs(idx),filtz,gaitLen,minT,downSampBy);
+        
+        %add rotational energy
+   
+        V=calcGranTemp(x,y,thet,t,L,withR);
+        wm=movmean(V,length(V)/max(t));
+%         V(V>1)=0;
+        phi=usedMovs(idx).phiMov(2:end);
+        phi=phi(1:length(t));
+        wph=movmean(phi,length(phi)/max(t));
+        
+        tphi(:,idx)=phi;
+        twphi(:,idx)=wph;
+        plot(t,wph);
+    end
+        mphi=mean(twphi,2);
+        ephi=std(twphi,0,2);
+        shadedErrorBar(t,mphi,ephi,{'color','k','linewidth',2},0.5);
+figText(gcf,20);
 end

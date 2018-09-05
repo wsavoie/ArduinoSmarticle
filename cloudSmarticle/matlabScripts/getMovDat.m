@@ -4,12 +4,16 @@ function [x,y,thet,t] = getMovDat(usedMovsidx,filtz,gaitLen,minT,downSampBy)
 x=usedMovsidx.x;
 y=usedMovsidx.y;
 thet=usedMovsidx.rot;
+thet=unwrap(thet,pi);
+% plot(thet);
 t=usedMovsidx.t(:,1);
+
 
 x=x(t(:)<minT,:);
 y=y(t(:)<minT,:);
 thet=thet(t(:)<minT,:);
 t=t(t(:)<minT,:);
+
 
 x=x-x(1);
 y=y-y(1);

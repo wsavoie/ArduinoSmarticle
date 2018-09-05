@@ -12,13 +12,13 @@ a=strfind(pathFold, 'd');
 randAmp=str2double(regexp(pathFold, '\d*','match'));
 % randAmp=0; %eventually read from filename instead
 if RIGIDBODYNAMES
-    numBods = 7;
+    numBods = 5;
     warning(['make sure to correct "numBods" to the number of '...
         'smarticles in the cloud data taken current set at numBods=',num2str(numBods)]);
     %names of bodies will be "something #"
 else
     %     rigidBodyName = 'rigid body 1';
-    numBods= 7;
+    numBods= 5;
 end
 
 % r=.9525;
