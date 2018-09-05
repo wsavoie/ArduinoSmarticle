@@ -11,14 +11,7 @@ fps=V.framerate;
 N = round(V.duration*fps);
 
 %define the vol frac and hull area vars
-solidity=zeros(N,1);
 area=zeros(N,1);
-hull=cell(N,1);
-
-%create waitbar
-% closeWaitbar;
-% h = waitbar(0,'Please wait...');
-% movegui(h,[2300,500]);
 
 %code for saving out to a movie
 if(SAVEOUTMOVIE)
@@ -29,8 +22,6 @@ end
 marker='-';
 % while hasFrame(V)
 %for long videos parfor is better for this initial serial loop
-I=cell(N,1);
-c=zeros(1,N);
 % p(N)=patch;
 
 % a1(N)=axes;
@@ -64,36 +55,51 @@ tic
 h=figure(55);
 close(10);
 close(1231);
-for(i=2:N)
-    
-    a=readFrame(V);
-    I=a(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:);
-    [solidity(i),area(i),p(i)]=processImage(I,h);
-%         [hull,solidity(i), ~,~]=GetHull(I,h);
-%     area(i)=polyarea([hull(:,2)],[hull(:,1)]);
-%     p(i)={[hull(:,2),hull(:,1)]};    
+
+loopSize=500;
+parLen=0;
+cc=2;
+while(cc<N)
+    if (N-cc)>loopSize
+        parLen=loopSize;
+    else
+        parLen=N-cc;
+    end
+    I=cell(1,parLen);
+    for i=1:parLen
+        a=readFrame(V);
+        I{i}=a(rect(2):rect(2)+rect(4),rect(1):rect(1)+rect(3),:);
+    end
+    tarea=zeros(1,parLen);
+    parfor(i=1:parLen)
+        [~,tarea(i),p{i}]=processImage(I{i},h);
+        
+    end
+    area(cc:cc+parLen-1)=tarea;
+    cc=cc+parLen;
+    %         [hull,solidity(i), ~,~]=GetHull(I,h);
+    %     area(i)=polyarea([hull(:,2)],[hull(:,1)]);
+    %     p(i)={[hull(:,2),hull(:,1)]};
     if(SAVEOUTMOVIE)
-%             figure(15);
-            imshow(I,'border','tight','initialMagnification','fit');
+        for(i=1:parLen)
+            
+            %             figure(15);
+            imshow(I{i},'border','tight','initialMagnification','fit');
             patch(p{i}(:,1),p{i}(:,2),'r','FaceAlpha',.3);
             writeVideo(vid,getframe(gcf));
             clf;
+        end
     end
-    if(~mod(i,1000))
-        pts(i,'/',N);
-    end
+        pts(cc,'/',N);
 end
 
 phi=totSmartArea./area;
-
+phi(1)=phi(2);
+phi(end)=phi(end-1);
 % parfor i=1:N2
 
 hh=figure(1000);
 hh.Position=[0 0 1280 720];
-% set(imfig,'visible','off');
-
-
-
 
 if(SAVEOUTMOVIE)
     close(vid);
@@ -102,5 +108,5 @@ end
 close
 figure(28);
 plot(phi);
-save([fold,filenameOut,'.mat'],'phi','p','hull');
+save([fold,filenameOut,'.mat'],'phi','dist');
 toc
