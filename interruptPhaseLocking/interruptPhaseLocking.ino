@@ -33,38 +33,50 @@ volatile int p1o= p1; volatile int p2o=p2;
 const byte servo=0; //0 for regular, 1 for non-reg
 int dly=0;
 const byte micPin = 2;  
-volatile bool interrupt=false;
+volatile bool INT01=false;
+volatile bool INT02=false;
+
+
 int An1[] = {maxx, maxx, minn, minn};
 int An2[] = {maxx, minn, minn, maxx};
 auto aSize=sizeof(An1) / sizeof(int);
 
 void leftSquareGait();
 
+auto const TRIGGER = RISING;
+unsigned volatile long old=micros();
 
-  
+
 void setup() {
   S1.attach(servo1,600,2400);
   S2.attach(servo2,600,2400);
   pinMode(led,OUTPUT);
   //deactivateSmarticle();
-  Serial.begin(9600);
-  attachInterrupt(digitalPinToInterrupt(micPin), ISRFunc, LOW);
+  //Serial.begin(9600);
+    S1.writeMicroseconds(p1 = *(An1+(aSize-1+servo)%aSize) * 10 + 600);
+    S2.writeMicroseconds(p2 = *(An2+(aSize-1+servo)%aSize) * 10 + 600);
+  delay(1000);
+  attachInterrupt(digitalPinToInterrupt(micPin), ISRFunc, TRIGGER);
 }
 
 void loop()
 {
-
-  if(interrupt)
+//  if(interrupt)
+  if(INT01&&INT02)
   { 
     detachInterrupt (digitalPinToInterrupt (micPin));
+    leftSquareGait();
+    delay(200);
     EIFR =1;  // clear flag for interrupt 1
     EIFR =2;  // clear flag for interrupt 2
-    leftSquareGait();
-    delay(300);
-    
-    attachInterrupt(digitalPinToInterrupt(micPin), ISRFunc, LOW);
-    interrupt=false;
+
+    INT01=false;
+    INT02=false;
+
+    attachInterrupt(digitalPinToInterrupt(micPin), ISRFunc, TRIGGER);
+    old=micros();
   }
+  
 }
 void setDly(int p1o,int p2o)
 {
@@ -72,7 +84,20 @@ void setDly(int p1o,int p2o)
 }
 void ISRFunc()
 {
-    interrupt=true;  
+  
+//    interrupt=true;
+    if(INT01)
+    {
+      INT01=((micros()-old)<1000 ? 0 : 1);
+      INT02=INT01;
+      EIFR =1;  // clear flag for interrupt 1
+      EIFR =2;  // clear flag for interrupt 2
+      return;
+    }
+    
+    INT01=true;
+    EIFR =1;  // clear flag for interrupt 1
+    EIFR =2;  // clear flag for interrupt 2
 }
 void leftSquareGait()
 {
