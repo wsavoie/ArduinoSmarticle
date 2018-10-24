@@ -75,7 +75,7 @@ fold
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
 % showFigs=[1,  52 53];
-showFigs=[1 55];
+showFigs=[29];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -1452,6 +1452,7 @@ if(showFigs(showFigs==xx))
         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         endPos(i)=newpos(end,2);
         nn(i)=newpos(end,2)./usedMovs(i).t(end);
+        rotPos{i}=newpos;
     end
     pts('mean((final y positions)/time)', mean(nn),' +-',std(nn));
     %     pts('avg projected v=',mean(endPos)/(minT/usedMovs(1).fps));

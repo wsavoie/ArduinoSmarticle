@@ -73,10 +73,12 @@ if(mag)
 else
     np=fpars(6)*2;
     x=linspace(0,1,length(t))';
-    expMult=1.5;
+%     expMult=1.5;
+    expMult=1;
     peakdisk=1.9;
     peakProm=.005;
     totalPts=fpars(6)*2;
+    pys=rob.*exp(1-(expMult*x)); % fpars(6)/2
     pys=rob.*exp(1-(expMult*x)); % fpars(6)/2
     pys=pys./max(pys);
     

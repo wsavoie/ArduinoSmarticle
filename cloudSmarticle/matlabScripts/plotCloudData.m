@@ -8,7 +8,7 @@ clear all;
 % f='A:\2DSmartData\cloud\cloud 9-30';
 % f='A:\2DSmartData\cloud\cloud 2-27\';
 % f='A:\2DSmartData\phaseStates';
-f='A:\2DSmartData\cloud\cloud 5-2-18\rand 0';
+f='A:\2DSmartData\phaseStates\interruptPin glued ring a=3 i=0';
 fold=uigetdir(f);
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
@@ -58,8 +58,8 @@ pts(fold);
 %************************************************************
 % showFigs=[7 11 27];
 % showFigs=[25 33 31 7 29];
-showFigs=[40 39];
 showFigs=[1];
+% showFigs=[1];
 %params we wish to plot
 % DIR=[]; RAD=[]; V=[];
 % cutoff/(sample/2)
@@ -107,49 +107,62 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=1;
     hold on;
     
-    idx=1; %index of movie to look at
+    idx=16; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
+    NF={};
+    Filt={};
+    x= usedMovs(idx).x*1000;
+    y= usedMovs(idx).y*1000;
+    rot= usedMovs(idx).rot;
+%      x=x-x(1);   y=y-y(1);  rot=rot-rot(1);
+    t=usedMovs(idx).t(:,1);
     
+    xF=filter(fb,fa,x);  %filtered signal
+    yF=filter(fb,fa,y);  %filtered signal
+    rotF=filter(fb,fa,rot);  %filtered signal
+        
     for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
-        figure(1000+i);
-        x= usedMovs(idx).x(:,i)*1000;
-        y= usedMovs(idx).y(:,i)*1000;
-        t= usedMovs(idx).t(:,i)*1000;
-        rot= usedMovs(idx).rot(:,i);
-        x=x-x(1);   y=y-y(1);  rot=rot-rot(1);
-        
+        figure(1000+i);    
         %         [b,a]=butter(3,1/120*2,'low');
-        xF=filter(fb,fa,x);  %filtered signal
-        yF=filter(fb,fa,y);  %filtered signal
-        rotF=filter(fb,fa,rot);  %filtered signal
-        
         subplot(1,2,1);
         hold on;
-        plot(x,y,'linewidth',lw);
-        plot(xF,yF,'linewidth',lw);
+        plot(x(:,i),y(:,i),'linewidth',lw);
+        plot(xF(:,i),yF(:,i),'linewidth',lw);
         xlabel('x (mm)');
         ylabel('y (mm)');
         figText(gcf,16);
         subplot(1,2,2);
         hold on;
-        plot(t,rot*180/pi,'linewidth',lw);
-        plot(t,rotF*180/pi,'linewidth',lw);
+        plot(t,rot(:,i)*180/pi,'linewidth',lw);
+        plot(t,rotF(:,i)*180/pi,'linewidth',lw);
         %         pts('i=',i,' maxrot=',max(abs(rot*180/pi)));
         xlabel('t (s)');
         ylabel('\theta (\circ)');
         axis auto
         figText(gcf,16);
         
-        
-        
-        
-        
     end
     pts('plotted: ',usedMovs(idx).fname);
-    %     xlabel('x (m)');
-    %     ylabel('y (m)');
+    xlabel('x (m)');
+    ylabel('y (m)');
+    figure(1);
+%    plot(x,y);
+% sf=169;%startFrame for fig 2a
+sf=169;
+    for i=1:size(usedMovs(idx).x,2)
+        plot(x(sf:end,i),y(sf:end,i));
+        plot(x(sf,i),y(sf,i),'k.','markersize',12);
+        plot(x(end,i),y(end,i),'r.','markersize',12);
+        
+    end
+    mx=mean(x(sf:end,:),2); my=mean(y(sf:end,:),2);
+    plot(mx(1),my(1),'k.','markersize',12);
+    plot(mx(end),my(end),'r.','markersize',12);
+    plot(mx,my,'linewidth',3);
+    
     figText(gcf,16);
-    axis auto
+    axis equal
+    
 end
 %% 2 plot COM trail of each run
 xx=2;
@@ -2401,11 +2414,12 @@ if(showFigs(showFigs==xx))
     wmTot=[];
     filtz=0;
     %     minT=80;
+    gaitLen=2.35;
     for(idx=1:N)
         %         for(idx=3)
         
         
-        
+         [x,y,thet,t]= getMovDat(usedMovs(idx),filtz,gaitLen,minT,downSampBy);
         %         rI(1:numBods,:,idx)=[usedMovs(idx).x(1,:)',usedMovs(idx).y(1,:)'];
         %         rF(1:numBods,:,idx)=[usedMovs(idx).x(end,:)',usedMovs(idx).y(end,:)'];
         dat=cat(3,usedMovs(idx).t,usedMovs(idx).x,usedMovs(idx).y,usedMovs(idx).rot);
@@ -2435,10 +2449,10 @@ if(showFigs(showFigs==xx))
         %%%%%%%%%%%%%%
         
         
-        pTot=[pTot,phi(2:end)];
         vTot=[vTot,VV'];
         wmTot=[wmTot,wm'];
-        %         plot(t(2:end),wm)
+                plot(t(1:end),VV)
+                pause
     end
     %     figText(gcf,16);
     %     set(gca, 'YScale', 'log')
@@ -2446,7 +2460,7 @@ if(showFigs(showFigs==xx))
     %     hold on;
     %     scatter(pTot,wmTot,'.r');
     %
-    plot(t(2:end),vTot);
+    
     figText(gcf,20);
 end
 %% 39. hist of v at diff phi vals
