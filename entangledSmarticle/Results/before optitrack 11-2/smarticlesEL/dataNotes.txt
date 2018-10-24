@@ -1,0 +1,1 @@
+extraStretch during delay from last two particles
