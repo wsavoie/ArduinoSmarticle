@@ -27,11 +27,17 @@
 %*22. another way to do k
 %*23. fft of force for SAC trials
 %*24. plot force vs strain for fracture
+%*25. work vs strain rate each line is different strain
+%*26. plot single trial reversability
+%*27. plot multitrial  at single SD and SPEED reversability
+%*28. plot single cycle multispd reversability
+%*29. plot single cycle multisd reversability
+%*30. plot para and perp movement vs time
 %*55. old force vs H data
 %************************************************************
 % clearvars -except t
 % close all;
-clearvars -except kdat;
+clearvars -except kdat LEG1 LEG2;
 
 % maxSpeed= 1.016; %m/s
 % pctSpeed=.0173;
@@ -42,7 +48,7 @@ smartWid=6.2;%centerlink back to arm tip
 lams=[0 1.75 2.25 4.15 7.3 17.15]./29.29;
 
 % fold=uigetdir('A:\2DSmartData\entangledData\4-17');
-fold=uigetdir('A:\2DSmartData\entangledData\');
+fold=uigetdir('A:\2DSmartData\entangledData\LastRuns\N=6\');
 % % fold=uigetdir('A:\2DSmartData\entangledData\11-30 multimarker');
 % fold='A:\2DSmartData\entangledData\12-19 multimark SAC w=10 weaker';
 % fold='A:\2DSmartData\entangledData\before 11-30 (multimarkers)';
@@ -53,10 +59,13 @@ fold=uigetdir('A:\2DSmartData\entangledData\');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 filtz=1;
 fractD=0;%flag for fractData
-showFigs=[9 10];
+% showFigs=[8 9 10];
+showFigs=[30];
+%19
+indx=2;% 8
 % showFigs=[5];
 tpt=[1 1];
-indx=1;% 8
+
 % strains=[65]/1000;
 % types=[]; strains=[85]/1000; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
 types=[]; strains=[]; Hs=[]; dels=[]; spds=[]; its=[]; vs=[];
@@ -71,7 +80,7 @@ if (~exist(fullfile(fold,'dataOut.mat'),'file') && ~exist(fullfile(fold,'fractDa
     s=struct;
     for i=1:N
         pts(i,'/',N);
-        [allFpars(i,:),s(i).t,s(i).strain,s(i).F,s(i).Fa,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel,s(i).zop,s(i).xop]=...
+        [allFpars(i,:),s(i).t,s(i).strain,s(i).F,s(i).Fa,L,s(i).rob,s(i).chain,s(i).dsPts, s(i).vel,s(i).zop,s(i).xop,s(i).smartPos]=...
             analyzeEntangleFileMM(fold,filez(i).name,samp,0);
         s(i).name=filez(i).name;
         s(i).fpars=allFpars(i,:);
@@ -128,6 +137,7 @@ end
 if ~exist('usedS','var')
     error('No file with specified parameters exists in folder');
 end
+clear s;
 uN=length(usedS);
 fpars=zeros(uN,7);
 for i=1:uN
@@ -150,7 +160,7 @@ if(showFigs(showFigs==xx))
     %     f=downsample(s(ind).F,10);
     %     st=downsample(s(ind).strain,10);
     pts('F vs. T for ',s(ind).name);
-
+    
     
     plot(s(ind).t,s(ind).F);
     maxF=max(s(ind).F);
@@ -358,7 +368,7 @@ if(showFigs(showFigs==xx))
     ds=10; %downsample amount
     unitless=0;
     for i=1:length(spds)
-
+        
         currSpds=find([usedS(:).spd]==spds(i));
         dspts={usedS(currSpds).dsPts};
         stpts=cellfun(@(x) x(timePts(1)*4+1,3),dspts);
@@ -369,7 +379,7 @@ if(showFigs(showFigs==xx))
         %         minT=min(cellfun(@(x) size(x,1),{usedS(currSpds).t}));
         strainz=[];
         forcez=[];
-         pause; hold on;
+        pause; hold on;
         for j=1:length(currSpds)
             if(unitless)
                 strainz(:,j)=usedS(currSpds(j)).strain(stpts(j):edpts(j));
@@ -381,25 +391,25 @@ if(showFigs(showFigs==xx))
             forcez(:,j)=usedS(currSpds(j)).F(stpts(j):edpts(j));
             forcez(:,j)=forcez(:,j)-min(forcez(:,j));
             strainz(:,j)=strainz(:,j)-strainz(1,j);
-%             plot(strainz(:,j),forcez(:,j));
+            %             plot(strainz(:,j),forcez(:,j));
         end
         pts({usedS(currSpds).name}');
         mforce(:,i)=mean(forcez,2);
         mstrainz(:,i)=mean(strainz,2);
         ef(:,i)=std(forcez,0,2);
-%         plot(mstrainz(:,i),mforce(:,i));
+        %         plot(mstrainz(:,i),mforce(:,i));
         if(ds)
             shadedErrorBar(downsample(mstrainz(:,i),10),downsample(mforce(:,i),10),downsample(ef(:,i),10),{'linewidth',2},.5);
         else
             shadedErrorBar(mstrainz(:,i),mforce(:,i),ef(:,i),{'linewidth',2},.5);
         end
         
-       
+        
         legT{i}=['$\dot{\epsilon}$=',num2str(spds(i)),'mm/s'];
         
     end
     legend(legT,'interpreter','latex');
-%     text(0.4,0.9,['\epsilon=',num2str(usedS(1).SD),'mm'],'units','normalized')
+    %     text(0.4,0.9,['\epsilon=',num2str(usedS(1).SD),'mm'],'units','normalized')
     
     xlabel(['Strain' xl]);
     ylabel('Force (N)');
@@ -468,35 +478,47 @@ xx=8;
 if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     % ind=2;
-    tArea=zeros(uN,1);
-    strMax=0;
-    fractData=struct;
-    set(0,'defaultAxesFontSize',20)
-    for(i=1:uN)
-        fractData(i).fname=usedS(i).name;
-        fractData(i).F=usedS(i).F;
-        fractData(i).H=usedS(i).H;
-        fractData(i).strain=usedS(i).strain;
-        
-        hold off
-        h=plot(usedS(i).strain,usedS(i).F);
-        xlabel('Strain');
-        ylabel('Force (N)');
-        hold on;
-        [fracStrainMax,fracFmax,~,fracInd]=MagnetGInput(h,1,1);
-        plot(fracStrainMax,fracFmax,'ko');
-        fractData(i).fracStrainMax=fracStrainMax;
-        fractData(i).fracFmax=fracFmax;
-        fractData(i).fracInd=fracInd;
-        [fMax,maxInd]=max(usedS(i).F);
-        fractData(i).maxInd=maxInd;
-        fractData(i).fMax=fMax;
-        fractData(i).maxFStrain=usedS(i).strain(maxInd);
-        %         plot(usedS(i).strain(1:ind),usedS(i).F(1:ind));
-        pts(i,'/',uN);
-        pause();
+    if exist(fullfile(fold,'fractData.mat'),'file')
+        pts('fractData already exists');
+    else
+        tArea=zeros(uN,1);
+        strMax=0;
+        fractData=struct;
+        set(0,'defaultAxesFontSize',20)
+        for(i=1:uN)
+            fractData(i).fname=usedS(i).name;
+            fractData(i).F=usedS(i).F;
+            fractData(i).H=usedS(i).H;
+            fractData(i).strain=usedS(i).strain;
+            
+            hold off
+            h=plot(usedS(i).strain,usedS(i).F);
+            xlabel('Strain');
+            ylabel('Force (N)');
+            hold on;
+            [fracStrainMax,fracFmax,~,fracInd]=MagnetGInput(h,1,1);
+            plot(fracStrainMax,fracFmax,'ko');
+            
+            %%%%adding negative value from bias problem
+            [~,fracNeg,~,~]=MagnetGInput(h,1,1);
+            fracFmax=fracFmax+abs(fracNeg);
+            fractData(i).F=fractData(i).F+abs(fracNeg);
+            %%%%
+            
+            
+            fractData(i).fracStrainMax=fracStrainMax;
+            fractData(i).fracFmax=fracFmax;
+            fractData(i).fracInd=fracInd;
+            [fMax,maxInd]=max(fractData(i).F);
+            fractData(i).maxInd=maxInd;
+            fractData(i).fMax=fMax;
+            fractData(i).maxFStrain=usedS(i).strain(maxInd);
+            %         plot(usedS(i).strain(1:ind),usedS(i).F(1:ind));
+            pts(i,'/',uN);
+            pause();
+        end
+        save(fullfile(fold,'fractData.mat'),'fractData');
     end
-    save(fullfile(fold,'fractData.mat'),'fractData');
 end
 %% 9. plot fracture force vs height and strain vs height
 xx=9;
@@ -841,7 +863,7 @@ if(showFigs(showFigs==xx))
     %     strF=struct; %strainFinal
     %     strFerr;
     
-%     velM=zeros(length(usd),length(gammaAmt));
+    %     velM=zeros(length(usd),length(gammaAmt));
     for i=1:length(gammaAmt)
         %I want to find number of SD's for for the given gamma I'm
         %searching
@@ -968,15 +990,15 @@ if(showFigs(showFigs==xx))
                 y=R.F(time2useS:time2useE-200)';
                 
                 x=x-x(1);%zero at start iteration
-%                 y=y-y(1);
+                %                 y=y-y(1);
                 
                 %get index at middle of plateau of iteration interested in
-%                 samp=diff(R.t(1:2));
-%                 smidx=time2useE+round(R.del/samp/2);%add half of delay to end of strain cycle
+                %                 samp=diff(R.t(1:2));
+                %                 smidx=time2useE+round(R.del/samp/2);%add half of delay to end of strain cycle
                 
                 %                 smidx=floor((R.dsPts(timePts(2)*4-2,3)));
-%                 smIdx=
-%                 smidx=smidx-time2useS;
+                %                 smIdx=
+                %                 smidx=smidx-time2useS;
                 sm(k)=x(end);
                 strMax(k)=max(x);
                 velMax(k)=v;
@@ -1186,6 +1208,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=2;
     hold on;
     spds=unique([usedS(:).spd]);
+    totArea={};
     timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
     if exist('tpt','var')
         timePts=tpt; %if I want to set it up top
@@ -1224,15 +1247,15 @@ if(showFigs(showFigs==xx))
         [mm,ID]=min(edpts-stpts);
         edpts=edpts-(edpts-stpts-mm);
         
-%         stpt=min(cellfun(@(x) x(timePts(1)*4+1,3),dspts));
-%         edpt=min(cellfun(@(x) x(timePts(2)*4+4,3),dspts));
+        %         stpt=min(cellfun(@(x) x(timePts(1)*4+1,3),dspts));
+        %         edpt=min(cellfun(@(x) x(timePts(2)*4+4,3),dspts));
         [mforce,mstrainz,ef]=deal(zeros(mm+1,length(spds)));
         %         minT=min(cellfun(@(x) size(x,1),{usedS(currSpds).t}));
         strainz=[];
         forcez=[];
         tArea=[];
         for j=1:length(currSpds)
-            strainz(:,j)=usedS(currSpds(j)).strain(stpts(j):edpts(j)).*diff(usedS(currSpds(j)).chain(stpts(j):edpts(j),:),1,2)';
+            strainz(:,j)=usedS(currSpds(j)).strain(stpts(j):edpts(j)).*diff(usedS(currSpds(j)).chain(stpts(j):edpts(j),:),1,2);
             forcez(:,j)=usedS(currSpds(j)).F(stpts(j):edpts(j));
             %             tArea(i,j)=trapz(strainz(:,j),forcez(:,j));
             tArea(j)=trapz(strainz(:,j),forcez(:,j));
@@ -1374,9 +1397,9 @@ if(showFigs(showFigs==xx))
         [mm,ID]=min(edpts-stpts);
         edpts=edpts-(edpts-stpts-mm);
         
-%         stpt=min(cellfun(@(x) x(timePts(1)*4+1,3),dspts));
-%         edpt=min(cellfun(@(x) x(timePts(2)*4+2,3)-300,dspts));
-%         stpt=floor((edpt-stpt)/2+stpt);
+        %         stpt=min(cellfun(@(x) x(timePts(1)*4+1,3),dspts));
+        %         edpt=min(cellfun(@(x) x(timePts(2)*4+2,3)-300,dspts));
+        %         stpt=floor((edpt-stpt)/2+stpt);
         %         strain=usedS(i).strain(stpt:edpt)-usedS(i).strain(stpt);
         
         %         minT=min(cellfun(@(x) size(x,1),{usedS(currSpds).t}));
@@ -1469,10 +1492,10 @@ if(showFigs(showFigs==xx))
     xl='';
     ind=[12];
     
-   
     
     
-    for(i=1:length(ind))       
+    
+    for(i=1:length(ind))
         ii=ind(i);
         pts('F vs. Strain for ',usedS(ii).name,' ind= ', ii);
         endInd=fractData(ii).fracInd+1000;
@@ -1498,6 +1521,408 @@ if(showFigs(showFigs==xx))
     %     figText(gcf,18)
 end
 
+%% 25. redone work vs strain rate with diff lines for diff strains
+xx=25;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    
+    totArea={};
+    timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
+    
+    legZ={};
+    strs=unique(SD);
+    for(i=1:length(strs))
+        sdIDs=find([usedS(:).SD]==strs(i))
+        R=usedS(sdIDs);
+        spds=unique([R.spd]);
+        for(j=1:length(spds))
+            
+            currSpds=find([R(:).spd]==spds(j));
+            dspts={R(currSpds).dsPts};
+            stpts=cellfun(@(x) x(timePts(1)*4+1,3),dspts);
+            edpts=cellfun(@(x) x(timePts(2)*4+4,3),dspts);
+            [mm,ID]=min(edpts-stpts);
+            edpts=edpts-(edpts-stpts-mm);
+            [mforce,mstrainz,ef]=deal(zeros(mm+1,length(spds)));
+            strainz=[];
+            forcez=[];
+            tArea=[];
+            for k=1:length(currSpds)
+                pts('F vs. Strain for ',R(currSpds(k)).name);
+                strainz(:,k)=R(currSpds(k)).strain(stpts(k):edpts(k)).*diff(R(currSpds(k)).chain(stpts(k):edpts(k),:),1,2);
+                forcez(:,k)=R(currSpds(k)).F(stpts(k):edpts(k));
+                %             tArea(i,j)=trapz(strainz(:,j),forcez(:,j));
+                tArea(k)=trapz(strainz(:,k),forcez(:,k));
+            end
+            totArea{j}=tArea;
+        end
+        mArea=cellfun(@mean,totArea);
+        eArea=cellfun(@std,totArea);
+        errorbar(spds,mArea,eArea,'linewidth',2);
+        
+        %get type and l value from filename
+        [~,a,~]=fileparts(fold);
+        [c,d]=parseFileNames(a);
+        fp=string(c);
+        Tval=d(fp=='T');
+        lval=d(fp=='l');
+        legz(i)={['T=',num2str(Tval), ' l=',num2str(lval),' SD=',num2str(strs(i)*1000),'mm']};
+    end
+    
+    legend(legz);
+    xlabel('Strain rate');
+    ylabel('Work N mm');
+    figText(gcf,18)
+end
+
+%% 26. plot single trial reversability
+xx=26;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    ind=1;
+    totArea={};
+    timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
+    
+    R=usedS(ind);
+    %convert to mm and center at 0
+    spx=(R.smartPos.x-R.smartPos.x(1,1))*1000;
+    spz=(R.smartPos.z-R.smartPos.z(1,1))*1000;
+    
+    
+    % plot(usedS(ind).smartPos.z(:,S),usedS(ind).smartPos.x(:,S));
+    
+    ax1=subplot(2,2,[1 2]);
+    
+    ptSkip=10;
+    %SPZ=parallel
+    %SPX=perp
+    plot(spz(1:ptSkip:end,:),spx(1:ptSkip:end,:))
+    hold on;
+    stpts=R.dsPts([0 1 2]*4+1,3);
+    midspts=R.dsPts([0 1 2]*4+2,3);
+    midepts=R.dsPts([0 1 2]*4+3,3);
+    edpts=R.dsPts([0 1 2]*4+4,3);
+    plot(spz(stpts,:),spx(stpts,:),'r.','markersize',10)
+    plot(spz(midspts,:),spx(midspts,:),'g.','markersize',10)
+    plot(spz(midepts,:),spx(midepts,:),'b.','markersize',10)
+    plot(spz(edpts,:),spx(edpts,:),'k.','markersize',10)
+    text(.08,0.9,'strain begin','color','r','units','normalized','fontsize',16)
+    text(.08,0.84,'strain return','color','k','units','normalized','fontsize',16)
+    xlabel('x (mm)')
+    ylabel('y (mm)')
+    
+    ax2=subplot(2,2,3);
+    hold on;
+    %eventually change to number of smarticles via size of smartPos
+    
+    pks=[0:it(ind)/2-1]*4;
+    
+    res=zeros(6,it(ind)/2);%6 for number of smarts its/2 for cycles
+    for(i=1:6)
+        res(i,:)=spx(usedS(ind).dsPts([pks+4],3),i)-spx(usedS(ind).dsPts([pks+1],3),i);
+    end
+    bar(ax2,res)
+    legend({'Cycle 1','Cycle 2', 'Cycle 3'});
+    ylabel('\Delta(C(perp)) (mm)');
+    xlabel('smarticle number')
+    set(gca,'xticklabel',{'1' '2' '3' '4' '5' '6'},'xtick',[1:6])
+    
+    ax3=subplot(2,2,4);
+    for(i=1:6)
+        res(i,:)=spz(usedS(ind).dsPts([pks+4],3),i)-spz(usedS(ind).dsPts([pks+1],3),i);
+    end
+    barh(ax3,res)
+    legend({'Cycle 1','Cycle 2', 'Cycle 3'});
+    xlabel('\Delta(C(parallel)) (mm)');
+    ylabel('smarticle number')
+    set(gca,'yticklabel',{'1' '2' '3' '4' '5' '6'},'ytick',[1:6])
+    
+end
+
+%% 27. plot multitrial  at single SD and SPEED reversability
+
+xx=27;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    
+    resz=zeros(6,it(1)/2);%6 for number of smarts its/2 for cycles
+    resx=zeros(6,it(1)/2);%6 for number of smarts its/2 for cycles
+    indxs=find(SD==0.06&spd==5);
+    for ii=1:length(indxs)
+        
+        R=usedS(indxs(ii));
+        %convert to mm and center at 0
+        spx=(R.smartPos.x-R.smartPos.x(1,1))*1000;
+        spz=(R.smartPos.z-R.smartPos.z(1,1))*1000;
+        
+        ax1=subplot(2,2,[1 2]);
+        
+        ptSkip=10;
+        plot(spz(1:ptSkip:end,:),spx(1:ptSkip:end,:))
+        hold on;
+        stpts=R.dsPts([0 1 2]*4+1,3);
+        midspts=R.dsPts([0 1 2]*4+2,3);
+        midepts=R.dsPts([0 1 2]*4+3,3);
+        edpts=R.dsPts([0 1 2]*4+4,3);
+        plot(spz(stpts,:),spx(stpts,:),'r.','markersize',10)
+        plot(spz(midspts,:),spx(midspts,:),'g.','markersize',10)
+        plot(spz(midepts,:),spx(midepts,:),'b.','markersize',10)
+        plot(spz(edpts,:),spx(edpts,:),'k.','markersize',10)
+        text(.08,0.9,'strain begin','color','r','units','normalized','fontsize',16)
+        text(.08,0.84,'strain return','color','k','units','normalized','fontsize',16)
+        xlabel('x (mm)')
+        ylabel('y (mm)')
+        
+        
+        %eventually change to number of smarticles via size of smartPos
+        
+        pks=[0:R.its/2-1]*4;
+        
+        
+        for(i=1:6)
+            resz(i,:,ii)=spz(R.dsPts([pks+4],3),i)-spz(R.dsPts([pks+1],3),i);
+        end
+        
+        for(i=1:6)
+            resx(i,:,ii)=spx(R.dsPts([pks+4],3),i)-spx(R.dsPts([pks+1],3),i);
+        end
+    end
+    mresZ=mean(resz,3);
+    mresX=mean(resx,3);
+    
+    eresZ=std(resz,0,3);
+    eresX=std(resx,0,3);
+    
+    ax2=subplot(1,2,1);
+    hold on;
+    %     bar(ax2,mresZ)
+    for i=1:it(1)/2
+        errorbar(ax2,1:6,mresZ(:,i),eresZ(:,i));
+    end
+    legend({'Cycle 1','Cycle 2', 'Cycle 3'});
+    ylabel('\Delta(C(parallel)) (mm)');
+    xlabel('smarticle number')
+    set(gca,'xticklabel',{'1' '2' '3' '4' '5' '6'},'xtick',[1:6])
+    figText(gcf,16);
+    
+    ax3=subplot(1,2,2);
+    hold on;
+    for i=1:it(1)/2
+        errorbar(ax3,1:6,mresX(:,i),eresX(:,i));
+    end
+    %     barh(ax3,mresX)
+    legend({'Cycle 1','Cycle 2', 'Cycle 3'});
+    ylabel('\Delta(C(perp)) (mm)');
+    xlabel('smarticle number')
+    set(gca,'xticklabel',{'1' '2' '3' '4' '5' '6'},'xtick',[1:6])
+    figText(gcf,16);
+end
+%% 28.  plot single cycle multispd reversability
+
+xx=28;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    uvar=unique(spd);
+    cycle=1;%1 2 or 3
+%     cmap=brewermap(length(uspd),'rdylgn');
+%     cmap=fire(length(uspd));
+    sd=0.035;
+    [~,a,~]=fileparts(fold);
+    [c,d]=parseFileNames(a);
+    
+    cmap=jet(length(uvar));
+    titlez=['T=',num2str(d(1)),' l=',num2str(d(2)),' cycle=',num2str(cycle),' sd=',num2str(sd*1000),'mm'];
+    for jj=1:length(uvar)
+        resz=zeros(6,it(1)/2);%6 for number of smarts its/2 for cycles
+        resx=zeros(6,it(1)/2);%6 for number of smarts its/2 for cycles
+        indxs=find(SD==sd&spd==uvar(jj));
+        for ii=1:length(indxs)
+            
+            R=usedS(indxs(ii));
+            %convert to mm and center at 0
+            spx=(R.smartPos.x-R.smartPos.x(1,1))*1000;
+            spz=(R.smartPos.z-R.smartPos.z(1,1))*1000;
+            
+            %eventually change to number of smarticles via size of smartPos
+            
+            pks=[0:R.its/2-1]*4;
+            
+            
+            for(i=1:6)
+                resz(i,:,ii)=spz(R.dsPts([pks+4],3),i)-spz(R.dsPts([pks+1],3),i);
+            end
+            
+            for(i=1:6)
+                resx(i,:,ii)=spx(R.dsPts([pks+4],3),i)-spx(R.dsPts([pks+1],3),i);
+            end
+        end
+        mresZ=mean(resz,3);
+        eresZ=std(resz,0,3);
+        
+        mresX=mean(resx,3);
+        eresX=std(resx,0,3);
+        
+        figure(xx)
+%         errorbar(1:6,mresZ(:,cycle)+(jj-1)*10,eresZ(:,cycle));
+        errorbar(1:6,mresZ(:,cycle),eresZ(:,cycle),'color',cmap(jj,:),'linewidth',2);
+%         pause
+        
+        ylabel('\Delta(C(parallel)) (mm)');
+        xlabel('smarticle number')
+        set(gca,'xticklabel',{'1' '2' '3' '4' '5' '6'},'xtick',[1:6])
+        figText(gcf,16);
+        title(titlez);
+        
+        figure(12312)
+        hold on;
+        
+        errorbar(1:6,mresX(:,cycle),eresX(:,cycle),'color',cmap(jj,:),'linewidth',2);
+        
+        ylim([-1,8]);
+        ylabel('\Delta(C(perp)) (mm)');
+        xlabel('smarticle number')
+        set(gca,'xticklabel',{'1' '2' '3' '4' '5' '6'},'xtick',[1:6])
+        figText(gcf,16);
+        title(titlez);
+        
+    end
+    legend({strcat('S=',num2str(uvar),'mm/s')})
+    figure(xx);
+    legend({strcat('S=',num2str(uvar),'mm/s')})
+end
+%% 29.  plot single cycle multisd reversability
+xx=29;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+%     sdz=5:5:45;
+    uvar=unique(SD);
+    cycle=1;%1 2 or 3
+%     cmap=brewermap(length(usd),'rdylgn');
+%     cmap=fire(length(uvar));
+    cmap=jet(length(uvar));
+
+    [~,a,~]=fileparts(fold);
+    [c,d]=parseFileNames(a);
+    
+
+%     titlez=['T=',num2str(d(1)),' l=',num2str(d(2)),' cycle=',num2str(cycle),' spd=',num2str(sdz),'mm/s'];
+titlez=['T=',num2str(d(1)),' l=',num2str(d(2)),' cycle=',num2str(cycle),' spd=all','mm/s'];
+    for jj=1:length(uvar)
+        resz=zeros(6,it(1)/2);%6 for number of smarts its/2 for cycles
+        resx=zeros(6,it(1)/2);%6 for number of smarts its/2 for cycles
+%         indxs=find(SD==uvar(jj)&spd==sdz);
+        indxs=find(SD==uvar(jj));
+        for ii=1:length(indxs)
+            
+            R=usedS(indxs(ii));
+            %convert to mm and center at 0
+            spx=(R.smartPos.x-R.smartPos.x(1,1))*1000;
+            spz=(R.smartPos.z-R.smartPos.z(1,1))*1000;
+            
+            %eventually change to number of smarticles via size of smartPos
+            
+            pks=[0:R.its/2-1]*4;
+            
+            
+            for(i=1:6)
+                resz(i,:,ii)=spz(R.dsPts([pks+4],3),i)-spz(R.dsPts([pks+1],3),i);
+                resx(i,:,ii)=spx(R.dsPts([pks+4],3),i)-spx(R.dsPts([pks+1],3),i);
+            end
+        end
+        mresZ=mean(resz,3);
+        eresZ=std(resz,0,3);
+        
+        mresX=mean(resx,3);
+        eresX=std(resx,0,3);
+        
+        figure(xx)
+%         errorbar(1:6,mresZ(:,cycle)+(jj-1)*10,eresZ(:,cycle));
+        errorbar(1:6,mresZ(:,cycle),eresZ(:,cycle),'color',cmap(jj,:),'linewidth',2);
+%         pause
+        
+        ylabel('\Delta(C(parallel)) (mm)');
+        xlabel('smarticle number')
+        set(gca,'xticklabel',{'1' '2' '3' '4' '5' '6'},'xtick',[1:6])
+        figText(gcf,16);
+        title(titlez);
+        
+        figure(12312)
+        hold on;
+        
+        errorbar(1:6,mresX(:,cycle),eresX(:,cycle),'color',cmap(jj,:),'linewidth',2);
+        
+        ylim([-1,8]);
+        ylabel('\Delta(C(perp)) (mm)');
+        xlabel('smarticle number')
+        set(gca,'xticklabel',{'1' '2' '3' '4' '5' '6'},'xtick',[1:6])
+        figText(gcf,16);
+        title(titlez);
+        
+    end
+    legend({strcat('S=',num2str(uvar*1000),'mm')})
+    figure(xx);
+    legend({strcat('S=',num2str(uvar*1000),'mm')})
+end
+
+%% 30. plot para and perp movement vs time
+xx=30;
+if(showFigs(showFigs==xx))
+    figure(xx); lw=2;
+    hold on;
+    ind=1;
+    totArea={};
+    timePts=[1,1]; %start and end pts, iteration to consider as "zero point"
+    if exist('tpt','var')
+        timePts=tpt; %if I want to set it up top
+    end
+    
+    R=usedS(ind);
+    %convert to mm and center at 0
+    spx=(R.smartPos.x-R.smartPos.x(1,1))*1000;
+    spz=(R.smartPos.z-R.smartPos.z(1,1))*1000;
+    
+    
+    % plot(usedS(ind).smartPos.z(:,S),usedS(ind).smartPos.x(:,S));
+        
+    ptSkip=100;
+    %SPZ=parallel
+    %SPX=perp
+%     plot(spz(1:ptSkip:end,:),spx(1:ptSkip:end,:))
+    hold on;
+    stpts=R.dsPts([0 1 2]*4+1,3);
+    midspts=R.dsPts([0 1 2]*4+2,3);
+    midepts=R.dsPts([0 1 2]*4+3,3);
+    edpts=R.dsPts([0 1 2]*4+4,3);
+    
+    ax2=subplot(1,2,1);
+    hold on;
+    
+    for jj=1:size(spx,2)
+        plot(R.t(1:ptSkip:end),spx(1:ptSkip:end,jj)-spx(1,jj),'linewidth',2);
+    end
+    ylabel('perp (mm)');
+    xlabel('time (s)');
+    
+    ax3=subplot(1,2,2);
+    hold on;
+    for jj=1:size(spz,2)
+        plot(R.t(1:ptSkip:end),spz(1:ptSkip:end,jj)-spz(1,jj),'linewidth',2);
+    end
+    xlabel('time (s)');
+    ylabel('parallel (mm)')
+    
+end
 %% 55. old force vs h data
 xx=55;
 if(showFigs(showFigs==xx))
