@@ -3,13 +3,14 @@
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 % fold=uigetdir('A:\2DSmartData\chordRing');
-fold=uigetdir('A:\2DSmartData\mediumRing\redSmarts\');
+fold=uigetdir('A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\PavelTrip2\interrupt_free_ring');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
 clearvars rigidBodyName
 if RIGIDBODYNAMES
-    inactiveName=' inactive';
+    %     activeName= ' active';
+    %     inactiveName=' inactive';
     frameName=' frame';
     numBods = 4;
 else
@@ -35,7 +36,6 @@ idx=1;
 badIdx=0;
 failedAttempts=struct;
 warning(['number of smarticles to track is set to ', num2str(numBods)])
-
 for i=1:nMovs
     
     % for i =1:length(f)
@@ -45,13 +45,15 @@ for i=1:nMovs
     
     try
         for jj=1:numBods
-            [movs(idx).t,movs(idx).Ax(:,jj),movs(idx).Ay(:,jj),~,fps,movs(idx).arot(:,jj)]= trackOptitrack(fullfile(fold,f(i).name),dec,[' ',num2str(jj)]);
+            [movs(idx).t,movs(idx).Ax(:,jj),movs(idx).Ay(:,jj),~,fps,movs(idx).Arot(:,jj)]= trackOptitrack(fullfile(fold,f(i).name),dec,[' ',num2str(jj)]);
         end
         if exist('frameName','var')
+            %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
             [~,movs(idx).x,movs(idx).y,movs(idx).data,~, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,frameName);
         end
         if exist('inactiveName','var')
-            [~,movs(idx).ix,movs(idx).Iy,movs(idx).Idata,~, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
+            %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
+            [~,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,~, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
         end
         movs(idx).fname=f(i).name;
         movs(idx).conv=1;
