@@ -109,7 +109,7 @@ for i=1:length(movs)
         ma = ma.addAll(movs(i).data(1));
         usedMovs(inds)=movs(i);
         inds=inds+1;
-        minT=min(length(movs(i).t),minT);
+        minT=min(length(usedMovs(i).t),minT);
         
         fpos=movs(i).data(1);
         fpos{1}(:,2)=filter(fb,fa,fpos{1}(:,2));  %filtered signal
@@ -1394,6 +1394,7 @@ if(showFigs(showFigs==xx))
     L=length(usedMovs);
     correctDir=0;
     minT=1e10;
+    
     for i=1:length(usedMovs)
         minT=min(length(usedMovs(i).t),minT);
         % dpos=diff(pos);

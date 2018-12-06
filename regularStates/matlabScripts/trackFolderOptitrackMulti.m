@@ -9,8 +9,8 @@ f=dir2(fullfile(fold,'*.csv'));
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
 clearvars rigidBodyName
 if RIGIDBODYNAMES
-    %     activeName= ' active';
-    %     inactiveName=' inactive';
+%     activeName= ' active';
+    inactiveName=' inactive';
     frameName=' frame';
     numBods = 4;
 else

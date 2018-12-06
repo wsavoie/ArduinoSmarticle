@@ -51,7 +51,7 @@ for i=1:nMovs
             [~,movs(idx).x,movs(idx).y,movs(idx).data,~, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,frameName);
         end
         if exist('inactiveName','var')
-            [~,movs(idx).ix,movs(idx).Iy,movs(idx).Idata,~, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
+            [~,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,~, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
         end
         movs(idx).fname=f(i).name;
         movs(idx).conv=1;

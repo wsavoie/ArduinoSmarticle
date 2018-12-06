@@ -8,7 +8,7 @@ clear all;
 % f='A:\2DSmartData\cloud\cloud 9-30';
 % f='A:\2DSmartData\cloud\cloud 2-27\';
 % f='A:\2DSmartData\phaseStates';
-f='A:\2DSmartData\phaseStates\interruptPin glued ring a=3 i=0';
+f='A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\PavelTrip2\interrupt_free_Dring\12.1.2018';
 fold=uigetdir(f);
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
@@ -107,7 +107,7 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=1;
     hold on;
     
-    idx=16; %index of movie to look at
+    idx=10; %index of movie to look at
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     NF={};
     Filt={};
