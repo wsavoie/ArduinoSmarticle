@@ -9,9 +9,9 @@ f=dir2(fullfile(fold,'*.csv'));
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
 clearvars rigidBodyName
 if RIGIDBODYNAMES
-    inactiveName=' inactive';
+%     inactiveName=' inactive';
     frameName=' frame';
-    numBods = 4;
+    numBods = 5;
 else
     rigidBodyName = 'rigid body 1';
 end
@@ -23,7 +23,7 @@ movs=struct;
 nMovs=length(f);
 movs(nMovs).fname='';
 r=.09525;%radius of boundary in meters
-dec=12; %decimate amount
+dec=1; %decimate amount
 %HANDEDNESS IN QUATERNIONS ISNT CHANGED?
 conv=zeros(nMovs,1);
 
@@ -45,13 +45,13 @@ for i=1:nMovs
     
     try
         for jj=1:numBods
-            [movs(idx).t,movs(idx).Ax(:,jj),movs(idx).Ay(:,jj),~,fps,movs(idx).arot(:,jj)]= trackOptitrack(fullfile(fold,f(i).name),dec,[' ',num2str(jj)]);
+            [movs(idx).t,movs(idx).Ax(:,jj),movs(idx).Ay(:,jj),~,fps,movs(idx).Arot(:,jj)]= trackOptitrack(fullfile(fold,f(i).name),dec,[' ',num2str(jj)]);
         end
         if exist('frameName','var')
-            [~,movs(idx).x,movs(idx).y,movs(idx).data,~, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,frameName);
+            [~,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).fps, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,frameName);
         end
         if exist('inactiveName','var')
-            [~,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,~, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
+            [~,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).fps, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
         end
         movs(idx).fname=f(i).name;
         movs(idx).conv=1;

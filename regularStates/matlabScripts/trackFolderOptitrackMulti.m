@@ -3,7 +3,7 @@
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 % fold=uigetdir('A:\2DSmartData\chordRing');
-fold=uigetdir('A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\PavelTrip2\interrupt_free_ring');
+fold=uigetdir('A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\PavelTrip2\interrupt_free_Dring');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
@@ -12,7 +12,7 @@ if RIGIDBODYNAMES
 %     activeName= ' active';
     inactiveName=' inactive';
     frameName=' frame';
-    numBods = 4;
+    numBods = 3;
 else
     rigidBodyName = 'rigid body 1';
 end
@@ -49,11 +49,11 @@ for i=1:nMovs
         end
         if exist('frameName','var')
             %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
-            [~,movs(idx).x,movs(idx).y,movs(idx).data,~, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,frameName);
+            [~,movs(idx).x,movs(idx).y,movs(idx).data,movs(idx).fps, movs(idx).rot]= trackOptitrack(fullfile(fold,f(i).name),dec,frameName);
         end
         if exist('inactiveName','var')
             %         [~,movs(idx).Ax,movs(idx).Ay,movs(idx).Adata,movs(idx).Arot]= trackOptitrack(fullfile(fold,f(i).name),dec,activeName);
-            [~,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,~, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
+            [~,movs(idx).Ix,movs(idx).Iy,movs(idx).Idata,movs(idx).fps, movs(idx).Irot]= trackOptitrack(fullfile(fold,f(i).name),dec,inactiveName);
         end
         movs(idx).fname=f(i).name;
         movs(idx).conv=1;

@@ -1499,7 +1499,8 @@ if(showFigs(showFigs==xx))
     xlabel('M_{inactive}/M_{ring}');
     ylabel('\langle final drift speed\rangle');
     hold on;
-    errorbar([0.5],[-0.00017361],[0.00021024])
+%     errorbar([0.5],[-0.00017361],[0.00021024])
+    errorbar(inactiveMass/57.75,-0.00028198,[0.00049381]);
     figText(gcf,16);
     xl=xlim;
     plot(xl,[0,0],'k');
