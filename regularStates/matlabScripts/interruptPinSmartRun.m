@@ -1,4 +1,4 @@
-t=600; %totalTime
+t=2800; %totalTime
 sampRate = 8192;
 tt=0:1/sampRate:.2;
 freq=500;

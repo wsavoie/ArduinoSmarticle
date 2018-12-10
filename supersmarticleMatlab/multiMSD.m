@@ -75,7 +75,7 @@ fold
 % showFigs=[1 23 29];
 % showFigs=[1 29 31 36];
 % showFigs=[1,  52 53];
-showFigs=[1 55];
+showFigs=[29];
 
 maf = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
 ma = msdanalyzer(2, SPACE_UNITS, TIME_UNITS);
@@ -109,7 +109,7 @@ for i=1:length(movs)
         ma = ma.addAll(movs(i).data(1));
         usedMovs(inds)=movs(i);
         inds=inds+1;
-        minT=min(length(movs(i).t),minT);
+        minT=min(length(usedMovs(i).t),minT);
         
         fpos=movs(i).data(1);
         fpos{1}(:,2)=filter(fb,fa,fpos{1}(:,2));  %filtered signal
@@ -1394,6 +1394,7 @@ if(showFigs(showFigs==xx))
     L=length(usedMovs);
     correctDir=0;
     minT=1e10;
+    
     for i=1:length(usedMovs)
         minT=min(length(usedMovs(i).t),minT);
         % dpos=diff(pos);
@@ -1452,6 +1453,7 @@ if(showFigs(showFigs==xx))
         set(get(get(h,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
         endPos(i)=newpos(end,2);
         nn(i)=newpos(end,2)./usedMovs(i).t(end);
+        rotPos{i}=newpos;
     end
     pts('mean((final y positions)/time)', mean(nn),' +-',std(nn));
     %     pts('avg projected v=',mean(endPos)/(minT/usedMovs(1).fps));

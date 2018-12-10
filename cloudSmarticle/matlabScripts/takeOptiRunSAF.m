@@ -1,5 +1,11 @@
+if ~exists('client','var')
+    client = natnet();
+else
+    client.stopRecord;
+end
+
 t=60; %seconds
-client = natnet();
+
 vidOn=1;
 %keypresses for starting recording for OBS
 robot = java.awt.Robot;
@@ -27,4 +33,5 @@ if vidOn
     pause(.1);
     robot.keyRelease(java.awt.event.KeyEvent.VK_F4);
 end
+client.disconnect;
 beep;
