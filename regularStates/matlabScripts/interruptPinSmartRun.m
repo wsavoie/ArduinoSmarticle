@@ -1,10 +1,11 @@
-pause(10)
-t=1200; %totalTime
+%pause(2)
+t=600; %totalTime
 sampRate = 8192;
 tt=0:1/sampRate:.2;
 freq=500;
 period=2.35; %sound playing period, must be slightly > smarticle gait period
-player=audioplayer(sin(tt*freq*2*pi), sampRate);
+amp = sin(tt*freq*2*pi);
+player=audioplayer(amp, sampRate);
 vidOn=1;
 if(~exist('robot','var'))
     robot = java.awt.Robot;

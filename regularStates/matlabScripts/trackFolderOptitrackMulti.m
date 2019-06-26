@@ -3,7 +3,7 @@
 % fold=uigetdir('A:\2DSmartData\LightSystem\rossSmarts\mediumring');
 % fold=uigetdir('A:\2DSmartData\shortRing\redSmarts\');
 % fold=uigetdir('A:\2DSmartData\chordRing');
-fold=uigetdir('A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\PavelTrip2\interrupt_free_Dring');
+fold=uigetdir('A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\PavelTrip2\Regular_states_beads');
 f=dir2(fullfile(fold,'*.csv'));
 
 RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)

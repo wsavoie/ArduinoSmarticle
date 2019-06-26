@@ -107,13 +107,13 @@ if(showFigs(showFigs==xx))
     figure(xx); lw=1;
     hold on;
     
-    idx=10; %index of movie to look at
+    idx=5; %index of movie to look atS
     %     for(i=1:size(usedMovs(idx).x,2) %for the number of smarticle
     NF={};
     Filt={};
-    x= usedMovs(idx).x*1000;
-    y= usedMovs(idx).y*1000;
-    rot= usedMovs(idx).rot;
+    x= usedMovs(idx).Ax*1000;
+    y= usedMovs(idx).Ay*1000;
+    rot= usedMovs(idx).Arot;
 %      x=x-x(1);   y=y-y(1);  rot=rot-rot(1);
     t=usedMovs(idx).t(:,1);
     
@@ -121,7 +121,7 @@ if(showFigs(showFigs==xx))
     yF=filter(fb,fa,y);  %filtered signal
     rotF=filter(fb,fa,rot);  %filtered signal
         
-    for i=1:size(usedMovs(idx).x,2) %for the number of smarticles
+    for i=1:size(x,2) %for the number of smarticles
         figure(1000+i);    
         %         [b,a]=butter(3,1/120*2,'low');
         subplot(1,2,1);
