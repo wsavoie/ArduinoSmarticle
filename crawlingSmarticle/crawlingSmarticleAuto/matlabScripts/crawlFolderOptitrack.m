@@ -2,10 +2,10 @@
 %CRAWLFOLDEROPTITRACK Summary of this function goes here
 %   Detailed explanation goes here
 % fold=uigetdir('A:\2DSmartData\crawl');
-fold=uigetdir('A:\Dropbox\Smarticles\Shengkai''s Summaries\gaitTestData');
+fold=uigetdir('A:\2DSmartData\crawl\trials_9-21-17');
 f=dir2(fullfile(fold,'*.csv'));
 
-RIGIDBODYNAMES = false; %make true if tracking multiple things (i.e. inactive smarticles)
+RIGIDBODYNAMES = true; %make true if tracking multiple things (i.e. inactive smarticles)
 clearvars walkerName
 if RIGIDBODYNAMES
     walkerName{1} = ' walker';

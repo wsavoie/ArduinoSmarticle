@@ -3,11 +3,14 @@
 % load('D:\ChronoCode\chronoPkgs\Smarticles\matlabScripts\amoeba\smarticleExpVids\rmv3\movieInfo.mat');
 
 % fold=uigetdir('A:\2DSmartData\');
-fold=uigetdir('A:\2DSmartData\crawl\diamond gait 9-27-17');
+% fold=uigetdir('A:\2DSmartData\crawl\diamond gait 9-27-17');
+clear all
+fold=uigetdir('A:\2DSmartData\crawl\trials_9-21-17');
 load(fullfile(fold,'movieInfo.mat'));
 SPACE_UNITS = 'm';
 TIME_UNITS = 's';
 fold
+
 %************************************************************
 %* Fig numbers:
 %* 1. calibrate world direction with DIR
@@ -18,7 +21,7 @@ fold
 %* 6. plotting out x vs t for dan and phase shifting
 %* 7. fft of gait
 %************************************************************
-showFigs=[2];
+showFigs=[2 4];
 
 %params we wish to plot
 DIR=[]; RAD=[]; V=[];
@@ -94,28 +97,58 @@ if(showFigs(showFigs==xx))
     %     first get number of gait radii used
     uRadD1=unique(allPars(D1,2));
     uRadD2=unique(allPars(D2,2));
-    
+    degs=343;
     VD1=zeros(length(uRadD1),1); stdD1=VD1;
     VD2=zeros(length(uRadD2),1); stdD2=VD2;
-    
+    clear clz
     for i=1:length(uRadD1)
         idxs=find(allPars(:,1)==1&allPars(:,2)==uRadD1(i));
         vtot=zeros(length(idxs),1);
+        clear cl;
         for j=1:length(idxs)
             vtot(j)=(usedMovs(idxs(j)).x(end)-usedMovs(idxs(j)).x(1))/usedMovs(idxs(j)).t(end);
+            ac=xcorr(usedMovs(idxs(j)).y,usedMovs(idxs(j)).y);
+            [~,locs]=findpeaks(ac);
+            cl(j)=mean(diff(locs)*(1/usedMovs(idxs(j)).fps));  
+            
         end
-        VD1(i)=mean(vtot)*1000;
-        stdD1(i)=std(vtot)*1000;
+        clz(i)=nanmean(cl);
+        cp=clz(i);
+        if(isnan(cp))
+            if(i>1)
+            cp=clz(i-1);
+            else
+                cp=1;
+            end
+        end
+        VD1(i)=mean(vtot)*1000.* cp;
+        stdD1(i)=std(vtot)*1000.*cp;
+
     end
-    
+    clear clz
     for i=1:length(uRadD2)
         idxs=find(allPars(:,1)==2&allPars(:,2)==uRadD2(i));
         vtot2=zeros(length(idxs),1);
+        clear cl;
         for j=1:length(idxs)
             vtot2(j)=(usedMovs(idxs(j)).x(end)-usedMovs(idxs(j)).x(1))/usedMovs(idxs(j)).t(end);
+            ac=xcorr(usedMovs(idxs(j)).z,usedMovs(idxs(j)).z);
+            [~,locs]=findpeaks(ac);
+            cl(j)=mean(diff(locs)*(1/usedMovs(idxs(j)).fps));  
         end
-        VD2(i)=mean(abs(vtot2))*1000;
-        stdD2(i)=std(vtot2)*1000;
+        clz(i)=nanmean(cl);
+        cp=clz(i);
+        if(isnan(cp))
+            if(i>1)
+            cp=clz(i-1);
+            else
+                cp=1;
+            end
+        end
+        
+        VD2(i)=mean(abs(vtot2))*1000 *cp;
+        stdD2(i)=std(vtot2)*1000 *cp;
+
     end
     
     errorbar(uRadD1,VD1,stdD1,'r','linewidth',lw);
@@ -265,8 +298,8 @@ if(showFigs(showFigs==xx))
         title('Right Movement');
         
     elseif DIREC==2 %both directions
-        h=errorbar(uRadD1,VD1,stdD1,'o-','markerfacecolor','r','linewidth',lw);
-        errorbar(uRadD2,VD2,stdD2,'o-','markerfacecolor','k','linewidth',lw,'color',h.Color);
+        h=errorbar(uRadD1,VD1,stdD1,'o-','markerfacecolor','r','markerEdgecolor','r','linewidth',lw);
+        errorbar(uRadD2,VD2,stdD2,'o-','markerfacecolor','k','markerEdgecolor','k','linewidth',lw,'color',h.Color);
     else%only left
         errorbar(uRadD2,VD2,stdD2,'o-','markerfacecolor','k','linewidth',lw);
         title('Left Movement');
@@ -371,7 +404,7 @@ if(showFigs(showFigs==xx))
     hold on;
     ind=1;
     
-    for i = 1:2
+%     for i = 1:2
         if(i==1)
             dat=usedMovs(D1(ind));
         else
@@ -382,7 +415,7 @@ if(showFigs(showFigs==xx))
         L = length(t);             % Length of signal        
         T = 1/Fs;             % Sampling period
         
-        X=dat.x;
+        X=dat.z;
 %         X=sin(2*pi*1.5*t)+2*t;
         k=(X(end)-X(1))/(t(end)-t(1));
         X2=X-k.*t;
@@ -398,7 +431,8 @@ if(showFigs(showFigs==xx))
         ylabel('|P1(f)|')
 
         
-    end
+%     end
+
     %
     %
     %     plot(usedMovs(D1(ind)).t,usedMovs(D1(ind)).x,'r','linewidth',lw);
