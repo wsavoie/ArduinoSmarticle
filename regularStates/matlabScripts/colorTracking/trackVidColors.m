@@ -1,7 +1,8 @@
 % function []=trackVidColors(fpath)
 % clear all
 %fpath='A:\Dropbox\smartmovies\pavel-smartVariousVidsAndPics\PavelTrip2\tracking\RGT10.mp4';
-fpath='A:\Dropbox\smartmovies\Characterizing Gliders\Tracking Arms\Square Gait\T3.mp4';
+% fpath='A:\Dropbox\smartmovies\Characterizing Gliders\Tracking Arms\Random Gait Correlated\T9.mp4';
+fpath='A:\Dropbox\smartmovies\Characterizing Gliders\Tracking Arms\Random Gait Correlated\GoodVideos\T8.mp4';
 PLOTON=0;
 tic
 matlab.video.read.UseHardwareAcceleration('on');
@@ -23,17 +24,21 @@ figure(1);
 
 hblob = vision.BlobAnalysis('AreaOutputPort', true, ... % Set blob analysis handling
     'CentroidOutputPort', true, ...
-    'BoundingBoxOutputPort', true', ...
-    'MinimumBlobArea', 450, ...  %uncomment minBlobAr to find
-    'MaximumBlobArea', 3000, ... %uncomment maxBlobAr to find
+    'BoundingBoxOutputPort', true, ...
+    'MinimumBlobArea', 200, ...  %uncomment minBlobAr to find
+    'MaximumBlobArea', 2400, ... %uncomment maxBlobAr to find
     'MaximumCount', 12);
 
 se = strel('disk',4);
-thresh = [170/255,150/255,190/255];
-mult=[3.1 5.15 3.25]; 
-
+% thresh = [180/255,165/255,190/255];
+% mult=[3.0 5.30 3.15]; 
+thresh = [180/255,160/255,180/255];
+% thresh = [180/255,170/255,220/255];
+mult=[3.0 6.3 3.15]; 
+%mult=[3 15 5.4]; 
 t=[1:totFrames]';
 t=t*1/fps;
+pause(.25)
 for(i=1:totFrames)
     fr=v.readFrame;
     fr=flip(fr,2);
@@ -43,11 +48,14 @@ for(i=1:totFrames)
     end   
     for j=1:numSmarts
         
-        nf = mult(j)*imsubtract(fr(:,:,j), rgb2gray(fr)); % Get color
-        nf=imdilate(nf,se);
-        nf = imbinarize(nf, thresh(j)); % Convert the image into binary with color as white
-        
-        [A,C]=step(hblob, nf); % Get the centroids and bounding boxes of the colored blobs
+        nff = mult(j)*imsubtract(fr(:,:,j), rgb2gray(fr)); % Get color
+%         nf=imdilate(nf,se);
+%         nff=imopen(nff,se);
+        nf = imbinarize(nff, thresh(j)); % Convert the image into binary with color as white
+        [~,C]=step(hblob, nf); % Get the centroids and bounding boxes of the colored blobs
+%         if(i==2083)
+%             pts('hi');
+%         end
         
 %         disp(['areas of ', colormat{j}]);
 %         A
@@ -56,7 +64,7 @@ for(i=1:totFrames)
         C = round(C); % Convert the centroids into Integer for further steps
         
         if(size(C,1)<blobsPerSmart)
-            pts('only found ', size(C,1), ' ',colorMat{j}, ' markers');
+            pts('only found ', size(C,1), ' ',colorMat{j}, ' markers at frame:', i);
             hold off;
             imagesc(fr);
             title('click lost marker');
@@ -100,7 +108,7 @@ for(i=1:totFrames)
          t=toc;
          tic;
          
-         pts('frame: ',i, ' ', t, ' secs');
+         pts('frame: ',i, '/',totFrames,' ', t, ' secs');
      end
         
     if(i==1)
@@ -129,14 +137,15 @@ for(i=1:totFrames)
 end
 %%
 %fix labels
+%save('rawMarkerDat.mat','blobCY','blobCX','movs','calibFactor');
 for(i=1:numSmarts)
     si=(i-1)*blobsPerSmart+1;
     ei=si+blobsPerSmart-1;
-    [blobCX(:,si:ei),blobCY(:,si:ei)]=assignLabels(blobCX(:,si:ei),blobCY(:,si:ei));
+    [blobCX(:,si:ei),blobCY(:,si:ei)]=assignLabels3(blobCX(:,si:ei),blobCY(:,si:ei));
 end
 blobCX=calibFactor*blobCX;
 blobCY=calibFactor*blobCY;
-
+% [ind,x]=max(abs(diff(blobCX(:,4))))
 
 movs=struct;
 movs.t=t;
@@ -145,7 +154,7 @@ movs.y=blobCY;
 movs.fps=fps;
 movs.fname=v.Name;
 
-save('markerDat.mat','blobCY','blobCX','movs','calibFactor');
+save('markerDat2.mat','blobCY','blobCX','movs','calibFactor');
 % end
 % matlab.video.read.UseHardwareAcceleration('off')
 % end

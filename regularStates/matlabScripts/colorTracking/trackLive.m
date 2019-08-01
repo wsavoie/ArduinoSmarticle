@@ -25,12 +25,15 @@ hblob = vision.BlobAnalysis('AreaOutputPort', true, ... % Set blob analysis hand
     'MaximumCount', 12);
 
 se = strel('disk',4);
-thresh = [170/255,170/255,220/255];
-mult=[1.7 3.4 2]; 
+thresh = [180/255,180/255,210/255];
+mult=[2.5 4.3 2.4]; 
 % mult=[1 1 1]; 
 %to find set all to 1 and view uncommented subplots
 %find lower limit of color and 1/num
-
+for(i=1:10)
+fr=snapshot(v);
+pause(.001);
+end
 while(nFrame < 300)
     fr = snapshot(v);
     fr = flip(fr,2);
@@ -44,9 +47,11 @@ while(nFrame < 300)
 % nfr= medfilt2(nfr, [6 6]); % Filter out the noise by using median filter
 
 % nfb= medfilt2(nfb, [6 6]);
-
+figure(1) 
+hold off;
 %put breakpoint on binarize lines when finding mult
 subplot(2,3,1); imshow(nfr);
+hold on;
 subplot(2,3,2); imshow(nfg);
 subplot(2,3,3); imshow(nfb);
 subplot(2,3,4); imshow(nnfr);
@@ -62,15 +67,18 @@ nfb = imbinarize(nnfb, thresh(3));
 [ag,cg, boxG]=step(hblob, nfg);  
 [ab,cb, boxB]=step(hblob, nfb);
 
-minBlobAr=min(min([ar,ag,ab]))/2
+minBlobAr=min(min([ar,ag,ab]))/1.5
 maxBlobAr=max(max([ar,ag,ab]))*1.5
 
 cr = round(cr); % Convert the centroids into Integer for further steps
 cg = round(cg);
 cb = round(cb);
+figure(2);
 
 %     if(PLOTON)
+hold off;
     fr=insertShape(fr,'filledRectangle',boxR,'color','red','opacity',.4);
+    hold on;
     fr=insertShape(fr,'filledRectangle',boxG,'color','green','opacity',.4);
     fr=insertShape(fr,'filledRectangle',boxB,'color','blue','opacity',.4);
 %     imshow(fr,'InitialMagnification','fit');
